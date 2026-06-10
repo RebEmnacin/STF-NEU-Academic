@@ -11,6 +11,12 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
+// ─── Deep-link signal for dashboard → schedule navigation ─────────────────────
+export const scheduleDeepLink: {
+  scheduleTab?: "manage" | "comprehensive";
+  comprehensiveTab?: "major" | "ge" | "panata" | "stf" | "personal" | "institutional";
+} = {};
+
 // ─── Fade-up animation hook ───────────────────────────────────────────────────
 function useFadeUp(delay = 0) {
   const [visible, setVisible] = useState(false);
@@ -84,11 +90,11 @@ export function StudentDashboard() {
   const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
 
   const summaryCards = [
-    { count: 2, period: "today",     category: "Major Subjects",  Icon: BookOpen,   bg: "bg-teal",         link: "schedule" },
-    { count: 3, period: "this week", category: "GE Subjects",     Icon: BookMarked, bg: "bg-teal-light",   link: "schedule" },
-    { count: 2, period: "upcoming",  category: "Panata Duties",   Icon: Users,      bg: "bg-gold",         link: "schedule-full" },
-    { count: 1, period: "practice",  category: "STF Activities",  Icon: Tv2,        bg: "bg-slate-blue",   link: "schedule-full" },
-    { count: 3, period: "this week", category: "Upcoming Events", Icon: Calendar,   bg: "bg-amber-status", link: "schedule-full" },
+    { count: 2, period: "today",     category: "Major Subjects",  Icon: BookOpen,   bg: "bg-teal",         scheduleTab: "comprehensive" as const, comprehensiveTab: "major"       as const },
+    { count: 3, period: "this week", category: "GE Subjects",     Icon: BookMarked, bg: "bg-teal-light",   scheduleTab: "comprehensive" as const, comprehensiveTab: "ge"          as const },
+    { count: 2, period: "upcoming",  category: "Panata Duties",   Icon: Users,      bg: "bg-gold",         scheduleTab: "comprehensive" as const, comprehensiveTab: "panata"      as const },
+    { count: 1, period: "practice",  category: "STF Activities",  Icon: Tv2,        bg: "bg-slate-blue",   scheduleTab: "comprehensive" as const, comprehensiveTab: "stf"         as const },
+    { count: 3, period: "this week", category: "Upcoming Events", Icon: Calendar,   bg: "bg-amber-status", scheduleTab: "comprehensive" as const, comprehensiveTab: "institutional" as const },
   ];
 
   return (
@@ -108,7 +114,11 @@ export function StudentDashboard() {
         {summaryCards.map((c, i) => (
           <FadeUp key={c.category} delay={i * 60}>
             <button
-              onClick={() => setView(c.link)}
+              onClick={() => {
+                scheduleDeepLink.scheduleTab = c.scheduleTab;
+                scheduleDeepLink.comprehensiveTab = c.comprehensiveTab;
+                setView("schedule");
+              }}
               className={`${c.bg} rounded-xl px-4 py-3 flex items-center gap-3 w-full text-left hover:opacity-90 active:scale-95 transition-all`}
               style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}
             >
@@ -263,7 +273,7 @@ export function DayDrawer() {
                             {block.label}
                             {block.locked && <Lock className="w-3.5 h-3.5 text-teal" />}
                           </span>
-                          <button onClick={() => { setDrawerDay(null); setView("schedule-full"); }}
+                          <button onClick={() => { setDrawerDay(null); setView("schedule"); }}
                             className="flex items-center gap-1 text-xs text-teal font-semibold hover:underline shrink-0">
                             <ExternalLink className="w-3 h-3" /> View
                           </button>
@@ -305,7 +315,7 @@ export function DayDrawer() {
                       <span className={`chip text-xs ${b.locked ? "bg-teal text-white" : "bg-gold text-teal-dark"}`}>
                         {b.locked ? "System" : "Manual"}
                       </span>
-                      <button onClick={() => { setDrawerDay(null); setView("schedule-full"); }}
+                      <button onClick={() => { setDrawerDay(null); setView("schedule"); }}
                         className="text-xs text-teal font-semibold hover:underline flex items-center gap-1">
                         <ExternalLink className="w-3 h-3" /> Comprehensive
                       </button>
@@ -349,6 +359,11 @@ export function ScheduleView() {
   const longPressTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
   const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [form, setForm] = useState({ title:"", day:1, start:"08:00", end:"09:30", type:"major", color:"#1B6B8F", location:"" });
+  const [scheduleTab, setScheduleTab] = useState<"manage"|"comprehensive">(() => {
+    const t = scheduleDeepLink.scheduleTab ?? "manage";
+    scheduleDeepLink.scheduleTab = undefined;
+    return t;
+  });
 
   const year  = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -482,6 +497,24 @@ export function ScheduleView() {
   return (
     <div className="p-7">
       <FadeUp>
+        {/* Sub-tabs */}
+        <div className="flex gap-0 border-b border-border mb-6 overflow-x-auto">
+          {([
+            { id:"manage" as const, label:"Schedule" },
+            { id:"comprehensive" as const, label:"Comprehensive View" },
+          ]).map(t => (
+            <button key={t.id} onClick={() => setScheduleTab(t.id)}
+              className={`px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                scheduleTab === t.id ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+              }`}>{t.label}</button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {scheduleTab === "comprehensive" && <ScheduleViewComprehensive />}
+
+      {scheduleTab === "manage" && (<>
+      <FadeUp>
         <div className="flex items-center justify-between mb-5">
           <div>
             <h1 className="font-serif text-3xl font-bold text-teal-dark">Schedule Management</h1>
@@ -576,6 +609,7 @@ export function ScheduleView() {
           </div>
         </div>
       )}
+      </>)}
     </div>
   );
 }
@@ -793,7 +827,11 @@ function ScheduleTable({ rows, showSourceType=true, showCode=true, onDelete }: {
 }
 
 export function ScheduleViewComprehensive() {
-  const [tab, setTab] = useState<TabId>("major");
+  const [tab, setTab] = useState<TabId>(() => {
+    const t = scheduleDeepLink.comprehensiveTab ?? "major";
+    scheduleDeepLink.comprehensiveTab = undefined;
+    return t;
+  });
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [panataView, setPanataView] = useState<PanataCategory|null>(null);
@@ -878,10 +916,10 @@ export function ScheduleViewComprehensive() {
   }
 
   return (
-    <div className="p-7 max-w-6xl">
+    <div className="max-w-6xl">
       <FadeUp>
         <div className="mb-2">
-          <h1 className="font-serif text-3xl font-bold text-teal-dark">Comprehensive Schedule View</h1>
+          <h1 className="font-serif text-3xl font-bold text-teal-dark">Schedule Management</h1>
           <p className="text-sm text-muted-text mt-1">Date updated: November 2, 2023</p>
         </div>
         <div className="flex gap-0 border-b border-border mb-6 mt-5 overflow-x-auto">
@@ -2211,7 +2249,7 @@ export function SettingsView() {
   );
 
   return (
-    <div className="p-7 max-w-2xl">
+    <div className="p-7">
       <FadeUp>
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -2229,7 +2267,9 @@ export function SettingsView() {
         </div>
       </FadeUp>
 
-      <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-5 items-start">
+        {/* LEFT COLUMN */}
+        <div className="space-y-5">
         {/* Main toggle settings — boss reference style */}
         <FadeUp delay={40}>
           <div className="bg-card border border-border rounded-2xl px-6 py-2" style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
@@ -2336,6 +2376,11 @@ export function SettingsView() {
           </div>
         </FadeUp>
 
+        </div>{/* END LEFT COLUMN */}
+
+        {/* RIGHT COLUMN */}
+        <div className="space-y-5">
+
         {/* Calendar */}
         <FadeUp delay={140}>
           <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
@@ -2435,7 +2480,9 @@ export function SettingsView() {
           </div>
         </FadeUp>
 
-      </div>
+        </div>{/* END RIGHT COLUMN */}
+
+      </div>{/* END GRID */}
     </div>
   );
 }
