@@ -6,7 +6,7 @@ import {
   Home, School, Clock, MapPin,
   CheckCircle2, FileText, MessageCircle, Send,
   Bell, Shield, Eye, EyeOff, Save, Sun, Moon, Monitor,
-  Mail, Hash, Star, AlertCircle, Info, CheckCircle, XCircle,
+  Mail, Hash, Star, AlertCircle, AlertTriangle, Info, CheckCircle, XCircle,
   UserCircle, Building2, Activity
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -14,7 +14,7 @@ import { useState, useEffect, useRef } from "react";
 // ─── Deep-link signal for dashboard → schedule navigation ─────────────────────
 export const scheduleDeepLink: {
   scheduleTab?: "manage" | "comprehensive";
-  comprehensiveTab?: "major" | "ge" | "panata" | "stf" | "personal" | "institutional";
+  comprehensiveTab?: "all" | "major" | "ge" | "panata" | "stf" | "personal" | "institutional";
 } = {};
 
 // ─── Fade-up animation hook ───────────────────────────────────────────────────
@@ -333,7 +333,9 @@ export function DayDrawer() {
 
 // ─── Schedule Management ──────────────────────────────────────────────────────
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 6);
-const BLOCK_COLORS = ["#1B6B8F","#4A8FA8","#F5C518","#2ECC71","#9B59B6","#E74C3C","#F39C12","#5A6C7D"];
+const BLOCK_TYPE_COLORS: Record<string, string> = {
+  major: "#1B6B8F", ge: "#4A8FA8", duty: "#F5C518", personal: "#9B59B6", church: "#F5C518", team: "#5A6C7D",
+};
 const BLOCK_TYPES  = ["major","ge","duty","personal","church","team"];
 type Block = { id: number; title: string; day: number; start: string; end: string; type: string; color: string; location: string };
 
@@ -358,7 +360,8 @@ export function ScheduleView() {
   const [longPressId, setLongPressId] = useState<number|null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
   const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const [form, setForm] = useState({ title:"", day:1, start:"08:00", end:"09:30", type:"major", color:"#1B6B8F", location:"" });
+  const [form, setForm] = useState({ title:"", day:1, start:"08:00", end:"09:30", type:"major", color:BLOCK_TYPE_COLORS.major, location:"", recurrence:"One-time", notes:"" });
+  const [showRequest, setShowRequest] = useState(false);
   const [scheduleTab, setScheduleTab] = useState<"manage"|"comprehensive">(() => {
     const t = scheduleDeepLink.scheduleTab ?? "manage";
     scheduleDeepLink.scheduleTab = undefined;
@@ -383,9 +386,10 @@ export function ScheduleView() {
 
   const addBlock = () => {
     if (!form.title) return;
-    setBlocks(b => [...b, { ...form, id: Date.now() }]);
+    const color = BLOCK_TYPE_COLORS[form.type] ?? BLOCK_TYPE_COLORS.major;
+    setBlocks(b => [...b, { ...form, color, id: Date.now() }]);
     setOpen(false);
-    setForm({ title:"", day:1, start:"08:00", end:"09:30", type:"major", color:"#1B6B8F", location:"" });
+    setForm({ title:"", day:1, start:"08:00", end:"09:30", type:"major", color:BLOCK_TYPE_COLORS.major, location:"", recurrence:"One-time", notes:"" });
   };
 
   const WeekView = () => (
@@ -535,6 +539,10 @@ export function ScheduleView() {
               className="text-sm font-semibold text-teal border border-teal/40 px-4 py-2 rounded-xl hover:bg-teal hover:text-white transition">
               Today
             </button>
+            <button onClick={()=>setShowRequest(true)}
+              className="flex items-center gap-2 border border-amber-status/50 text-amber-status px-4 py-2 rounded-xl text-sm font-semibold hover:bg-amber-status/10 transition">
+              <AlertTriangle className="w-4 h-4" /> Request Change
+            </button>
             <button onClick={()=>setOpen(true)}
               className="flex items-center gap-2 bg-teal text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-teal-dark transition">
               <Plus className="w-4 h-4" /> Add Block
@@ -580,27 +588,23 @@ export function ScheduleView() {
                 <select value={form.day} onChange={e=>setForm(f=>({...f,day:Number(e.target.value)}))} className="border border-border rounded-xl px-4 py-2.5 text-sm bg-background">
                   {["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].map((d,i)=><option key={d} value={i}>{d}</option>)}
                 </select>
-                <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} className="border border-border rounded-xl px-4 py-2.5 text-sm bg-background">
+                <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value,color:BLOCK_TYPE_COLORS[e.target.value]??BLOCK_TYPE_COLORS.major}))} className="border border-border rounded-xl px-4 py-2.5 text-sm bg-background">
                   {BLOCK_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
+              <select value={form.recurrence} onChange={e=>setForm(f=>({...f,recurrence:e.target.value}))} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background">
+                <option>One-time</option><option>Weekly</option><option>Bi-weekly</option>
+              </select>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="text-xs text-muted-text mb-1 block font-medium">Start</label>
                   <input type="time" value={form.start} onChange={e=>setForm(f=>({...f,start:e.target.value}))} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background"/></div>
                 <div><label className="text-xs text-muted-text mb-1 block font-medium">End</label>
                   <input type="time" value={form.end} onChange={e=>setForm(f=>({...f,end:e.target.value}))} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background"/></div>
               </div>
-              <input placeholder="Location (optional)" value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))}
+              <input placeholder="Venue (optional)" value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))}
                 className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background"/>
-              <div>
-                <div className="text-xs text-muted-text mb-2 font-medium">Color</div>
-                <div className="flex gap-2 flex-wrap">
-                  {BLOCK_COLORS.map(c=>(
-                    <button key={c} onClick={()=>setForm(f=>({...f,color:c}))} className="w-8 h-8 rounded-full transition-transform hover:scale-110"
-                      style={{background:c, outline:form.color===c?"3px solid #0D4A6B":"2px solid transparent", outlineOffset:"2px"}}/>
-                  ))}
-                </div>
-              </div>
+              <textarea placeholder="Notes (optional)" value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} rows={2}
+                className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background resize-none"/>
               <button onClick={addBlock} disabled={!form.title}
                 className="w-full bg-teal text-white py-3 rounded-xl font-bold text-sm hover:bg-teal-dark transition disabled:opacity-50">
                 Save Block
@@ -609,6 +613,7 @@ export function ScheduleView() {
           </div>
         </div>
       )}
+      {showRequest && <RequestScheduleChangeModal onClose={()=>setShowRequest(false)}/>}
       </>)}
     </div>
   );
@@ -617,8 +622,8 @@ export function ScheduleView() {
 export function ScheduleModal() { return null; }
 
 // ─── Comprehensive Schedule View ──────────────────────────────────────────────
-type ScheduleEntry = { day: string; timeSlot: string; label: string; venue: string; sourceType: string; editable?: boolean };
-type TabId = "major"|"ge"|"panata"|"stf"|"personal"|"institutional";
+type ScheduleEntry = { day: string; timeSlot: string; label: string; venue: string; sourceType: string; editable?: boolean; category?: string };
+type TabId = "all"|"major"|"ge"|"panata"|"stf"|"personal"|"institutional";
 type PanataCategory = "lokal"|"stf"|"pulong";
 const PAGE_SIZE = 7;
 
@@ -699,41 +704,151 @@ const panataTableEntries: Record<PanataCategory, { day:string; timeSlot:string; 
   ],
 };
 
-type AddScheduleForm = { day:string; timeSlot:string; label:string; venue:string };
+type AddScheduleForm = { day:string; timeSlot:string; label:string; venue:string; category?:string; recurrence?:string; notes?:string };
 const DAYS_OF_WEEK = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 
-function AddScheduleModal({ onClose, onSave }: { onClose:()=>void; onSave:(e:AddScheduleForm)=>void }) {
-  const [form, setForm] = useState<AddScheduleForm>({day:"MON",timeSlot:"08:00–09:00",label:"",venue:""});
-  const valid = form.label.trim() && form.venue.trim();
+function getCombinedScheduleRows(extraRows: Record<string, ScheduleEntry[]>): ScheduleEntry[] {
+  const cats: { key: string; label: string }[] = [
+    { key: "major", label: "Major" }, { key: "ge", label: "GE" }, { key: "panata", label: "Panata" },
+    { key: "stf", label: "STF Team" }, { key: "personal", label: "Personal" }, { key: "institutional", label: "Event" },
+  ];
+  return cats.flatMap(({ key, label }) =>
+    [...(allScheduleEntries[key] ?? []), ...(extraRows[key] ?? [])].map(r => ({ ...r, category: label }))
+  );
+}
+
+function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
+  const [context, setContext] = useState<"Team" | "Panata Group" | "GE Subject Group">("GE Subject Group");
+  const actions = context === "Team" ? ["Join"] : context === "Panata Group" ? ["Switch"] : ["Switch", "Drop"];
+  const [action, setAction] = useState(actions[0]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-card rounded-2xl border border-border p-7 w-[460px] shadow-2xl" onClick={e=>e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="font-serif font-bold text-teal-dark text-xl">Add Schedule</h2>
-          <button onClick={onClose} className="hover:bg-secondary rounded-lg p-1.5"><X className="w-5 h-5"/></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="bg-card rounded-2xl border border-border w-full max-w-lg shadow-2xl overflow-hidden" onClick={e=>e.stopPropagation()}>
+        <div className="bg-teal-dark text-white px-6 py-4">
+          <h2 className="font-serif font-bold text-xl">Request Schedule Change</h2>
+          <p className="text-xs text-white/70 mt-1">Routed to admin approvers · Expires mid-midterms</p>
         </div>
-        <div className="space-y-3.5">
+        <div className="p-6 space-y-3.5">
+          <div className="bg-amber-status/10 border border-amber-status/30 rounded-xl px-4 py-2.5 text-xs">
+            Request window closes <strong>Oct 14, 2025</strong> (middle of midterms). Late submissions are auto-rejected.
+          </div>
           <div>
-            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Day</label>
-            <select value={form.day} onChange={e=>setForm(f=>({...f,day:e.target.value}))}
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">1 — Context (required)</label>
+            <select value={context} onChange={e=>{const v=e.target.value as typeof context;setContext(v);setAction(v==="Team"?"Join":"Switch");}}
               className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
-              {DAYS_OF_WEEK.map(d=><option key={d}>{d}</option>)}
+              <option>GE Subject Group</option><option>Panata Group</option><option>Team</option>
             </select>
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Time Slot</label>
-            <input value={form.timeSlot} onChange={e=>setForm(f=>({...f,timeSlot:e.target.value}))} placeholder="e.g. 08:00–10:00"
-              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">2 — Action (required)</label>
+            <select value={action} onChange={e=>setAction(e.target.value)} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
+              {actions.map(a=><option key={a}>{a}</option>)}
+            </select>
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Schedule Label *</label>
-            <input value={form.label} onChange={e=>setForm(f=>({...f,label:e.target.value}))} placeholder="e.g. Advanced Statistics"
-              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">3 — Target</label>
+            <input placeholder={context==="Team"?"e.g. Writers Team":context==="Panata Group"?"e.g. CICS4":"e.g. Sosyedad at Literatura — IS234A"}
+              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none"/>
+          </div>
+          {context==="GE Subject Group"&&action==="Switch"&&(
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Current Group</label>
+              <input placeholder="e.g. Sosyedad at Literatura — IS233B" className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none"/>
+            </div>
+          )}
+          <div>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Reason (required)</label>
+            <textarea placeholder="Explain the schedule conflict and why this change is necessary." rows={3}
+              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none resize-none"/>
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Venue *</label>
-            <input value={form.venue} onChange={e=>setForm(f=>({...f,venue:e.target.value}))} placeholder="e.g. M415 A"
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Attach evidence (optional)</label>
+            <input type="file" className="w-full text-sm border border-border rounded-xl px-4 py-2 bg-background"/>
+          </div>
+          <div className="flex gap-3 pt-1">
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-secondary transition">Cancel</button>
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-teal-dark text-white text-sm font-semibold hover:bg-teal transition">Submit Request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AddScheduleModal({ onClose, onSave, majorOnly = false }: { onClose:()=>void; onSave:(e:AddScheduleForm)=>void; majorOnly?: boolean }) {
+  const [form, setForm] = useState<AddScheduleForm>({day:"MON",timeSlot:"08:00–09:00",label:"",venue:"",category:majorOnly?"Major Subject":"Personal",recurrence:"One-time",notes:""});
+  const [conflict, setConflict] = useState(false);
+  const valid = form.label.trim();
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-card rounded-2xl border border-border p-7 w-[480px] max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e=>e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-5">
+          <div>
+            <h2 className="font-serif font-bold text-teal-dark text-xl">{majorOnly ? "Add Major Subject Schedule" : "Add Personal Schedule"}</h2>
+            <p className="text-xs text-muted-text mt-0.5">Conflicts with locked sessions will be flagged automatically.</p>
+          </div>
+          <button onClick={onClose} className="hover:bg-secondary rounded-lg p-1.5"><X className="w-5 h-5"/></button>
+        </div>
+        <div className="space-y-3.5">
+          {conflict && (
+            <div className="bg-amber-status/10 border border-amber-status/30 rounded-xl px-4 py-2.5 text-xs">
+              Potential conflict: OOP Lab (Thu 10:00–13:00). Save anyway or adjust time.
+            </div>
+          )}
+          <div>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Title</label>
+            <input value={form.label} onChange={e=>setForm(f=>({...f,label:e.target.value}))} placeholder={majorOnly?"e.g. OOP Lecture":"e.g. Thesis Reading"}
               className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Category</label>
+              <select value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
+                {majorOnly
+                  ? <><option>Major Subject</option><option>Major Lab</option></>
+                  : <><option>Personal</option><option>Group Study</option><option>Devotion</option><option>Errand</option></>}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Recurrence</label>
+              <select value={form.recurrence} onChange={e=>setForm(f=>({...f,recurrence:e.target.value}))} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
+                <option>One-time</option><option>Weekly</option><option>Bi-weekly</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Venue (optional)</label>
+            <input value={form.venue} onChange={e=>setForm(f=>({...f,venue:e.target.value}))} placeholder="Leave blank if not applicable"
+              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Day</label>
+              <select value={form.day} onChange={e=>setForm(f=>({...f,day:e.target.value}))}
+                className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
+                {DAYS_OF_WEEK.map(d=><option key={d}>{d}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Start</label>
+              <input type="time" defaultValue="10:30" onFocus={()=>setConflict(true)}
+                className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none"/>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">End</label>
+              <input type="time" defaultValue="12:00" className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none"/>
+            </div>
+          </div>
+          {majorOnly && (
+            <div className="bg-teal-soft/60 border border-teal/20 rounded-xl px-4 py-2.5 text-xs text-muted-text">
+              Majors are student-input because the system does not yet integrate the COM master schedule. Your monitor may flag inconsistencies.
+            </div>
+          )}
+          <div>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Notes</label>
+            <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="Optional notes" rows={2}
+              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none resize-none"/>
           </div>
           <div className="flex gap-3 pt-1">
             <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-secondary transition">Cancel</button>
@@ -828,7 +943,7 @@ function ScheduleTable({ rows, showSourceType=true, showCode=true, onDelete }: {
 
 export function ScheduleViewComprehensive() {
   const [tab, setTab] = useState<TabId>(() => {
-    const t = scheduleDeepLink.comprehensiveTab ?? "major";
+    const t = scheduleDeepLink.comprehensiveTab ?? "all";
     scheduleDeepLink.comprehensiveTab = undefined;
     return t;
   });
@@ -836,24 +951,33 @@ export function ScheduleViewComprehensive() {
   const [page, setPage] = useState(1);
   const [panataView, setPanataView] = useState<PanataCategory|null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showRequest, setShowRequest] = useState(false);
   const [extraRows, setExtraRows] = useState<Record<string,ScheduleEntry[]>>({
     major:[],ge:[],panata:[],stf:[],personal:[],institutional:[],lokal:[],stfPanata:[],pulong:[],
   });
 
   const handleSave = (form: AddScheduleForm) => {
-    const key = panataView ? (panataView==="stf"?"stfPanata":panataView) : tab;
+    const key = panataView ? (panataView==="stf"?"stfPanata":panataView) : (tab === "all" ? "personal" : tab);
     setExtraRows(prev => ({...prev,[key]:[...(prev[key]||[]),{...form,sourceType:"Manual (PERSONAL)",editable:true}]}));
     setShowModal(false);
   };
 
   const tabs: {id:TabId;label:string}[] = [
+    {id:"all",label:"All"},
     {id:"major",label:"Major Subjects"},{id:"ge",label:"GE / Minor Subjects"},
     {id:"panata",label:"Panata Groups"},{id:"stf",label:"STF Teams"},
     {id:"personal",label:"Personal Responsibilities"},{id:"institutional",label:"Institutional Events"},
   ];
 
-  const baseRows = tab!=="panata" ? allScheduleEntries[tab] : [];
-  const allRows  = [...baseRows,...(extraRows[tab]||[])];
+  const allowCreate = tab === "all" || tab === "major" || tab === "personal";
+  const majorOnlyModal = tab === "major";
+
+  const baseRows = tab === "all"
+    ? getCombinedScheduleRows(extraRows)
+    : tab !== "panata" && tab !== "all"
+      ? (allScheduleEntries[tab] ?? [])
+      : [];
+  const allRows  = tab === "all" ? baseRows : [...baseRows, ...(extraRows[tab] || [])];
   const filtered = allRows.filter(r =>
     r.label.toLowerCase().includes(search.toLowerCase())||
     r.venue.toLowerCase().includes(search.toLowerCase())||
@@ -918,9 +1042,23 @@ export function ScheduleViewComprehensive() {
   return (
     <div className="max-w-6xl">
       <FadeUp>
-        <div className="mb-2">
-          <h1 className="font-serif text-3xl font-bold text-teal-dark">Schedule Management</h1>
-          <p className="text-sm text-muted-text mt-1">Date updated: November 2, 2023</p>
+        <div className="mb-2 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Comprehensive Schedule Management</h1>
+            <p className="text-sm text-muted-text mt-1">GE, Panata, STF and Events are managed by monitors. Majors and personal items are editable.</p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button onClick={()=>setShowRequest(true)}
+              className="flex items-center gap-2 border border-amber-status/50 text-amber-status px-4 py-2 rounded-xl text-sm font-semibold hover:bg-amber-status/10 transition">
+              <AlertTriangle className="w-4 h-4"/> Request Change
+            </button>
+            {allowCreate && (
+              <button onClick={()=>setShowModal(true)}
+                className="flex items-center gap-2 bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-teal transition-colors">
+                <Plus className="w-4 h-4"/> Add {tab === "major" ? "Major" : "Personal"} Schedule
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex gap-0 border-b border-border mb-6 mt-5 overflow-x-auto">
           {tabs.map(t=>(
@@ -931,6 +1069,14 @@ export function ScheduleViewComprehensive() {
           ))}
         </div>
       </FadeUp>
+
+      {tab !== "panata" && !allowCreate && (
+        <FadeUp delay={40}>
+          <div className="mb-4 bg-teal-soft/40 border border-teal/20 rounded-xl px-4 py-2.5 text-xs text-muted-text">
+            Add-schedule is disabled for this tab. Use <strong className="text-teal-dark">Request Change</strong> for switch/drop/join requests.
+          </div>
+        </FadeUp>
+      )}
 
       {tab==="panata" && (<>
         {!panataView && (
@@ -990,17 +1136,14 @@ export function ScheduleViewComprehensive() {
               <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Search schedules..."
                 className="w-full pl-10 pr-4 py-2.5 text-sm border border-border rounded-xl bg-card focus:outline-none focus:ring-2 focus:ring-teal/30"/>
             </div>
-            <button onClick={()=>setShowModal(true)}
-              className="flex items-center gap-2 bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-teal transition-colors">
-              <Plus className="w-4 h-4"/> Add Schedule
-            </button>
           </div>
           <ScheduleTable rows={pageRows} showSourceType onDelete={handleDeleteMain} showCode={tab==="major"||tab==="ge"}/>
           <Pagination total={totalPages} cur={page} set={setPage}/>
         </FadeUp>
       )}
 
-      {showModal && <AddScheduleModal onClose={()=>setShowModal(false)} onSave={handleSave}/>}
+      {showModal && <AddScheduleModal majorOnly={majorOnlyModal} onClose={()=>setShowModal(false)} onSave={handleSave}/>}
+      {showRequest && <RequestScheduleChangeModal onClose={()=>setShowRequest(false)}/>}
     </div>
   );
 }
@@ -1430,6 +1573,8 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
   const [activeCategory, setActiveCategory] = useState<"ALL"|"TEAM"|"PANATA"|"GE SUBJECT GROUP"|"INSTITUTIONAL">("ALL");
   const [annPage, setAnnPage] = useState(0);
   const [evtPage, setEvtPage] = useState(0);
+  const [openAnn, setOpenAnn] = useState<number | null>(null);
+  const [followUpText, setFollowUpText] = useState("");
 
   const anns = [
     {
@@ -1505,8 +1650,14 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
   };
 
   const filtered = activeCategory === "ALL" ? anns : anns.filter(a => a.category === activeCategory);
-  const annTotalPages = Math.max(1, Math.ceil(filtered.length / ANN_PER_PAGE));
-  const pageAnns = filtered.slice(annPage * ANN_PER_PAGE, (annPage + 1) * ANN_PER_PAGE);
+  const sortedAnns = [...filtered].sort((a, b) => {
+    const urgOrder = { URGENT: 3, HIGH: 2 };
+    const ua = a.urgency ? urgOrder[a.urgency as keyof typeof urgOrder] ?? 0 : 0;
+    const ub = b.urgency ? urgOrder[b.urgency as keyof typeof urgOrder] ?? 0 : 0;
+    return ub - ua || b.date.localeCompare(a.date);
+  });
+  const annTotalPages = Math.max(1, Math.ceil(sortedAnns.length / ANN_PER_PAGE));
+  const pageAnns = sortedAnns.slice(annPage * ANN_PER_PAGE, (annPage + 1) * ANN_PER_PAGE);
   const evtTotalPages = Math.max(1, Math.ceil(upcomingEvents.length / EVT_PER_PAGE));
   const pageEvts = upcomingEvents.slice(evtPage * EVT_PER_PAGE, (evtPage + 1) * EVT_PER_PAGE);
 
@@ -1549,12 +1700,13 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-serif font-bold text-teal-dark text-lg">Latest Announcements</h2>
-            <span className="text-xs text-muted-text font-medium">{filtered.length} total</span>
+            <span className="text-xs text-muted-text font-medium">{sortedAnns.length} total</span>
           </div>
           <div className="space-y-3">
             {pageAnns.map((a, i) => (
               <FadeUp key={i} delay={i * 60}>
-                <div className={`bg-card border rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow ${
+                <button type="button" onClick={() => setOpenAnn(i)}
+                  className={`w-full text-left bg-card border rounded-xl p-5 cursor-pointer hover:shadow-md hover:border-teal/40 transition-shadow ${
                   a.urgency === "URGENT" ? "border-l-4 border-red-status border-r border-t border-b" : "border-border"
                 }`}>
                   <div className="flex items-start gap-2 mb-2 flex-wrap">
@@ -1571,8 +1723,9 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
                   <p className="text-sm text-muted-text leading-relaxed line-clamp-2 mb-3">{a.content}</p>
                   <p className="text-xs text-muted-text">
                     Posted by: <strong>{a.author}</strong> · {a.date} · Target: <strong>{a.scope}</strong>
+                    <span className="ml-2 font-semibold text-teal-dark">View →</span>
                   </p>
-                </div>
+                </button>
               </FadeUp>
             ))}
             {pageAnns.length === 0 && (
@@ -1642,6 +1795,58 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
           </div>
         </div>
       </div>
+
+      {openAnn !== null && pageAnns[openAnn] && (
+        <div onClick={() => setOpenAnn(null)} className="fixed inset-0 bg-black/50 z-50 grid place-items-center p-4">
+          <div onClick={e => e.stopPropagation()} className="bg-card rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className={`px-6 py-4 shrink-0 ${pageAnns[openAnn].urgency === "URGENT" ? "bg-red-status text-white" : pageAnns[openAnn].urgency === "HIGH" ? "bg-amber-status text-white" : "bg-teal-dark text-white"}`}>
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/20">{pageAnns[openAnn].category}</span>
+                {pageAnns[openAnn].urgency && <span className="text-[10px] font-bold tracking-wider">{pageAnns[openAnn].urgency}</span>}
+              </div>
+              <h2 className="font-serif text-xl font-bold">{pageAnns[openAnn].title}</h2>
+            </div>
+            <div className="p-6 space-y-4 overflow-y-auto flex-1">
+              <p className="text-sm text-foreground leading-relaxed">{pageAnns[openAnn].content}</p>
+              <div className="border-t border-border pt-4 text-xs text-muted-text grid grid-cols-2 gap-2">
+                <div><span className="font-bold text-foreground">Posted by:</span> {pageAnns[openAnn].author}</div>
+                <div><span className="font-bold text-foreground">Date:</span> {pageAnns[openAnn].date}</div>
+                <div className="col-span-2"><span className="font-bold text-foreground">Target audience:</span> {pageAnns[openAnn].scope}</div>
+              </div>
+              <div className="border-t border-border pt-4">
+                <div className="mb-3 text-xs font-bold uppercase tracking-wider text-teal-dark">Clarifications & Follow-ups</div>
+                <div className="space-y-3">
+                  {[
+                    { name: "Maria Santos", role: "Student", time: "2h ago", msg: "Will attendance still be counted if I arrive at 3:10 PM?", admin: false },
+                    { name: "Jofrell Garcia", role: "Coordinator", time: "1h ago", msg: "Yes, late attendance is counted up to 3:15. After that it's marked Excused only with valid reason.", admin: true },
+                    { name: "Juan Dela Cruz", role: "Student", time: "32m ago", msg: "Salamat sa clarification kapatid!", admin: false },
+                  ].map((m, k) => (
+                    <div key={k} className={`rounded-xl border p-3 text-sm ${m.admin ? "border-teal/40 bg-teal-soft/30" : "border-border bg-secondary/30"}`}>
+                      <div className="mb-1 flex items-center gap-2 text-xs">
+                        <span className="font-semibold">{m.name}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${m.admin ? "bg-teal text-white" : "bg-muted text-foreground"}`}>{m.role}</span>
+                        <span className="text-muted-text">· {m.time}</span>
+                      </div>
+                      <div className="text-foreground">{m.msg}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <input value={followUpText} onChange={e => setFollowUpText(e.target.value)} placeholder="Ask a question or follow up…"
+                    className="flex-1 border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+                  <button onClick={() => setFollowUpText("")} className="px-4 py-2.5 bg-teal text-white rounded-xl text-sm font-semibold hover:bg-teal-dark transition">
+                    <Send className="w-4 h-4"/>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-border shrink-0">
+              <button onClick={() => setOpenAnn(null)} className="px-4 py-2 text-sm border border-border rounded-xl hover:bg-secondary">Close</button>
+              <button onClick={() => setOpenAnn(null)} className="px-4 py-2 text-sm bg-teal text-white rounded-xl hover:bg-teal-dark">Mark as Read</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1838,13 +2043,100 @@ function RadarChart() {
 }
 
 // ─── Profile View — redesigned to match boss reference ───────────────────────
+type ResponsibilityCard = {
+  id: string; scope: "Team" | "Panata" | "GE"; title: string; role: string;
+  attendance: number; events: number; tasks: number;
+};
+
+const STUDENT_RESPONSIBILITIES: ResponsibilityCard[] = [
+  { id: "s1", scope: "Team", title: "Video Team 104", role: "Member", attendance: 87, events: 12, tasks: 8 },
+  { id: "s2", scope: "Panata", title: "CICS2 Panata", role: "Prayer Leader", attendance: 94, events: 6, tasks: 4 },
+  { id: "s3", scope: "GE", title: "Sosyedad at Literatura — IS233B", role: "Student", attendance: 91, events: 3, tasks: 5 },
+];
+
+const LEADER_RESPONSIBILITIES: ResponsibilityCard[] = [
+  { id: "l1", scope: "Team", title: "Video Team 104", role: "Team Leader", attendance: 89, events: 24, tasks: 18 },
+  { id: "l2", scope: "Panata", title: "CICS2 Panata", role: "Monitor", attendance: 93, events: 8, tasks: 6 },
+  { id: "l3", scope: "GE", title: "GE 101 — Section A", role: "GE Monitor", attendance: 84, events: 5, tasks: 12 },
+];
+
+const MASTERLIST_MEMBERS = [
+  { name: "Natalie Portman", id: "STF-2022-0101", course: "BS Nursing", year: "3", attendance: 95 },
+  { name: "Alex Ammin", id: "STF-2022-0102", course: "BS IT", year: "2", attendance: 87 },
+  { name: "Maria Santos", id: "STF-2023-0103", course: "BA Communication", year: "1", attendance: 76 },
+  { name: "Ben Affleck", id: "STF-2021-0088", course: "BS Civil Eng", year: "4", attendance: 91 },
+];
+
+function ResponsibilityMasterlistModal({ card, onClose }: { card: ResponsibilityCard; onClose: () => void }) {
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "attendance">("name");
+  const rows = MASTERLIST_MEMBERS
+    .filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.id.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => sortBy === "name" ? a.name.localeCompare(b.name) : b.attendance - a.attendance);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="bg-card rounded-2xl border border-border w-full max-w-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="px-6 py-4 bg-teal-dark text-white">
+          <h2 className="font-serif font-bold text-lg">{card.title}</h2>
+          <p className="text-xs text-white/70 mt-0.5">{card.scope} · {card.role} · Masterlist</p>
+        </div>
+        <div className="p-4 border-b border-border flex gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-text"/>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search members…"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-xl bg-background outline-none"/>
+          </div>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as typeof sortBy)}
+            className="px-3 py-2 text-sm border border-border rounded-xl bg-background">
+            <option value="name">Sort: Name</option>
+            <option value="attendance">Sort: Attendance</option>
+          </select>
+        </div>
+        <div className="overflow-y-auto flex-1">
+          <table className="w-full text-sm">
+            <thead className="bg-secondary/50 text-xs uppercase sticky top-0">
+              <tr>{["Name", "Student ID", "Course", "Year", "Attendance"].map(h => (
+                <th key={h} className="px-4 py-2 text-left font-semibold text-muted-text">{h}</th>
+              ))}</tr>
+            </thead>
+            <tbody>
+              {rows.map((m, i) => (
+                <tr key={m.id} className={`border-b border-border ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"}`}>
+                  <td className="px-4 py-2.5 font-semibold">{m.name}</td>
+                  <td className="px-4 py-2.5 font-mono text-xs text-muted-text">{m.id}</td>
+                  <td className="px-4 py-2.5 text-xs">{m.course}</td>
+                  <td className="px-4 py-2.5 text-xs">{m.year}</td>
+                  <td className="px-4 py-2.5"><span className={`text-xs font-bold px-2 py-0.5 rounded-full ${m.attendance >= 85 ? "bg-green-status/15 text-green-700" : "bg-amber-status/15 text-amber-700"}`}>{m.attendance}%</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-6 py-4 border-t border-border flex justify-end gap-2">
+          <button className="px-4 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white">Export CSV</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm bg-teal text-white rounded-xl font-semibold hover:bg-teal-dark">Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ProfileView() {
+  const { role } = usePortal();
   const [profileTab, setProfileTab] = useState<"overview"|"academic"|"membership"|"preferences"|"responsibilities">("overview");
   const [editMode, setEditMode] = useState(false);
   const [telegramHandle, setTelegramHandle] = useState("@reb_emnacin");
   const [tempTelegram, setTempTelegram] = useState(telegramHandle);
   const [saved, setSaved] = useState(false);
   const [prefNote, setPrefNote] = useState("Open to switching to DGA full-time if needed for upcoming animation projects.");
+  const [respSort, setRespSort] = useState<"All" | "Team" | "Panata" | "GE">("All");
+  const [openMaster, setOpenMaster] = useState<ResponsibilityCard | null>(null);
+
+  const responsibilityData = role === "leader" || role === "ge-monitor" || role === "panata-monitor" || role === "admin" || role === "superadmin"
+    ? LEADER_RESPONSIBILITIES
+    : STUDENT_RESPONSIBILITIES;
+  const filteredResp = respSort === "All" ? responsibilityData : responsibilityData.filter(r => r.scope === respSort);
 
   const handleSave = () => {
     setTelegramHandle(tempTelegram);
@@ -2141,20 +2433,37 @@ export function ProfileView() {
 
               {/* Responsibilities Tab */}
               {profileTab === "responsibilities" && (
-                <div className="space-y-3">
-                  {[
-                    {type:"STF TEAM",   detail:"Video Team Member — Weekly practice attendance, multimedia submissions",    color:"bg-teal/10 border-teal/20 text-teal-dark",        badge:"bg-teal text-white"},
-                    {type:"PANATA",     detail:"CICS2 Prayer Leader — Leads weekly Tupad and Pulong Panata sessions",       color:"bg-gold/10 border-gold/20 text-yellow-800",       badge:"bg-gold text-teal-dark"},
-                    {type:"EVENT ROLE", detail:"Choir Orientation Documenter — Assigned Nov 2, 2023",                       color:"bg-slate-blue/10 border-slate-blue/20 text-slate-blue", badge:"bg-slate-blue text-white"},
-                    {type:"KOMITI",     detail:"Sagana Condo Bldg 1 — Weekly Monday 4PM coordination",                      color:"bg-secondary/60 border-border text-foreground",   badge:"bg-muted text-foreground"},
-                  ].map((r, i) => (
-                    <div key={i} className={`rounded-xl border p-4 ${r.color}`}>
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${r.badge}`}>{r.type}</span>
-                      </div>
-                      <div className="text-sm font-medium">{r.detail}</div>
-                    </div>
-                  ))}
+                <div className="space-y-4">
+                  <div className="flex gap-1.5 flex-wrap">
+                    {(["All", "Team", "Panata", "GE"] as const).map(s => (
+                      <button key={s} onClick={() => setRespSort(s)}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition ${respSort === s ? "bg-teal-dark text-white border-teal-dark" : "bg-card border-border hover:bg-secondary"}`}>
+                        {s === "GE" ? "GE Subject Groups" : s === "All" ? "All" : `${s}s`}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {filteredResp.map(r => (
+                      <article key={r.id} className="rounded-xl border border-border bg-card p-5 shadow-sm">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${r.scope === "Panata" ? "bg-gold/15 text-yellow-800" : r.scope === "Team" ? "bg-teal/10 text-teal-dark" : "bg-secondary text-foreground"}`}>{r.scope}</span>
+                          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-green-status/15 text-green-700">{r.role}</span>
+                        </div>
+                        <h3 className="text-base font-bold text-foreground">{r.title}</h3>
+                        <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
+                          <div><div className="font-bold text-teal-dark">{r.attendance}%</div><div className="text-muted-text">Attendance</div></div>
+                          <div><div className="font-bold">{r.events}</div><div className="text-muted-text">Events</div></div>
+                          <div><div className="font-bold">{r.tasks}</div><div className="text-muted-text">Tasks</div></div>
+                        </div>
+                        {(role === "leader" || role === "ge-monitor" || role === "panata-monitor" || role === "admin" || role === "superadmin") && (
+                          <button onClick={() => setOpenMaster(r)} className="mt-4 w-full py-2.5 rounded-xl bg-teal text-white text-sm font-semibold hover:bg-teal-dark transition">
+                            View Masterlist
+                          </button>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                  {openMaster && <ResponsibilityMasterlistModal card={openMaster} onClose={() => setOpenMaster(null)}/>}
                 </div>
               )}
             </div>

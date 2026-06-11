@@ -151,6 +151,7 @@ function Content() {
       case "dashboard": return <SectionDashboard />;
       case "students": return <MyStudents />;
       case "schedule": return <ScheduleView />;
+      case "announcements": return <AnnouncementsView canCreate />;
       case "heatmap": return <HeatmapView scope="GE 101 Sec A" banner="Scoped View — GE 101 Sec A Only" />;
       case "dispatcher": return <DispatcherCTA scope="GE 101 - Sec A" />;
       case "attendance": return <SectionAttendance />;
@@ -167,6 +168,7 @@ function Content() {
     case "event-detail": return <EventDetail />;
     case "groups": return <StudentGroups />;
     case "schedule": return <ScheduleView />;
+    case "announcements": return <AnnouncementsView canCreate />;
     case "heatmap": return <HeatmapView scope="ALL STUDENTS (4,500)" />;
     case "dispatcher": return <DispatcherCTA scope="Full Organization (4,500)" />;
     case "sessions": return <SessionLogs />;

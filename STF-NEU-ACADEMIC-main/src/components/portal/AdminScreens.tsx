@@ -426,197 +426,424 @@ export function SessionLogs() {
   );
 }
 
-// SA7: Operations Control
+// SA7: Operations Control (tabbed)
 export function Operations() {
+  const [tab, setTab] = useState<"assigner" | "requests" | "groups" | "algorithms">("assigner");
+  const [reqType, setReqType] = useState("All");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [geStudents, setGeStudents] = useState(120);
+  const [gePerGroup, setGePerGroup] = useState(30);
+  const [panataStudents, setPanataStudents] = useState(75);
+  const [panataPerGroup, setPanataPerGroup] = useState(15);
   const [requests, setRequests] = useState([
-    ["David Lee, ID 701","Join Video Team","Jun 2, 2026"],
-    ["Michael Chen, ID 612","Switch Panata Group to CICS3","Jun 2, 2026"],
-    ["Jane Cooper, ID 613","Drop GE 101-B","Jun 2, 2026"],
+    { id: "r1", type: "Guest Request", requester: "David Lee", details: "Join Video Team", date: "Jun 2, 2026" },
+    { id: "r2", type: "Schedule Switch", requester: "Michael Chen", details: "Switch Panata Group to CICS3", date: "Jun 2, 2026" },
+    { id: "r3", type: "GE Switch", requester: "Jane Cooper", details: "Drop GE 101-B", date: "Jun 2, 2026" },
+    { id: "r4", type: "Team Joining", requester: "Pedro Ramos", details: "Join Writers Team", date: "Jun 3, 2026" },
+    { id: "r5", type: "New Group Creation", requester: "Maria Cruz", details: "Create CICS6 Panata Group", date: "Jun 3, 2026" },
   ]);
-  const [flash, setFlash] = useState<{i:number, kind:"a"|"r"}|null>(null);
-  const act = (i:number, kind:"a"|"r") => {
-    setFlash({i, kind});
-    setTimeout(() => { setRequests(r => r.filter((_,j) => j!==i)); setFlash(null); }, 350);
-  };
+
+  const unassigned = [
+    { id: "u1", name: "Alice Brown", dept: "CICS", scope: "GE" },
+    { id: "u2", name: "Michael Chen", dept: "CICS", scope: "Panata" },
+    { id: "u3", name: "Jane Cooper", dept: "CAS", scope: "GE" },
+    { id: "u4", name: "Pedro Ramos", dept: "CEA", scope: "Team" },
+  ];
+  const reqTypes = ["All", "Guest Request", "Schedule Switch", "GE Switch", "Panata Switch", "Team Joining", "New Group Creation"];
+  const filteredReqs = reqType === "All" ? requests : requests.filter(r => r.type === reqType || (reqType === "Schedule Switch" && r.type.includes("Switch")));
+  const geGroupsNeeded = Math.max(1, Math.ceil(geStudents / gePerGroup));
+  const panataGroupsNeeded = Math.max(1, Math.ceil(panataStudents / panataPerGroup));
+
+  const tabs = [
+    { id: "assigner" as const, label: "Student Assigner" },
+    { id: "requests" as const, label: "Pending Requests" },
+    { id: "groups" as const, label: "New Group Creation" },
+    { id: "algorithms" as const, label: "Algorithms" },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark">Administrative Operations Control Panel</h1>
+    <div className="p-6 space-y-5">
+      <div>
+        <h1 className="font-serif text-2xl font-bold text-teal-dark">Operations Control</h1>
+        <p className="text-sm text-muted-text mt-1">Student assignment, request approval, group creation, and semi-automated algorithms.</p>
+      </div>
 
-      {/* Section 1 */}
-      <section className="bg-card border border-border rounded-lg p-5 card-soft">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="font-serif text-lg font-bold text-teal-dark">Student Assigner Workspace</h2>
-          <span className="chip bg-teal text-white">65 Unassigned</span>
-          <span className="chip bg-gold text-teal-dark">21 Categories</span>
-        </div>
-        <div className="grid grid-cols-2 gap-5">
-          <div className="border border-border rounded p-3">
-            <div className="text-xs font-bold text-muted-text mb-2">UNASSIGNED STUDENTS (65)</div>
-            <ul className="space-y-1 text-sm">
-              {[
-                "Alice Brown, ID 611 · GE Class Request",
-                "Michael Chen, ID 612 · Panata Group Request",
-                "Jane Cooper, ID 613 · GE Class Request",
-                "Jose Mendoza, ID 614 · Panata Group",
-                "Maria Cruz, ID 615 · Team Preference",
-                "Pedro Ramos, ID 616 · STF Team Preference",
-              ].map(s => (
-                <li key={s} className="p-2 bg-secondary rounded cursor-grab flex justify-between hover:bg-teal-soft"><span>{s}</span><span>⠿</span></li>
-              ))}
-            </ul>
-          </div>
-          <div className="border border-border rounded p-3 space-y-4">
-            <div>
-              <div className="text-xs font-bold text-muted-text mb-2">GE CLASSES</div>
-              {[["GE 101 - Sec A",24,30,"bg-gold"],["GE 102 - Sec B",18,30,"bg-teal"]].map(([n,c,m,col]) => (
-                <div key={n as string} className="mb-2">
-                  <div className="flex justify-between text-xs"><span>{n}</span><span>{c}/{m}</span></div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden"><div className={`h-full ${col}`} style={{width:`${(c as number)/(m as number)*100}%`}}/></div>
-                </div>
-              ))}
-            </div>
-            <div>
-              <div className="text-xs font-bold text-muted-text mb-2">PANATA GROUPS</div>
-              {[["CICS1",12,15],["CICS2",14,15],["CAS1-CCR",10,15]].map(([n,c,m]) => (
-                <div key={n as string} className="mb-2">
-                  <div className="flex justify-between text-xs"><span>{n}</span><span>{c}/{m}</span></div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-teal" style={{width:`${(c as number)/(m as number)*100}%`}}/></div>
-                </div>
-              ))}
-            </div>
-            <div>
-              <div className="text-xs font-bold text-muted-text mb-2">STF TEAMS</div>
-              {[["Video Team 104",19,25],["DGA Team",22,25],["Music Team",18,25]].map(([n,c,m]) => (
-                <div key={n as string} className="mb-2">
-                  <div className="flex justify-between text-xs"><span>{n}</span><span>{c}/{m}</span></div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-gold" style={{width:`${(c as number)/(m as number)*100}%`}}/></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="flex gap-0 border-b border-border overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            className={`px-5 py-3 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition ${tab === t.id ? "border-teal-dark text-teal-dark" : "border-transparent text-muted-text hover:text-teal-dark"}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-      {/* Section 2 */}
-      <section className="bg-card border border-border rounded-lg p-5 card-soft">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="font-serif text-lg font-bold text-teal-dark">Pending Request Approver</h2>
-          <span className="chip bg-teal-soft text-teal">Queue-based data List</span>
-          <span className="chip bg-amber-status text-white">Pending ({requests.length})</span>
-        </div>
-        <table className="w-full text-sm">
-          <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Applicant","Requested Action","Date","Controls"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
-          <tbody>
-            {requests.map((r,i) => (
-              <tr key={i} className={`row-alt border-b border-border transition-colors ${flash?.i===i?(flash.kind==="a"?"!bg-green-status/30":"!bg-red-status/30"):""}`}>
-                <td className="px-3 py-2 font-semibold">{r[0]}</td>
-                <td className="px-3 py-2">{r[1]}</td>
-                <td className="px-3 py-2 text-muted-text">{r[2]}</td>
-                <td className="px-3 py-2 flex gap-2">
-                  <button onClick={() => act(i,"a")} className="bg-gold text-teal-dark px-3 py-1 rounded text-xs font-bold hover:brightness-105">APPROVE</button>
-                  <button onClick={() => act(i,"r")} className="bg-teal-dark text-white px-3 py-1 rounded text-xs font-bold hover:bg-teal">REJECT</button>
-                </td>
-              </tr>
+      {tab === "assigner" && (
+        <section className="bg-card border border-border rounded-xl p-5 card-soft space-y-4">
+          <div className="grid grid-cols-4 gap-3">
+            {[["Unassigned", "65", "bg-amber-status text-white"], ["Selected", String(selected.length), "bg-teal text-white"], ["Open GE Slots", "42", "bg-teal-light text-white"], ["Open Panata Slots", "18", "bg-gold text-teal-dark"]].map(([k,v,c]) => (
+              <div key={k} className={`${c} rounded-lg p-4`}><div className="text-xs opacity-85">{k}</div><div className="font-serif text-2xl font-bold mt-1">{v}</div></div>
             ))}
-            {requests.length===0 && <tr><td colSpan={4} className="p-4 text-center text-muted-text text-xs">All requests processed.</td></tr>}
-          </tbody>
-        </table>
-      </section>
+          </div>
+          <div className="bg-teal-soft/40 border border-teal/20 rounded-lg px-4 py-2 text-xs">
+            Multi-select students, choose a target group, then assign. Suggestions weighted by Availability Heatmap.
+          </div>
+          <div className="grid grid-cols-2 gap-5">
+            <div className="border border-border rounded-lg p-3">
+              <div className="text-xs font-bold text-muted-text mb-2">UNASSIGNED STUDENTS</div>
+              <ul className="space-y-1.5">
+                {unassigned.map(u => {
+                  const on = selected.includes(u.id);
+                  return (
+                    <li key={u.id}>
+                      <button onClick={() => setSelected(s => s.includes(u.id) ? s.filter(x => x !== u.id) : [...s, u.id])}
+                        className={`w-full p-2 rounded text-sm text-left flex justify-between ${on ? "bg-teal-soft border border-teal/40" : "bg-secondary hover:bg-teal-soft/30"}`}>
+                        <span><strong>{u.name}</strong> · {u.dept}</span>
+                        <span className="chip bg-teal-soft text-teal text-[10px]">{u.scope}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div className="border border-border rounded-lg p-3 space-y-3">
+              <div>
+                <label className="text-xs font-bold text-muted-text">Assign To</label>
+                <select className="w-full mt-1 px-3 py-2 border border-border rounded text-sm bg-card">
+                  <optgroup label="Panata Groups"><option>CICS3 Panata</option><option>CICS4 Panata</option></optgroup>
+                  <optgroup label="GE Subject Groups"><option>Sosyedad — IS234A</option><option>Art App — M414B</option></optgroup>
+                  <optgroup label="Teams"><option>Video Team 104</option><option>Writers Team</option></optgroup>
+                  <optgroup label="Event Duties"><option>Choir Concert — Usher</option><option>Choir Concert — Stage Crew</option></optgroup>
+                </select>
+              </div>
+              <div className="bg-secondary/50 rounded p-3 text-xs">Heatmap suggestion: Best window <strong>Sun 7AM–10AM</strong> (89% available)</div>
+              <div className="flex gap-2">
+                <button onClick={() => setSelected([])} className="flex-1 py-2 border border-border rounded text-sm font-semibold hover:bg-secondary">Clear</button>
+                <button onClick={() => setSelected([])} className="flex-1 py-2 bg-teal text-white rounded text-sm font-semibold hover:bg-teal-dark">Assign {selected.length}</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* Section 3 — Task Grader (org-wide) */}
-      <section className="bg-card border border-border rounded-lg p-5 card-soft">
-        <h2 className="font-serif text-lg font-bold text-teal-dark mb-3">Task Evaluator & Eval Grader (Org-wide)</h2>
-        <div className="flex gap-3 mb-3">
-          <input placeholder="Search students…" className="flex-1 px-3 py-1.5 border border-border rounded text-sm"/>
-          <select className="px-2 py-1.5 border border-border rounded text-sm"><option>All Sections</option><option>GE 101 - Sec A</option><option>GE 101 - Sec B</option><option>GE 102 - Sec A</option></select>
-          <select className="px-2 py-1.5 border border-border rounded text-sm"><option>GRADED</option><option>PENDING</option></select>
-        </div>
-        <TaskGrader />
-      </section>
+      {tab === "requests" && (
+        <section className="bg-card border border-border rounded-xl p-5 card-soft space-y-4">
+          <div className="flex flex-wrap gap-1.5">
+            {reqTypes.map(t => (
+              <button key={t} onClick={() => setReqType(t)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg border ${reqType === t ? "bg-teal text-white border-teal" : "bg-card border-border hover:bg-secondary"}`}>{t}</button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {[
+              { type: "Guest Request", count: 2, desc: "New member onboarding" },
+              { type: "Schedule Switch", count: 3, desc: "GE or Panata group changes" },
+              { type: "Team Joining", count: 1, desc: "STF team membership" },
+              { type: "New Group Creation", count: 1, desc: "Panata, GE section, or team" },
+            ].map(c => (
+              <button key={c.type} onClick={() => setReqType(c.type)}
+                className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition">
+                <div className="text-xs font-bold text-teal-dark">{c.type}</div>
+                <div className="font-serif text-2xl font-bold mt-1">{c.count}</div>
+                <div className="text-[11px] text-muted-text mt-1">{c.desc}</div>
+              </button>
+            ))}
+          </div>
+          <table className="w-full text-sm">
+            <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Submitted", "Type", "Requester", "Details", "Actions"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
+            <tbody>
+              {filteredReqs.map(r => (
+                <tr key={r.id} className="row-alt border-b border-border">
+                  <td className="px-3 py-2 text-muted-text">{r.date}</td>
+                  <td className="px-3 py-2"><span className="chip bg-teal-soft text-teal">{r.type}</span></td>
+                  <td className="px-3 py-2 font-semibold">{r.requester}</td>
+                  <td className="px-3 py-2">{r.details}</td>
+                  <td className="px-3 py-2 flex gap-2">
+                    <button onClick={() => setRequests(q => q.filter(x => x.id !== r.id))} className="bg-gold text-teal-dark px-3 py-1 rounded text-xs font-bold">Approve</button>
+                    <button onClick={() => setRequests(q => q.filter(x => x.id !== r.id))} className="bg-teal-dark text-white px-3 py-1 rounded text-xs font-bold">Reject</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {tab === "groups" && (
+        <section className="grid grid-cols-3 gap-4">
+          {[
+            { title: "Create GE Subject Group", fields: ["GE Subject", "Group Name", "Teacher"] },
+            { title: "Create Team", fields: ["Team Name", "Lead", "Overseer"] },
+            { title: "Create Panata Group", fields: ["Group Code", "Assigned Department", "Monitor"] },
+          ].map(g => (
+            <div key={g.title} className="bg-card border border-border rounded-xl p-5 card-soft">
+              <h3 className="font-serif font-bold text-teal-dark mb-3">{g.title}</h3>
+              {g.fields.map(f => (
+                <div key={f} className="mb-2"><label className="text-xs text-muted-text">{f}</label>
+                  <input className="w-full mt-0.5 px-3 py-2 border border-border rounded text-sm bg-card"/></div>
+              ))}
+              <button className="w-full mt-2 py-2 bg-teal text-white rounded text-sm font-semibold hover:bg-teal-dark">+ Create</button>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {tab === "algorithms" && (
+        <section className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-card border border-border rounded-xl p-5 card-soft">
+              <h3 className="font-serif font-bold text-teal-dark mb-2">GE Subject Group Calculator</h3>
+              <p className="text-xs text-muted-text mb-3">Based on enrolled students per GE subject — editable split.</p>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div><label className="text-xs text-muted-text">Enrolled Students</label>
+                  <input type="number" value={geStudents} onChange={e => setGeStudents(Number(e.target.value))} className="w-full mt-1 px-3 py-2 border border-border rounded text-sm"/></div>
+                <div><label className="text-xs text-muted-text">Students per Group</label>
+                  <input type="number" value={gePerGroup} onChange={e => setGePerGroup(Number(e.target.value))} className="w-full mt-1 px-3 py-2 border border-border rounded text-sm"/></div>
+              </div>
+              <div className="bg-teal-soft rounded-lg p-3 text-sm"><strong>{geGroupsNeeded}</strong> group(s) needed · ~{Math.ceil(geStudents / geGroupsNeeded)} students each</div>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-5 card-soft">
+              <h3 className="font-serif font-bold text-teal-dark mb-2">Panata Group Calculator</h3>
+              <p className="text-xs text-muted-text mb-3">Based on students in a department — editable split.</p>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div><label className="text-xs text-muted-text">Dept Students</label>
+                  <input type="number" value={panataStudents} onChange={e => setPanataStudents(Number(e.target.value))} className="w-full mt-1 px-3 py-2 border border-border rounded text-sm"/></div>
+                <div><label className="text-xs text-muted-text">Students per Group</label>
+                  <input type="number" value={panataPerGroup} onChange={e => setPanataPerGroup(Number(e.target.value))} className="w-full mt-1 px-3 py-2 border border-border rounded text-sm"/></div>
+              </div>
+              <div className="bg-gold-soft rounded-lg p-3 text-sm"><strong>{panataGroupsNeeded}</strong> group(s) needed · ~{Math.ceil(panataStudents / panataGroupsNeeded)} students each</div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-5 card-soft">
+            <h3 className="font-serif font-bold text-teal-dark mb-2">Event Duty Assignment (Heatmap-based)</h3>
+            <p className="text-xs text-muted-text mb-3">Assign individual students or teams to event duties based on availability heatmap.</p>
+            <div className="grid grid-cols-3 gap-3">
+              <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>Choir Concert B4</option><option>Snapseed Seminar</option></select>
+              <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>Ushering</option><option>Stage Crew</option><option>Photographer</option></select>
+              <button className="py-2 bg-teal text-white rounded text-sm font-semibold hover:bg-teal-dark">Auto-Assign from Heatmap</button>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
 
-// SA6: Grade Manager Grade Manager
+// SA6: Grade Manager
 export function Endoar() {
-  const [tab, setTab] = useState<"ge"|"aevm">("ge");
+  const [tab, setTab] = useState<"ge" | "team" | "final">("ge");
+  const [geView, setGeView] = useState<"cards" | "all">("cards");
+  const [openSubject, setOpenSubject] = useState<string | null>(null);
+  const [openTeam, setOpenTeam] = useState<string | null>(null);
+
+  const geSubjects = ["Art Appreciation", "Sosyedad at Literatura", "Ethics", "PE 3"];
+  const teams = [
+    { name: "Video Team 104", members: 55, avgAevm: "B+" },
+    { name: "DGA Team", members: 25, avgAevm: "A-" },
+    { name: "Writers Team", members: 18, avgAevm: "B" },
+    { name: "Music Team", members: 30, avgAevm: "A" },
+  ];
+  const geGroups: Record<string, { group: string; teacher: string; members: number; attendance: number }[]> = {
+    "Art Appreciation": [{ group: "Art App — M414B", teacher: "Prof. Reyes", members: 32, attendance: 91 }],
+    "Sosyedad at Literatura": [{ group: "SosLit — IS233B", teacher: "Prof. Sandoval", members: 28, attendance: 84 }, { group: "SosLit — IS234A", teacher: "Prof. Sandoval", members: 30, attendance: 88 }],
+    "Ethics": [{ group: "Ethics — M210A", teacher: "Prof. Mariano", members: 35, attendance: 93 }],
+    "PE 3": [{ group: "PE 3 — G2", teacher: "Coach Lim", members: 40, attendance: 78 }],
+  };
+
+  const gradeRows = [
+    { student: "Natalie Portman", group: "Art App — M414B", attendance: 94, tasks: 92, grade: 1.4 },
+    { student: "Alex Ammin", group: "SosLit — IS233B", attendance: 81, tasks: 78, grade: 1.7 },
+    { student: "Ben Affleck", group: "Ethics — M210A", attendance: 100, tasks: 96, grade: 1.1 },
+    { student: "Maria Santos", group: "PE 3 — G2", attendance: 70, tasks: 65, grade: 2.3 },
+  ];
+
+  const gradeChip = (g: number) => g <= 1.5 ? "bg-green-status text-white" : g <= 2.0 ? "bg-teal text-white" : g <= 2.5 ? "bg-amber-status text-white" : "bg-red-status text-white";
+
   return (
     <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-1">Grade Manager — Grade Entry & Score Management</h1>
-      <div className="border-b border-border flex gap-1 mb-4 mt-3">
-        {[["ge","GE Subject Grades"],["aevm","AEVM Performance Scores"]].map(([id,l]) => (
-          <button key={id} onClick={() => setTab(id as any)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===id?"border-teal text-teal-dark":"border-transparent text-muted-text"}`}>{l}</button>
+      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-1">Grade Manager</h1>
+      <p className="text-sm text-muted-text mb-4">GE grading by subject group · Team AEVM scores · Final grade by GE subject.</p>
+      <div className="border-b border-border flex gap-1 mb-4">
+        {[["ge", "GE Subject"], ["team", "Team"], ["final", "Final Grade"]].map(([id, l]) => (
+          <button key={id} onClick={() => setTab(id as typeof tab)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab === id ? "border-teal text-teal-dark" : "border-transparent text-muted-text"}`}>{l}</button>
         ))}
       </div>
 
-      {tab==="ge" && <>
-        <div className="mb-3"><select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>GE 101 - Sec A</option><option>GE 101 - Sec B</option></select></div>
-        <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-          <table className="w-full text-sm">
-            <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student","Student ID","Written Works","Performance Tasks","Quarterly","Computed","Status"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
-            <tbody>
-              {[
-                ["Natalie Portman","STF-2022-0101",88,91,85,88.2,"Passing","green"],
-                ["Alex Ammin","STF-2022-0102",75,80,72,76.1,"Passing","green"],
-                ["Ben Affleck","STF-2021-0088",95,93,90,92.8,"Passing","green"],
-                ["Maria Santos","STF-2023-0103",60,65,58,61.4,"At Risk","amber"],
-                ["Jose Reyes","STF-2023-0104",45,50,42,45.8,"Failing","red"],
-              ].map((r,i) => (
-                <tr key={i} className="row-alt border-b border-border">
-                  <td className="px-3 py-2 font-semibold">{r[0]}</td>
-                  <td className="px-3 py-2 font-mono text-xs">{r[1]}</td>
-                  <td className="px-3 py-2">{r[2]}</td>
-                  <td className="px-3 py-2">{r[3]}</td>
-                  <td className="px-3 py-2">{r[4]}</td>
-                  <td className="px-3 py-2 font-bold">{r[5]}</td>
-                  <td className="px-3 py-2"><span className={`chip ${r[7]==="green"?"bg-green-status text-white":r[7]==="amber"?"bg-amber-status text-white":"bg-red-status text-white"}`}>{r[6]}</span></td>
-                </tr>
+      {tab === "ge" && (
+        <>
+          <div className="flex gap-2 mb-4">
+            <button onClick={() => setGeView("cards")} className={`px-3 py-1.5 text-xs font-bold rounded-lg ${geView === "cards" ? "bg-teal text-white" : "bg-card border border-border"}`}>Subject Cards</button>
+            <button onClick={() => setGeView("all")} className={`px-3 py-1.5 text-xs font-bold rounded-lg ${geView === "all" ? "bg-teal text-white" : "bg-card border border-border"}`}>All View</button>
+          </div>
+          {geView === "cards" ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              {geSubjects.map(s => (
+                <button key={s} onClick={() => setOpenSubject(s)} className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition card-soft">
+                  <div className="font-serif font-bold text-teal-dark">{s}</div>
+                  <div className="text-xs text-muted-text mt-1">{(geGroups[s] ?? []).length} subgroup(s)</div>
+                </button>
               ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex justify-end mt-4"><button className="bg-teal text-white px-5 py-2 rounded font-semibold text-sm hover:bg-teal-dark">Save Grades</button></div>
-      </>}
+            </div>
+          ) : (
+            <div className="bg-card border border-border rounded-lg overflow-hidden card-soft mb-4">
+              <table className="w-full text-sm">
+                <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student", "GE Subject Group", "Attendance %", "Task %", "Grade"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
+                <tbody>
+                  {gradeRows.map((r, i) => (
+                    <tr key={i} className="row-alt border-b border-border">
+                      <td className="px-3 py-2 font-semibold">{r.student}</td>
+                      <td className="px-3 py-2">{r.group}</td>
+                      <td className="px-3 py-2">{r.attendance}%</td>
+                      <td className="px-3 py-2">{r.tasks}%</td>
+                      <td className="px-3 py-2"><span className={`chip ${gradeChip(r.grade)}`}>{r.grade.toFixed(2)}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {openSubject && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenSubject(null)}>
+              <div className="bg-card rounded-xl max-w-lg w-full p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <h3 className="font-serif font-bold text-teal-dark mb-3">{openSubject} · Subgroups</h3>
+                <div className="space-y-2">
+                  {(geGroups[openSubject] ?? []).map(g => (
+                    <div key={g.group} className="p-3 border border-border rounded-lg">
+                      <div className="font-semibold">{g.group}</div>
+                      <div className="text-xs text-muted-text">Teacher: {g.teacher} · {g.members} members · {g.attendance}% attendance</div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setOpenSubject(null)} className="mt-4 w-full py-2 bg-teal text-white rounded font-semibold text-sm">Close</button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
-      {tab==="aevm" && <>
-        <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-          <table className="w-full text-sm">
-            <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student","Student ID","Attendance","Task Completion","Participation","AEVM Final","Status"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
-            <tbody>
-              {[
-                ["Natalie Portman","STF-2022-0101",95,88,90,91.0,"Excellent","green"],
-                ["Alex Ammin","STF-2022-0102",87,72,80,79.7,"Good","teal"],
-                ["Ben Affleck","STF-2021-0088",91,95,93,93.0,"Excellent","green"],
-                ["Maria Santos","STF-2023-0103",76,60,65,67.0,"Needs Improvement","amber"],
-                ["Jose Reyes","STF-2023-0104",82,55,60,65.7,"Needs Improvement","amber"],
-              ].map((r,i) => (
-                <tr key={i} className="row-alt border-b border-border">
-                  <td className="px-3 py-2 font-semibold">{r[0]}</td>
-                  <td className="px-3 py-2 font-mono text-xs">{r[1]}</td>
-                  <td className="px-3 py-2">{r[2]}</td>
-                  <td className="px-3 py-2">{r[3]}</td>
-                  <td className="px-3 py-2">{r[4]}</td>
-                  <td className="px-3 py-2 font-bold">{r[5]}</td>
-                  <td className="px-3 py-2"><span className={`chip ${r[7]==="green"?"bg-green-status text-white":r[7]==="teal"?"bg-teal text-white":"bg-amber-status text-white"}`}>{r[6]}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {tab === "team" && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {teams.map(t => (
+            <button key={t.name} onClick={() => setOpenTeam(t.name)} className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition card-soft">
+              <div className="font-serif font-bold text-teal-dark">{t.name}</div>
+              <div className="text-xs text-muted-text mt-1">{t.members} members</div>
+              <div className="mt-2"><span className="chip bg-teal text-white">Avg AEVM: {t.avgAevm}</span></div>
+            </button>
+          ))}
+          {openTeam && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenTeam(null)}>
+              <div className="bg-card rounded-xl max-w-2xl w-full p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <h3 className="font-serif font-bold text-teal-dark mb-3">{openTeam} · AEVM Scores</h3>
+                <table className="w-full text-sm">
+                  <thead><tr className="text-xs uppercase text-muted-text border-b"><th className="py-2 text-left">Student</th><th className="py-2 text-left">Attendance</th><th className="py-2 text-left">Tasks</th><th className="py-2 text-left">AEVM</th></tr></thead>
+                  <tbody>
+                    {gradeRows.slice(0, 3).map((r, i) => (
+                      <tr key={i} className="border-b border-border"><td className="py-2 font-semibold">{r.student}</td><td>{r.attendance}%</td><td>{r.tasks}%</td><td><span className="chip bg-teal text-white">{["A-", "B+", "A"][i]}</span></td></tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button onClick={() => setOpenTeam(null)} className="mt-4 w-full py-2 bg-teal text-white rounded font-semibold text-sm">Close</button>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex justify-end gap-2 mt-4">
-          <button className="bg-gold text-teal-dark px-5 py-2 rounded font-bold text-sm hover:brightness-105">Compute Final Grades</button>
-          <button className="bg-teal text-white px-5 py-2 rounded font-semibold text-sm hover:bg-teal-dark">Save AEVM Scores</button>
-        </div>
-      </>}
+      )}
+
+      {tab === "final" && (
+        <>
+          <div className="bg-teal-soft/40 border border-teal/20 rounded-lg px-4 py-2 text-xs mb-4">
+            Final Grade = average of GE subject group score and AEVM score · drill down by GE subject.
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            {geSubjects.map(s => (
+              <button key={s} onClick={() => setOpenSubject(s)} className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition card-soft">
+                <div className="font-serif font-bold text-teal-dark">{s}</div>
+                <div className="text-xs text-muted-text mt-1">View final grades</div>
+              </button>
+            ))}
+          </div>
+          <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
+            <table className="w-full text-sm">
+              <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student", "GE Score", "AEVM", "Final Grade"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
+              <tbody>
+                {[{ s: "Natalie Portman", ge: 1.4, aevm: "A-", final: 1.33 }, { s: "Alex Ammin", ge: 1.7, aevm: "B+", final: 1.6 }, { s: "Ben Affleck", ge: 1.1, aevm: "A", final: 1.05 }].map((r, i) => (
+                  <tr key={i} className="row-alt border-b border-border">
+                    <td className="px-3 py-2 font-semibold">{r.s}</td>
+                    <td className="px-3 py-2"><span className={`chip ${gradeChip(r.ge)}`}>{r.ge.toFixed(2)}</span></td>
+                    <td className="px-3 py-2"><span className="chip bg-teal text-white">{r.aevm}</span></td>
+                    <td className="px-3 py-2"><span className={`chip ${gradeChip(r.final)}`}>{r.final.toFixed(2)}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      <div className="flex justify-end gap-2 mt-4">
+        <button className="bg-gold text-teal-dark px-5 py-2 rounded font-bold text-sm hover:brightness-105">Compute Final Grades</button>
+        <button className="bg-teal text-white px-5 py-2 rounded font-semibold text-sm hover:bg-teal-dark">Save Grades</button>
+      </div>
     </div>
   );
 }
 
 // SA-Student Management (org-wide)
 export function StudentGroups() {
+  const [openCard, setOpenCard] = useState<string | null>(null);
+  const respCards = [
+    { id: "ge", scope: "GE", title: "GE Subject Groups", count: 87, attendance: 84 },
+    { id: "team", scope: "Team", title: "STF Teams", count: 6, attendance: 89 },
+    { id: "panata", scope: "Panata", title: "Panata Groups", count: 25, attendance: 91 },
+  ];
+
   return (
     <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-4">Student Management — Masterlist</h1>
+      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-1">Student Management — Masterlist</h1>
+      <p className="text-sm text-muted-text mb-4">Responsibility sub-cards with searchable masterlists across the organization.</p>
+
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        {respCards.map(c => (
+          <button key={c.id} onClick={() => setOpenCard(c.id)} className="text-left bg-card border border-border rounded-xl p-4 card-soft hover:border-teal/40 transition">
+            <span className="chip bg-teal-soft text-teal text-[10px]">{c.scope}</span>
+            <div className="font-serif font-bold text-teal-dark mt-2">{c.title}</div>
+            <div className="text-xs text-muted-text mt-1">{c.count} active · {c.attendance}% avg attendance</div>
+            <div className="text-xs text-teal font-semibold mt-2">View Masterlist →</div>
+          </button>
+        ))}
+      </div>
+
+      {openCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenCard(null)}>
+          <div className="bg-card rounded-xl max-w-3xl w-full max-h-[80vh] overflow-hidden shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 bg-teal-dark text-white">
+              <h3 className="font-serif font-bold">{respCards.find(c => c.id === openCard)?.title} · Masterlist</h3>
+            </div>
+            <div className="p-4 border-b flex gap-2">
+              <input placeholder="Search students…" className="flex-1 px-3 py-2 border border-border rounded text-sm"/>
+              <select className="px-3 py-2 border border-border rounded text-sm"><option>Sort: Name</option><option>Sort: Attendance</option><option>Sort: Year</option></select>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4">
+              <table className="w-full text-sm">
+                <thead className="text-xs uppercase text-muted-text border-b"><tr>{["Name", "Student ID", "Department", "Team", "Panata", "Status"].map(h => <th key={h} className="py-2 text-left">{h}</th>)}</tr></thead>
+                <tbody>
+                  {[
+                    ["Alex Johnson", "STF-2021-0042", "Computer Studies", "Video Team 104", "CICS2", "Active"],
+                    ["Natalie Portman", "STF-2022-0101", "Nursing", "Video Team 104", "CON-CRT", "Active"],
+                    ["David Lee", "STF-2024-0701", "Criminology", "—", "—", "Unassigned"],
+                  ].map((r, i) => (
+                    <tr key={i} className="border-b border-border"><td className="py-2 font-semibold">{r[0]}</td>{r.slice(1).map((c, j) => <td key={j} className="py-2 text-xs">{c}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-4 border-t flex justify-end gap-2">
+              <button className="px-4 py-2 text-sm border border-teal text-teal rounded font-semibold">Export CSV</button>
+              <button onClick={() => setOpenCard(null)} className="px-4 py-2 text-sm bg-teal text-white rounded font-semibold">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 gap-3 mb-5">
         {[
           ["Total Students","4,500","bg-teal text-white"],
