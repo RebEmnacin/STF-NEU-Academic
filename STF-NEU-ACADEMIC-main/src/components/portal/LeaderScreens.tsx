@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Lock,
   GripVertical, MapPin, Calendar, Send, Pencil, Trash2, Link,
   Upload, FileText, Megaphone, CheckSquare, BarChart2, CalendarCheck,
-  BookOpen,
+  BookOpen, CalendarDays,
 } from "lucide-react";
 
 // ─── Shared animation primitives ──────────────────────────────────────────────
@@ -97,15 +97,15 @@ function AvatarSVG({ initials, size = 48, isOnLeave = false, className = "" }: {
     <div
       className={className}
       style={{
-        width: size, height: size, borderRadius: 14,
+        width: size, height: size, borderRadius: 10,
         background: bg,
         display: "grid", placeItems: "center",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
         flexShrink: 0,
       }}
     >
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-        style={{ width: size * 0.65, height: size * 0.65 }}>
+        style={{ width: size * 0.6, height: size * 0.6 }}>
         <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.92)" />
         <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.92)" />
       </svg>
@@ -134,7 +134,7 @@ function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose:
           transition: "opacity 0.3s ease, transform 0.3s ease",
         }}
       >
-                <div className="px-6 pt-6 pb-10 relative"
+        <div className="px-6 pt-6 pb-10 relative"
           style={{ background: "linear-gradient(135deg, #0D4A6B 0%, #1B6B8F 50%, #4A8FA8 80%, #5A8FA8 100%)" }}>
           <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
           <div style={{ position:"absolute", bottom:0, left:"30%", width:70, height:70, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
@@ -291,7 +291,7 @@ function MessageModal({ member, onClose }: { member: Member; onClose: () => void
   );
 }
 
-// ─── FIXED MemberCard — clean two-tone card matching screenshot reference ─────
+// ─── COMPACT MemberCard — horizontal layout, avatar on left side ───────────────
 function MemberCard({ member, onView, onMessage, onSubmissions }: {
   member: Member; onView: () => void; onMessage: () => void; onSubmissions: () => void;
 }) {
@@ -631,11 +631,11 @@ export function Roster() {
             </div>
           )}
           {viewMode === "grid" && (
-            <div className="p-5 grid grid-cols-4 gap-4">
+            <div className="p-5 grid grid-cols-3 gap-3">
               {filtered.map(r => (
                 <MemberCard key={r.id} member={r} onView={() => setViewMember(r)} onMessage={() => setMsgMember(r)} onSubmissions={() => setSubsMember(r)} />
               ))}
-              {filtered.length === 0 && <div className="col-span-4 text-center text-muted-text py-16 text-sm">No members match your search.</div>}
+              {filtered.length === 0 && <div className="col-span-3 text-center text-muted-text py-16 text-sm">No members match your search.</div>}
             </div>
           )}
           <div className="flex justify-between items-center px-4 py-3 border-t border-border">
@@ -655,21 +655,18 @@ export function Roster() {
   );
 }
 
-// ─── QR Generator — date/time config instead of QR settings ──────────────────
+// ─── QR Generator ─────────────────────────────────────────────────────────────
 export function QRGenerator() {
   const [generated, setGenerated] = useState(true);
   const [event, setEvent] = useState("Video Team Practice (Nov 8)");
-  const [singleScan, setSingleScan] = useState(true);
   const [timeLimited, setTimeLimited] = useState(true);
   const [attendanceType, setAttendanceType] = useState<"Present" | "Late" | "Excused">("Present");
   const [timeLeft, setTimeLeft] = useState(30 * 60);
-
   const [dateMode, setDateMode] = useState<"single" | "range">("single");
   const [singleDate, setSingleDate] = useState("2023-11-08");
   const [singleTime, setSingleTime] = useState("15:00");
   const [rangeStart, setRangeStart] = useState("2023-11-08T15:00");
   const [rangeEnd, setRangeEnd]     = useState("2023-11-08T16:30");
-
   const [linkCopied, setLinkCopied] = useState(false);
   const placeholderLink = `https://stf-attend.neu.edu.ph/qr/${event.replace(/\s+/g,"_").toLowerCase().slice(0,20)}_${singleDate}`;
 
@@ -706,11 +703,8 @@ export function QRGenerator() {
           <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Leader View</span>
         </div>
       </FadeUp>
-
       <div className="grid grid-cols-12 gap-5">
-        {/* ── Left: Config ── */}
         <div className="col-span-7 space-y-4">
-          {/* Event selection */}
           <FadeUp delay={60}>
             <SectionCard icon={Calendar} title="Step 1 — Select Event">
               <div className="p-5 space-y-3">
@@ -732,8 +726,6 @@ export function QRGenerator() {
               </div>
             </SectionCard>
           </FadeUp>
-
-          {/* Date & Time */}
           <FadeUp delay={100}>
             <SectionCard icon={CalendarCheck} title="Step 2 — Date & Time">
               <div className="p-5 space-y-4">
@@ -747,7 +739,6 @@ export function QRGenerator() {
                     </button>
                   ))}
                 </div>
-
                 {dateMode === "single" ? (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -778,7 +769,6 @@ export function QRGenerator() {
               </div>
             </SectionCard>
           </FadeUp>
-
           <FadeUp delay={180}>
             <button onClick={() => { setGenerated(true); setTimeLeft(30 * 60); }}
               className="w-full bg-teal text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-teal-dark transition flex items-center justify-center gap-2"
@@ -787,8 +777,6 @@ export function QRGenerator() {
             </button>
           </FadeUp>
         </div>
-
-        {/* ── Right: QR Display ── */}
         <div className="col-span-5">
           <FadeUp delay={80}>
             <SectionCard icon={QrCode} title="Generated QR Code">
@@ -803,28 +791,14 @@ export function QRGenerator() {
                           ))}
                         </div>
                       </div>
-                      {[{ top: 8, left: 8 }, { top: 8, right: 8 }, { bottom: 8, left: 8 }, { bottom: 8, right: 8 }].map((pos, i) => (
-                        <div key={i} className="absolute w-7 h-7 pointer-events-none" style={{
-                          ...pos,
-                          borderTop: i < 2 ? "3px solid var(--teal)" : "none",
-                          borderBottom: i >= 2 ? "3px solid var(--teal)" : "none",
-                          borderLeft: (i === 0 || i === 2) ? "3px solid var(--teal)" : "none",
-                          borderRight: (i === 1 || i === 3) ? "3px solid var(--teal)" : "none",
-                          borderRadius: i === 0 ? "4px 0 0 0" : i === 1 ? "0 4px 0 0" : i === 2 ? "0 0 0 4px" : "0 0 4px 0",
-                        }} />
-                      ))}
                     </div>
-
                     <div className="text-center w-full">
                       <div className="font-bold text-teal-dark text-sm">{event.split("(")[0].trim()}</div>
                       <div className="text-xs text-muted-text mt-0.5">
-                        {dateMode === "single"
-                          ? `${singleDate} · ${singleTime}`
-                          : `${rangeStart.replace("T"," ")} → ${rangeEnd.replace("T"," ")}`}
+                        {dateMode === "single" ? `${singleDate} · ${singleTime}` : `${rangeStart.replace("T"," ")} → ${rangeEnd.replace("T"," ")}`}
                         {" "}· <span className="font-semibold text-teal-dark">{attendanceType}</span>
                       </div>
                     </div>
-
                     {timeLimited && (
                       <div className="w-full">
                         <div className="flex justify-between text-xs mb-1.5">
@@ -837,7 +811,6 @@ export function QRGenerator() {
                         {timeLeft === 0 && <div className="mt-2 text-xs text-red-status font-semibold text-center">⚠ QR code expired — regenerate to continue</div>}
                       </div>
                     )}
-
                     <div className="w-full bg-teal-soft rounded-xl px-4 py-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-teal-dark font-medium">Scanned</span>
@@ -847,24 +820,19 @@ export function QRGenerator() {
                         <div className="h-full rounded-full bg-teal" style={{ width: `${(12/55)*100}%` }} />
                       </div>
                     </div>
-
                     <div className="flex gap-2 w-full">
                       <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-teal text-teal text-xs font-semibold hover:bg-teal hover:text-white transition">
                         <Download className="w-3.5 h-3.5" /> PNG
                       </button>
-                      <button
-                        onClick={handleCopyLink}
+                      <button onClick={handleCopyLink}
                         className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition ${
                           linkCopied ? "border-teal bg-teal text-white" : "border-border text-muted-text hover:bg-secondary"
-                        }`}
-                      >
+                        }`}>
                         {linkCopied ? <CheckCircle className="w-3.5 h-3.5" /> : <Link className="w-3.5 h-3.5" />}
                         {linkCopied ? "Copied!" : "Link"}
                       </button>
-                      <button
-                        onClick={handleReset}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition"
-                      >
+                      <button onClick={handleReset}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition">
                         <RefreshCw className="w-3.5 h-3.5" /> Reset
                       </button>
                     </div>
@@ -900,7 +868,6 @@ const statusColor: Record<string, string> = {
   Absent:  "bg-red-500/15 text-red-600 border border-red-300",
 };
 
-// ─── AttendanceLogger — method buttons control which UI panel renders ─────────
 export function AttendanceLogger() {
   const [saved, setSaved] = useState(false);
   const [method, setMethod] = useState<"qr" | "manual" | "csv">("manual");
@@ -927,7 +894,6 @@ export function AttendanceLogger() {
             <div className="p-5 space-y-3">
               <select className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
                 <option>Video Team Practice</option><option>Panata Session</option><option>GE Attendance Check</option>
-                <option>DGA Training</option><option>Choir Orientation</option><option>Komiti Meeting</option>
               </select>
               <div className="bg-teal-soft rounded-xl p-4">
                 <div className="font-semibold text-teal-dark text-sm">Video Team Practice</div>
@@ -939,28 +905,18 @@ export function AttendanceLogger() {
           </SectionCard>
         </FadeUp>
         <FadeUp delay={100}>
-          {/* Method selector — clicking a label sets method and shows the correct panel */}
           <SectionCard icon={ScanLine} title="Attendance Method">
             <div className="p-5 space-y-2">
               {[
-                { id: "qr"     as const, icon: QrCode, label: "QR Code Scan",  desc: "Students scan a generated QR code" },
-                { id: "manual" as const, icon: Pencil, label: "Manual Entry",  desc: "Mark attendance manually below" },
-                { id: "csv"    as const, icon: Upload, label: "CSV Upload",    desc: "Upload a CSV attendance sheet" },
+                { id: "qr" as const, icon: QrCode, label: "QR Code Scan", desc: "Students scan a generated QR code" },
+                { id: "manual" as const, icon: Pencil, label: "Manual Entry", desc: "Mark attendance manually below" },
+                { id: "csv" as const, icon: Upload, label: "CSV Upload", desc: "Upload a CSV attendance sheet" },
               ].map(({ id, icon: Icon, label, desc }) => (
-                <div
-                  key={id}
-                  onClick={() => setMethod(id)}
+                <div key={id} onClick={() => setMethod(id)}
                   className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition select-none ${
                     method === id ? "border-teal bg-teal-soft/40" : "border-border hover:bg-teal-soft/20"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="att-method"
-                    checked={method === id}
-                    onChange={() => setMethod(id)}
-                    className="accent-teal pointer-events-none"
-                  />
+                  }`}>
+                  <input type="radio" name="att-method" checked={method === id} onChange={() => setMethod(id)} className="accent-teal pointer-events-none" />
                   <Icon className="w-4 h-4 text-teal shrink-0" />
                   <div>
                     <div className="text-sm font-semibold">{label}</div>
@@ -972,8 +928,6 @@ export function AttendanceLogger() {
           </SectionCard>
         </FadeUp>
       </div>
-
-      {/* ── QR: show QR preview panel ── */}
       {method === "qr" && (
         <FadeUp delay={120}>
           <SectionCard icon={QrCode} title="Step 3 — QR Code Attendance">
@@ -985,20 +939,13 @@ export function AttendanceLogger() {
                   ))}
                 </div>
               </div>
-              <div className="text-center">
-                <div className="font-bold text-teal-dark text-sm">Video Team Practice</div>
-                <div className="text-xs text-muted-text mt-0.5">Nov 8, 2023 · Scan to mark attendance</div>
-              </div>
               <div className="w-full max-w-sm bg-teal-soft rounded-xl px-4 py-3 text-center">
                 <span className="text-sm font-semibold text-teal-dark">12 / 55 scanned</span>
               </div>
-              <p className="text-xs text-muted-text text-center max-w-xs">Share this QR code on screen. Students will scan it to mark themselves as present. Configure advanced settings in the QR Generator tab.</p>
             </div>
           </SectionCard>
         </FadeUp>
       )}
-
-      {/* ── Manual: show attendance table ── */}
       {method === "manual" && (
         <FadeUp delay={160}>
           <SectionCard icon={ClipboardList} title="Step 3 — Mark Attendance">
@@ -1052,8 +999,6 @@ export function AttendanceLogger() {
           </SectionCard>
         </FadeUp>
       )}
-
-      {/* ── CSV: upload UI only, no table ── */}
       {method === "csv" && (
         <FadeUp delay={120}>
           <SectionCard icon={Upload} title="Step 3 — Upload CSV">
@@ -1085,29 +1030,137 @@ export function AttendanceLogger() {
                 )}
               </div>
               <input id="csv-input" type="file" accept=".csv" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setCsvFile(f); }} />
-              <div className="w-full max-w-lg bg-secondary/60 rounded-xl px-4 py-3 flex items-start gap-3">
-                <AlertCircle className="w-4 h-4 text-teal shrink-0 mt-0.5" />
-                <div className="text-xs text-muted-text">
-                  CSV must include columns: <code className="font-mono bg-card px-1 py-0.5 rounded text-foreground">student_id, name, status</code>.
-                  {" "}<button className="text-teal font-semibold hover:underline">Download template</button>
-                </div>
-              </div>
-              {csvFile && (
-                <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000); }}
-                  className="flex items-center gap-2 px-6 py-2.5 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition"
-                  style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}>
-                  <Upload className="w-4 h-4" /> Import & Save
-                </button>
-              )}
-              {saved && (
-                <span className="flex items-center gap-1.5 text-sm font-semibold text-green-700 bg-green-500/10 border border-green-300 px-3 py-1.5 rounded-lg">
-                  <CheckCircle className="w-4 h-4" /> Attendance imported
-                </span>
-              )}
             </div>
           </SectionCard>
         </FadeUp>
       )}
+    </div>
+  );
+}
+
+// ─── Session Attendance Sheet Modal ───────────────────────────────────────────
+type SessionRow = {
+  name: string; id: string; dept: string; course: string; group: string; status: string;
+};
+
+function SessionAttendanceModal({ session, onClose }: { session: any[]; onClose: () => void }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 20); return () => clearTimeout(t); }, []);
+
+  // Generate attendance data for all roster members for this session
+  const sessionName = session[0] as string;
+  const sessionDate = session[2] as string;
+  const sessionTime = session[3] as string;
+  const presentCount = session[4] as number;
+  const absentCount = session[5] as number;
+  const lateCount = session[6] as number;
+  const excusedCount = session[7] as number;
+  const rate = session[8] as number;
+
+  // Build mock full attendance sheet from loggerRoster extended
+  const allMembers: SessionRow[] = [
+    ...loggerRoster.map(r => ({ name: r[1], id: r[2], dept: r[3], course: r[4], group: r[5], status: r[6] })),
+    { name: "John Narvasa",    id: "STF-2022-0001", dept: "CICS",      course: "BS IT",         group: "CICS2", status: "Present" },
+    { name: "Lea Salonga",     id: "STF-2023-0201", dept: "CAS",       course: "BA Comm",       group: "CAS1",  status: "Present" },
+    { name: "Carlo Reyes",     id: "STF-2023-0202", dept: "CEA",       course: "BS EE",         group: "CEA2",  status: "Absent" },
+    { name: "Mara Santos",     id: "STF-2022-0203", dept: "COA",       course: "BS Acctg",      group: "COA2",  status: "Late" },
+    { name: "Kevin Park",      id: "STF-2021-0090", dept: "CICS",      course: "BS CS",         group: "CICS1", status: "Present" },
+  ];
+
+  const statCounts = { Present: 0, Late: 0, Excused: 0, Absent: 0 };
+  allMembers.forEach(m => { if (m.status in statCounts) statCounts[m.status as keyof typeof statCounts]++; });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)" }}
+      onClick={onClose}>
+      <div onClick={e => e.stopPropagation()}
+        className="bg-background border border-border rounded-2xl w-full max-w-4xl flex flex-col overflow-hidden"
+        style={{
+          maxHeight: "88vh",
+          boxShadow: "0 20px 70px rgba(0,0,0,0.3)",
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0) scale(1)" : "translateY(24px) scale(0.97)",
+          transition: "opacity 0.3s ease, transform 0.3s ease",
+        }}>
+        {/* Header */}
+        <div className="px-6 py-5 flex items-start justify-between gap-4"
+          style={{ background: "linear-gradient(135deg, #0D4A6B, #1B6B8F)" }}>
+          <div className="text-white">
+            <div className="font-serif text-xl font-bold">{sessionName}</div>
+            <div className="text-xs text-white/60 mt-0.5 flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5" /> {sessionDate} · {sessionTime}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right text-white">
+              <div className="text-2xl font-bold font-serif">{rate}%</div>
+              <div className="text-[11px] text-white/60">attendance rate</div>
+            </div>
+            <button onClick={onClose} className="text-white/60 hover:text-white transition ml-2">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Stats strip */}
+        <div className="grid grid-cols-4 divide-x divide-border border-b border-border">
+          {[
+            { label: "Present", count: statCounts.Present, color: "text-green-700", bg: "bg-green-50" },
+            { label: "Late",    count: statCounts.Late,    color: "text-amber-600", bg: "bg-amber-50" },
+            { label: "Excused", count: statCounts.Excused, color: "text-slate-600", bg: "" },
+            { label: "Absent",  count: statCounts.Absent,  color: "text-red-600",   bg: "bg-red-50" },
+          ].map(({ label, count, color, bg }) => (
+            <div key={label} className={`px-5 py-3 text-center ${bg}`}>
+              <div className={`text-xl font-bold font-serif ${color}`}>{count}</div>
+              <div className="text-[11px] text-muted-text font-medium">{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div className="overflow-y-auto flex-1">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0">
+              <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
+                {["#", "Name", "Student ID", "Department", "Course", "Group", "Status"].map(h => (
+                  <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {allMembers.map((m, i) => (
+                <tr key={m.id} className={`border-b border-border last:border-0 transition-colors ${
+                  i % 2 === 0 ? "bg-card" : "bg-secondary/20"
+                } hover:bg-teal-soft/10`}>
+                  <td className="px-4 py-3 font-mono text-xs text-muted-text">{i + 1}</td>
+                  <td className="px-4 py-3 font-semibold">{m.name}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-muted-text">{m.id}</td>
+                  <td className="px-4 py-3 text-xs text-muted-text">{m.dept}</td>
+                  <td className="px-4 py-3 text-xs">{m.course}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-soft text-teal-dark border border-teal/20 font-mono">{m.group}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${statusColor[m.status] ?? ""}`}>{m.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-border bg-card flex justify-between items-center">
+          <span className="text-xs text-muted-text">Showing {allMembers.length} members</span>
+          <div className="flex gap-2">
+            <button className="flex items-center gap-1.5 px-4 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white transition">
+              <Download className="w-3.5 h-3.5" /> Export Sheet
+            </button>
+            <button onClick={onClose} className="px-5 py-2 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1126,7 +1179,7 @@ const SESSION_FILTERS = ["ALL SESSIONS","MAJOR SUBJECTS","GE CLASSES","PANATA","
 export function TeamAttendance() {
   const [mainTab, setMainTab] = useState<"records" | "logger">("records");
   const [tab, setTab] = useState("ALL SESSIONS");
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
   const pct = 89;
   const r = 36; const circ = 2 * Math.PI * r;
   const [go, setGo] = useState(false);
@@ -1193,44 +1246,34 @@ export function TeamAttendance() {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-teal-dark text-white uppercase tracking-wider">
-                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %"].map(h => (
+                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
                       <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {sessions.map((s, i) => (
-                    <Fragment key={i}>
-                      <tr onClick={() => setExpanded(expanded === i ? null : i)}
-                        className={`border-b border-border cursor-pointer transition-colors ${
-                          (s[8] as number) < 50 ? "bg-red-status/10 hover:bg-red-status/15" : i % 2 === 0 ? "bg-card hover:bg-teal-soft/20" : "bg-secondary/20 hover:bg-teal-soft/20"
-                        }`}>
-                        {s.map((c, j) => (
-                          <td key={j} className={`px-4 py-3 ${j === 8 ? `font-bold ${(s[8] as number) < 50 ? "text-red-status" : "text-green-700"}` : ""}`}>
-                            {j === 1
-                              ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
-                              : j === 8 ? `${c}%` : c}
-                          </td>
-                        ))}
-                      </tr>
-                      {expanded === i && (
-                        <tr><td colSpan={9} className="p-4 bg-teal-soft/20">
-                          <div className="text-xs font-bold mb-3 text-teal-dark uppercase tracking-wider">Student-level breakdown</div>
-                          <table className="w-full text-xs">
-                            <thead><tr className="border-b border-border"><th className="text-left py-1.5 font-semibold">Name</th><th className="text-left font-semibold">ID</th><th className="text-center font-semibold">Status</th></tr></thead>
-                            <tbody>
-                              {loggerRoster.slice(0, 5).map((r, k) => (
-                                <tr key={k} className="border-b border-border/40">
-                                  <td className="py-2">{r[1]}</td>
-                                  <td className="font-mono text-muted-text">{r[2]}</td>
-                                  <td className="text-center py-2"><span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${statusColor[r[6]] ?? ""}`}>{r[6]}</span></td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </td></tr>
-                      )}
-                    </Fragment>
+                    <tr key={i}
+                      className={`border-b border-border transition-colors ${
+                        (s[8] as number) < 50 ? "bg-red-status/10 hover:bg-red-status/15" : i % 2 === 0 ? "bg-card hover:bg-teal-soft/20" : "bg-secondary/20 hover:bg-teal-soft/20"
+                      }`}>
+                      {s.map((c, j) => (
+                        <td key={j} className={`px-4 py-3.5 ${j === 8 ? `font-bold ${(s[8] as number) < 50 ? "text-red-status" : "text-green-700"}` : ""}`}>
+                          {j === 1
+                            ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
+                            : j === 8 ? `${c}%` : c}
+                        </td>
+                      ))}
+                      {/* Attendance Sheet button */}
+                      <td className="px-4 py-3.5">
+                        <button
+                          onClick={() => setViewSession(s)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap"
+                        >
+                          <ClipboardList className="w-3 h-3" /> View Sheet
+                        </button>
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -1240,6 +1283,10 @@ export function TeamAttendance() {
       </>)}
 
       {mainTab === "logger" && <AttendanceLogger />}
+
+      {viewSession && (
+        <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />
+      )}
     </div>
   );
 }
@@ -1285,19 +1332,16 @@ function heatCellColor(pct: number): string {
   return         "rgba(15,78,70,0.85)";
 }
 
-// ─── HeatmapView — detail panel replaces heatmap (no z-index layering issue) ─
 export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: string; banner?: string }) {
   const [selected, setSelected] = useState<{ dayIdx: number; hourIdx: number } | null>(null);
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [msgMember, setMsgMember]   = useState<Member | null>(null);
 
-  // ── Detail view: full page replacement, no layering issues ──
   if (selected !== null) {
     const { dayIdx, hourIdx } = selected;
     const day = HEATMAP_DAYS[dayIdx];
     const hour = HEATMAP_HOURS[hourIdx];
     const availableInitials = getAvailableInitialsForCell(dayIdx, hourIdx);
-    const unavailableInitials = roster.filter(m => !availableInitials.includes(m.initials)).map(m => m.initials);
     const cell = heatCell(dayIdx, hourIdx);
 
     return (
@@ -1326,7 +1370,7 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
         <div className="grid grid-cols-3 gap-4 mb-6">
           {[
             { label: "Available", value: availableInitials.length, color: "text-green-700" },
-            { label: "Unavailable", value: unavailableInitials.length, color: "text-red-status" },
+            { label: "Unavailable", value: roster.length - availableInitials.length, color: "text-red-status" },
             { label: "Availability Rate", value: `${cell.pct}%`, color: "text-teal-dark" },
           ].map(({ label, value, color }, i) => (
             <FadeUp key={label} delay={i * 60}>
@@ -1337,11 +1381,9 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
             </FadeUp>
           ))}
         </div>
-
-        {/* Available — same MemberCard as Team Members */}
         <FadeUp delay={180}>
           <SectionCard icon={CheckCircle} title={`Available (${availableInitials.length})`}>
-            <div className="p-5 grid grid-cols-4 gap-4">
+            <div className="p-5 grid grid-cols-3 gap-3">
               {availableInitials.map(initials => {
                 const member = INITIALS_MAP[initials];
                 if (!member) return null;
@@ -1355,14 +1397,12 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
             </div>
           </SectionCard>
         </FadeUp>
-
         {viewMember && <ProfileModal member={viewMember} onClose={() => setViewMember(null)} onMessage={() => { setViewMember(null); setMsgMember(viewMember); }} />}
         {msgMember && <MessageModal member={msgMember} onClose={() => setMsgMember(null)} />}
       </div>
     );
   }
 
-  // ── Heatmap grid — tooltips rendered in a portal-like wrapper above the grid ──
   return (
     <div className="p-7">
       <FadeUp>
@@ -1404,28 +1444,14 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
                       const availCount = getAvailableInitialsForCell(di, hi).length;
                       const cellBg = heatCellColor(c.pct);
                       return (
-                        // Each cell: relative + overflow-visible so tooltip isn't clipped
-                        <div
-                          key={`${di}-${hi}`}
-                          className="group relative"
-                          style={{ isolation: "isolate" }}
-                        >
+                        <div key={`${di}-${hi}`} className="group relative" style={{ isolation: "isolate" }}>
                           <div
                             onClick={() => setSelected({ dayIdx: di, hourIdx: hi })}
                             className="h-8 m-0.5 rounded-lg cursor-pointer transition-all hover:scale-105 hover:ring-2 hover:ring-teal/50"
                             style={{ background: cellBg }}
                           />
-                          {/* Tooltip — z-index 9999 so it floats over everything */}
-                          <div
-                            className="hidden group-hover:block pointer-events-none"
-                            style={{
-                              position: "absolute",
-                              zIndex: 9999,
-                              bottom: "calc(100% + 6px)",
-                              left: "50%",
-                              transform: "translateX(-50%)",
-                            }}
-                          >
+                          <div className="hidden group-hover:block pointer-events-none"
+                            style={{ position: "absolute", zIndex: 9999, bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)" }}>
                             <div className="bg-teal-dark text-white text-[10px] p-2.5 rounded-xl whitespace-nowrap shadow-xl"
                               style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
                               <div className="font-bold mb-1.5">{HEATMAP_DAYS[di]}, {h} — {c.pct}% available</div>
@@ -1444,28 +1470,24 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
                   </Fragment>
                 ))}
               </div>
-
-              {/* Color legend matching actual pct bands */}
               <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border text-xs flex-wrap">
                 <span className="text-muted-text font-semibold">Members available:</span>
                 {[
                   { bg: "rgba(148,163,184,0.20)", border: "1px solid var(--border)", label: "0–20%" },
-                  { bg: "rgba(100,116,139,0.30)", border: "none",                   label: "20–40%" },
-                  { bg: "rgba(234,179,8,0.55)",   border: "none",                   label: "40–60%" },
-                  { bg: "rgba(13,148,136,0.50)",  border: "none",                   label: "60–80%" },
-                  { bg: "rgba(15,78,70,0.85)",    border: "none",                   label: "80–100%" },
+                  { bg: "rgba(100,116,139,0.30)", border: "none", label: "20–40%" },
+                  { bg: "rgba(234,179,8,0.55)", border: "none", label: "40–60%" },
+                  { bg: "rgba(13,148,136,0.50)", border: "none", label: "60–80%" },
+                  { bg: "rgba(15,78,70,0.85)", border: "none", label: "80–100%" },
                 ].map(({ bg, border, label }) => (
                   <span key={label} className="flex items-center gap-1.5">
                     <span className="w-3.5 h-3.5 rounded inline-block" style={{ background: bg, border }} />
                     {label}
                   </span>
                 ))}
-                <span className="ml-auto text-muted-text italic">Click any cell to see who's available</span>
               </div>
             </div>
           </SectionCard>
         </FadeUp>
-
         <div className="col-span-3 space-y-4">
           <FadeUp delay={100}>
             <SectionCard icon={CheckCircle} title="Most Available">
@@ -1504,183 +1526,449 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
   );
 }
 
-// ─── Template Library — Action Center-style tabs matching the screenshots ──────
-type Tmpl = { name: string; uses: number; lastUsed: string; createdBy?: string; scope?: string; type: string };
+// ─── ACTION CENTER — Full standalone page (matching screenshots) ───────────────
+type ActionTab = "announcement" | "task" | "survey" | "event";
 
-const ACTION_CENTER_TEMPLATES: Tmpl[] = [
-  { name: "Weekly Panata Reminder",      type: "Announcement", uses: 12, lastUsed: "Nov 22, 2025", createdBy: "Kuya J. Ramirez", scope: "Video Team" },
-  { name: "STF Training Reschedule",     type: "Announcement", uses: 8,  lastUsed: "Nov 18, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
-  { name: "GE Section Make-up Class",    type: "Announcement", uses: 6,  lastUsed: "Nov 10, 2025", createdBy: "Prof. C. Velasco", scope: "GE Sec A" },
-  { name: "Reflection Paper Submission", type: "Task",          uses: 4,  lastUsed: "Nov 22, 2025", createdBy: "Kuya J. Ramirez", scope: "Video Team" },
-  { name: "Poster Brief — Event",        type: "Task",          uses: 3,  lastUsed: "Nov 19, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
-  { name: "Recap Reel Assignment",       type: "Task",          uses: 3,  lastUsed: "Nov 15, 2025", createdBy: "Kuya R. Lim",     scope: "Video Team" },
-  { name: "Event Feedback — Concert",    type: "Survey",        uses: 5,  lastUsed: "Nov 23, 2025", createdBy: "STF Operations",  scope: "Org-wide" },
-  { name: "Team Availability Check",     type: "Survey",        uses: 7,  lastUsed: "Nov 20, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
-  { name: "GE Class Sentiment Pulse",    type: "Survey",        uses: 3,  lastUsed: "Nov 08, 2025", createdBy: "Prof. C. Velasco", scope: "GE Sec A" },
+const ACTION_TAB_ICONS: Record<ActionTab, React.ReactNode> = {
+  announcement: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>,
+  task:         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+  survey:       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="9" y="11" width="13" height="13"/><path d="M5 7H3v14h14v-2"/><path d="M14 3H3v14"/></svg>,
+  event:        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+};
+
+const ACTION_TABS: { id: ActionTab; label: string }[] = [
+  { id: "announcement", label: "ANNOUNCEMENT" },
+  { id: "task",         label: "TASK" },
+  { id: "survey",       label: "SURVEY" },
+  { id: "event",        label: "EVENT SETTER" },
 ];
 
-const TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Announcement: { bg: "rgba(239,68,68,0.08)",   text: "#dc2626",  border: "rgba(239,68,68,0.25)" },
-  Task:         { bg: "rgba(13,148,136,0.10)",  text: "#0f766e",  border: "rgba(13,148,136,0.25)" },
-  Survey:       { bg: "rgba(234,179,8,0.12)",   text: "#a16207",  border: "rgba(234,179,8,0.35)" },
-};
+function FormField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">{label}</label>
+      {children}
+    </div>
+  );
+}
 
-const TYPE_ICONS: Record<string, React.ElementType> = {
-  Announcement: Megaphone,
-  Task:         CheckSquare,
-  Survey:       BarChart2,
-};
+function SurveyQuestion({ idx, question, type, onRemove }: {
+  idx: number; question: string; type: string; onRemove: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 border border-border rounded-xl bg-card hover:border-teal/40 transition group">
+      <span className="text-xs font-bold text-muted-text shrink-0">Q{idx}.</span>
+      <span className="flex-1 text-sm text-foreground">{question}</span>
+      <span className="text-[11px] font-semibold text-muted-text shrink-0 border border-border px-2 py-0.5 rounded-lg">{type}</span>
+      <button onClick={onRemove} className="opacity-0 group-hover:opacity-100 transition text-muted-text hover:text-red-500 ml-1">
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+}
 
-const TEMPLATE_TABS = ["All", "Announcement", "Task", "Survey"] as const;
+export function ActionCenter() {
+  const [activeTab, setActiveTab] = useState<ActionTab>("announcement");
+  const [saved, setSaved] = useState(false);
+  const [sent, setSent] = useState(false);
 
-export function TemplateLibrary({ global = false }: { global?: boolean }) {
-  const [activeTab, setActiveTab] = useState<string>("All");
-  const [search, setSearch] = useState("");
+  // Announcement state
+  const [annTitle, setAnnTitle] = useState("Reminder: Pulong Panata");
+  const [annBody, setAnnBody] = useState("Magandang araw mga kapatid! Please be reminded that this week's Pulong Panata has been scheduled.");
+  const [annScope, setAnnScope] = useState("All Members");
+  const [annRecurrence, setAnnRecurrence] = useState("Does not repeat");
+  const [annEffStart, setAnnEffStart] = useState("2026-06-08");
+  const [annEffEnd, setAnnEffEnd] = useState("2026-06-30");
+  const [annPriority, setAnnPriority] = useState("Normal");
+  const [annSchedule, setAnnSchedule] = useState("");
 
-  const filtered = ACTION_CENTER_TEMPLATES.filter(t => {
-    const matchTab = activeTab === "All" || t.type === activeTab;
-    const matchSearch =
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      (t.createdBy?.toLowerCase().includes(search.toLowerCase()) ?? false);
-    return matchTab && matchSearch;
-  });
+  // Task state
+  const [taskTitle, setTaskTitle] = useState("Submit Choir Concert Batch");
+  const [taskDesc, setTaskDesc] = useState("Upload your raw BTS footage (min. 30s, max 5min) to the shared drive.");
+  const [taskScope, setTaskScope] = useState("All Members");
+  const [taskRecurrence, setTaskRecurrence] = useState("Does not repeat");
+  const [taskEffStart, setTaskEffStart] = useState("2026-06-08");
+  const [taskEffEnd, setTaskEffEnd] = useState("2026-06-30");
+  const [taskDeadline, setTaskDeadline] = useState("2026-06-15T23:59");
+  const [taskPriority, setTaskPriority] = useState("Normal");
+  const [taskGraded, setTaskGraded] = useState(true);
+  const [taskPoints, setTaskPoints] = useState("100");
+  const [taskFile, setTaskFile] = useState<File | null>(null);
+
+  // Survey state
+  const [surveyTitle, setSurveyTitle] = useState("Choir Concert Batch 3 — Dry Run Poll");
+  const [surveyDesc, setSurveyDesc] = useState("Quick poll to confirm member availability for Dec 28 dry run.");
+  const [surveyScope, setSurveyScope] = useState("All Members");
+  const [surveyRecurrence, setSurveyRecurrence] = useState("Does not repeat");
+  const [surveyEffStart, setSurveyEffStart] = useState("2026-06-08");
+  const [surveyEffEnd, setSurveyEffEnd] = useState("2026-06-30");
+  const [questions, setQuestions] = useState([
+    { q: "Are you available for Choir Concert dry run on Dec 28?", type: "Multiple Choice" },
+    { q: "Which equipment can you bring?", type: "Selectable Options" },
+    { q: "Any conflicts to flag?", type: "Text Area" },
+  ]);
+  const [newQ, setNewQ] = useState("");
+  const [newQType, setNewQType] = useState("Multiple Choice");
+
+  // Event state
+  const [evtTitle, setEvtTitle] = useState("STF-NEU Choir Concert B");
+  const [evtType, setEvtType] = useState("Team Activity");
+  const [evtVenue, setEvtVenue] = useState("UHall - Main Stage");
+  const [evtStart, setEvtStart] = useState("2026-06-20T18:00");
+  const [evtEnd, setEvtEnd] = useState("2026-06-20T21:00");
+  const [evtDesc, setEvtDesc] = useState("Annual choir concert featuring STF-NEU Music Team batch 3.");
+  const [evtScope, setEvtScope] = useState("All Members");
+  const [evtRecurrence, setEvtRecurrence] = useState("Does not repeat");
+  const [evtEffStart, setEvtEffStart] = useState("2026-06-08");
+  const [evtEffEnd, setEvtEffEnd] = useState("2026-06-30");
+
+  function handleSend() {
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+  }
+
+  const inputCls = "w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-teal/30 text-foreground";
+  const selectCls = "w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-teal/30 text-foreground";
+
+  const sendLabel = activeTab === "announcement" ? "Send Announcement"
+    : activeTab === "task" ? "Send / Assign"
+    : activeTab === "survey" ? "Send Survey"
+    : "Publish Event";
 
   return (
     <div className="p-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-2">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">
-              {global ? "Action Center" : "Action Center"}
-            </h1>
-            <p className="text-sm text-muted-text mt-1">Reusable templates for announcements, tasks &amp; surveys</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {global && (
-              <select className="text-sm border border-border rounded-xl px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
-                <option>All Scopes</option><option>All Teams</option><option>All Sections</option>
-              </select>
-            )}
-            <button className="flex items-center gap-2 bg-teal text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-teal-dark transition"
-              style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}>
-              <Plus className="w-4 h-4" /> New Template
-            </button>
-          </div>
+        <div className="mb-1">
+          <h1 className="font-serif text-3xl font-bold text-teal-dark">Action Center</h1>
+          <p className="text-sm text-muted-text mt-1">Compose, schedule and dispatch · Scope: Group</p>
         </div>
       </FadeUp>
 
-      {/* Scope banner — matches Action Center */}
+      {/* Scope lock banner */}
       <FadeUp delay={30}>
-        <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mt-4 mb-0 flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mt-4">
           <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
           As Student Leader, you can only target your assigned group:
-          <strong className="text-teal-dark ml-1">Video Team / CICS2 / GE Sec A</strong>
+          <strong className="text-teal-dark ml-0.5">Video Team / CICS2 / GE Sec A</strong>
         </div>
       </FadeUp>
 
-      {/* Tabs row — Action Center underline style */}
+      {/* Tab bar — underline style matching screenshots */}
       <FadeUp delay={60}>
-        <div className="flex items-center justify-between border-b border-border mt-5">
-          <div className="flex">
-            {TEMPLATE_TABS.map(t => (
-              <button
-                key={t}
-                onClick={() => setActiveTab(t)}
-                className={`px-5 py-3 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition-all ${
-                  activeTab === t
-                    ? "border-teal-dark text-teal-dark"
-                    : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
-                }`}
-              >
-                {t}
+        <div className="flex border-b border-border mt-5 mb-0">
+          {ACTION_TABS.map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`flex items-center gap-2 px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 -mb-px transition-all whitespace-nowrap ${
+                activeTab === t.id
+                  ? "border-teal-dark text-teal-dark"
+                  : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+              }`}>
+                            <span className={activeTab === t.id ? "text-teal-dark" : "text-muted-text"}>
+                {ACTION_TAB_ICONS[t.id]}
+              </span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {/* Form card */}
+      <FadeUp delay={100}>
+        <div className="bg-card border border-border rounded-2xl mt-5 overflow-hidden" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+          {/* Card header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <span className="text-sm font-semibold text-foreground capitalize">
+              {activeTab === "event" ? "Event Setter" : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            </span>
+            <div className="flex gap-2">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold text-muted-text hover:bg-secondary transition">
+                <BookOpen className="w-3.5 h-3.5" /> Load Template
               </button>
-            ))}
+              <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold text-muted-text hover:bg-secondary transition">
+                <Save className="w-3.5 h-3.5" /> Save as Template
+              </button>
+            </div>
           </div>
-          {/* Search inline with tab bar (right side) */}
-          <div className="relative mb-1">
-            <Search className="w-4 h-4 absolute left-3 top-2 text-muted-text" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search templates…"
-              className="pl-9 pr-3 py-1.5 text-xs border border-border rounded-xl bg-card w-48 focus:outline-none focus:ring-2 focus:ring-teal/30"
-            />
+
+          <div className="px-6 py-5 space-y-5">
+
+            {/* ── ANNOUNCEMENT ── */}
+            {activeTab === "announcement" && (
+              <>
+                <FormField label="Title">
+                  <input value={annTitle} onChange={e => setAnnTitle(e.target.value)} className={inputCls} />
+                </FormField>
+                <FormField label="Body">
+                  <textarea value={annBody} onChange={e => setAnnBody(e.target.value)} rows={4}
+                    className={inputCls + " resize-none"} />
+                </FormField>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Audience / Scope">
+                    <select value={annScope} onChange={e => setAnnScope(e.target.value)} className={selectCls}>
+                      <option>All Members</option>
+                      <option>CICS2 Only</option>
+                      <option>GE Sec A</option>
+                    </select>
+                    <div className="text-[11px] text-muted-text mt-1 flex items-center gap-1">
+                      <Users className="w-3 h-3" /> This will reach: <strong>55 members of Video Team</strong>
+                    </div>
+                  </FormField>
+                  <FormField label="Recurrence">
+                    <select value={annRecurrence} onChange={e => setAnnRecurrence(e.target.value)} className={selectCls}>
+                      <option>Does not repeat</option>
+                      <option>Daily</option>
+                      <option>Weekly</option>
+                      <option>Monthly</option>
+                    </select>
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Effectivity Start">
+                    <input type="date" value={annEffStart} onChange={e => setAnnEffStart(e.target.value)} className={inputCls} />
+                  </FormField>
+                  <FormField label="Effectivity End">
+                    <input type="date" value={annEffEnd} onChange={e => setAnnEffEnd(e.target.value)} className={inputCls} />
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Priority">
+                    <select value={annPriority} onChange={e => setAnnPriority(e.target.value)} className={selectCls}>
+                      <option>Normal</option><option>High</option><option>Low</option>
+                    </select>
+                  </FormField>
+                  <FormField label="Schedule Send (Optional)">
+                    <input type="datetime-local" value={annSchedule} onChange={e => setAnnSchedule(e.target.value)} className={inputCls} />
+                  </FormField>
+                </div>
+              </>
+            )}
+
+            {/* ── TASK ── */}
+            {activeTab === "task" && (
+              <>
+                <FormField label="Task Title">
+                  <input value={taskTitle} onChange={e => setTaskTitle(e.target.value)} className={inputCls} />
+                </FormField>
+                <FormField label="Description">
+                  <textarea value={taskDesc} onChange={e => setTaskDesc(e.target.value)} rows={4}
+                    className={inputCls + " resize-none"} />
+                </FormField>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Audience / Scope">
+                    <select value={taskScope} onChange={e => setTaskScope(e.target.value)} className={selectCls}>
+                      <option>All Members</option><option>CICS2 Only</option><option>GE Sec A</option>
+                    </select>
+                    <div className="text-[11px] text-muted-text mt-1 flex items-center gap-1">
+                      <Users className="w-3 h-3" /> This will reach: <strong>55 members of Video Team</strong>
+                    </div>
+                  </FormField>
+                  <FormField label="Recurrence">
+                    <select value={taskRecurrence} onChange={e => setTaskRecurrence(e.target.value)} className={selectCls}>
+                      <option>Does not repeat</option><option>Weekly</option><option>Monthly</option>
+                    </select>
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Effectivity Start">
+                    <input type="date" value={taskEffStart} onChange={e => setTaskEffStart(e.target.value)} className={inputCls} />
+                  </FormField>
+                  <FormField label="Effectivity End">
+                    <input type="date" value={taskEffEnd} onChange={e => setTaskEffEnd(e.target.value)} className={inputCls} />
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField label="Deadline">
+                    <input type="datetime-local" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} className={inputCls} />
+                  </FormField>
+                  <FormField label="Priority">
+                    <select value={taskPriority} onChange={e => setTaskPriority(e.target.value)} className={selectCls}>
+                      <option>Normal</option><option>High</option><option>Low</option>
+                    </select>
+                  </FormField>
+                  <FormField label="Graded?">
+                    <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-xl bg-background">
+                      <input type="checkbox" checked={taskGraded} onChange={e => setTaskGraded(e.target.checked)} className="accent-teal w-4 h-4" />
+                      <span className="text-sm text-foreground">Graded</span>
+                      {taskGraded && (
+                        <input value={taskPoints} onChange={e => setTaskPoints(e.target.value)}
+                          className="w-16 px-2 py-1 border border-border rounded-lg text-sm bg-card focus:outline-none" />
+                      )}
+                    </div>
+                  </FormField>
+                </div>
+                <FormField label="File Attachment">
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl text-sm bg-background cursor-pointer hover:bg-secondary transition">
+                      <Upload className="w-4 h-4 text-muted-text" />
+                      <span className="text-muted-text">{taskFile ? taskFile.name : "Choose File"}</span>
+                      <span className="text-muted-text text-xs">{!taskFile && "No file chosen"}</span>
+                      <input type="file" className="hidden" onChange={e => setTaskFile(e.target.files?.[0] ?? null)} />
+                    </label>
+                    {taskFile && <button onClick={() => setTaskFile(null)} className="text-muted-text hover:text-foreground"><X className="w-4 h-4" /></button>}
+                  </div>
+                </FormField>
+              </>
+            )}
+
+            {/* ── SURVEY ── */}
+            {activeTab === "survey" && (
+              <>
+                <FormField label="Survey Title">
+                  <input value={surveyTitle} onChange={e => setSurveyTitle(e.target.value)} className={inputCls} />
+                </FormField>
+                <FormField label="Description">
+                  <textarea value={surveyDesc} onChange={e => setSurveyDesc(e.target.value)} rows={3}
+                    className={inputCls + " resize-none"} />
+                </FormField>
+                <FormField label="Questions">
+                  <div className="space-y-2">
+                    {questions.map((q, i) => (
+                      <SurveyQuestion key={i} idx={i + 1} question={q.q} type={q.type}
+                        onRemove={() => setQuestions(prev => prev.filter((_, j) => j !== i))} />
+                    ))}
+                    <div className="flex gap-2 mt-2">
+                      <input value={newQ} onChange={e => setNewQ(e.target.value)} placeholder="Add a question…"
+                        className={inputCls + " flex-1"} onKeyDown={e => {
+                          if (e.key === "Enter" && newQ.trim()) {
+                            setQuestions(prev => [...prev, { q: newQ.trim(), type: newQType }]);
+                            setNewQ("");
+                          }
+                        }} />
+                      <select value={newQType} onChange={e => setNewQType(e.target.value)}
+                        className="px-3 py-2.5 border border-border rounded-xl text-xs bg-background focus:outline-none shrink-0">
+                        <option>Multiple Choice</option>
+                        <option>Selectable Options</option>
+                        <option>Text Area</option>
+                        <option>Rating Scale</option>
+                      </select>
+                      <button
+                        onClick={() => { if (newQ.trim()) { setQuestions(prev => [...prev, { q: newQ.trim(), type: newQType }]); setNewQ(""); } }}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-teal text-teal text-xs font-semibold hover:bg-teal hover:text-white transition shrink-0">
+                        <Plus className="w-3.5 h-3.5" /> Add
+                      </button>
+                    </div>
+                  </div>
+                </FormField>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Audience / Scope">
+                    <select value={surveyScope} onChange={e => setSurveyScope(e.target.value)} className={selectCls}>
+                      <option>All Members</option><option>CICS2 Only</option><option>GE Sec A</option>
+                    </select>
+                    <div className="text-[11px] text-muted-text mt-1 flex items-center gap-1">
+                      <Users className="w-3 h-3" /> This will reach: <strong>55 members</strong>
+                    </div>
+                  </FormField>
+                  <FormField label="Recurrence">
+                    <select value={surveyRecurrence} onChange={e => setSurveyRecurrence(e.target.value)} className={selectCls}>
+                      <option>Does not repeat</option><option>Weekly</option><option>Monthly</option>
+                    </select>
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Effectivity Start">
+                    <input type="date" value={surveyEffStart} onChange={e => setSurveyEffStart(e.target.value)} className={inputCls} />
+                  </FormField>
+                  <FormField label="Effectivity End">
+                    <input type="date" value={surveyEffEnd} onChange={e => setSurveyEffEnd(e.target.value)} className={inputCls} />
+                  </FormField>
+                </div>
+              </>
+            )}
+
+            {/* ── EVENT SETTER ── */}
+            {activeTab === "event" && (
+              <>
+                <FormField label="Event Title">
+                  <input value={evtTitle} onChange={e => setEvtTitle(e.target.value)} className={inputCls} />
+                </FormField>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Event Type">
+                    <select value={evtType} onChange={e => setEvtType(e.target.value)} className={selectCls}>
+                      <option>Team Activity</option><option>GE Class</option><option>Panata</option><option>STF Practice</option><option>Major Event</option>
+                    </select>
+                  </FormField>
+                  <FormField label="Venue (Nullable)">
+                    <input value={evtVenue} onChange={e => setEvtVenue(e.target.value)} className={inputCls} placeholder="e.g. UHall - Main Stage" />
+                    {evtVenue && <div className="text-[11px] text-muted-text mt-1">📍 Sonic GPS TBD</div>}
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Scheduled Start">
+                    <input type="datetime-local" value={evtStart} onChange={e => setEvtStart(e.target.value)} className={inputCls} />
+                  </FormField>
+                  <FormField label="Scheduled End">
+                    <input type="datetime-local" value={evtEnd} onChange={e => setEvtEnd(e.target.value)} className={inputCls} />
+                  </FormField>
+                </div>
+                <FormField label="Description">
+                  <textarea value={evtDesc} onChange={e => setEvtDesc(e.target.value)} rows={3}
+                    className={inputCls + " resize-none"} />
+                </FormField>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Audience / Scope">
+                    <select value={evtScope} onChange={e => setEvtScope(e.target.value)} className={selectCls}>
+                      <option>All Members</option><option>CICS2 Only</option><option>GE Sec A</option>
+                    </select>
+                    <div className="text-[11px] text-muted-text mt-1 flex items-center gap-1">
+                      <Users className="w-3 h-3" /> This will reach: <strong>55 members</strong>
+                    </div>
+                  </FormField>
+                  <FormField label="Recurrence">
+                    <select value={evtRecurrence} onChange={e => setEvtRecurrence(e.target.value)} className={selectCls}>
+                      <option>Does not repeat</option><option>Weekly</option><option>Monthly</option>
+                    </select>
+                  </FormField>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Effectivity Start">
+                    <input type="date" value={evtEffStart} onChange={e => setEvtEffStart(e.target.value)} className={inputCls} />
+                  </FormField>
+                  <FormField label="Effectivity End">
+                    <input type="date" value={evtEffEnd} onChange={e => setEvtEffEnd(e.target.value)} className={inputCls} />
+                  </FormField>
+                </div>
+                <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs text-muted-text">
+                  📌 Publishing auto-adds to Institutional Calendar · dispatches announcement
+                </div>
+              </>
+            )}
+
+          </div>
+
+          {/* Card footer */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-secondary/20">
+            <div className="flex items-center gap-2 text-xs text-muted-text">
+              {/* Rich text toolbar hint */}
+              <span className="flex items-center gap-1 px-2 py-1 border border-border rounded-lg bg-card">T</span>
+              <span className="flex items-center gap-1 px-2 py-1 border border-border rounded-lg bg-card"><Pencil className="w-3 h-3" /></span>
+            </div>
+            <div className="flex items-center gap-2">
+              {sent && (
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-500/10 border border-green-300 px-3 py-1.5 rounded-lg">
+                  <CheckCircle className="w-3.5 h-3.5" /> {activeTab === "event" ? "Event published!" : "Sent successfully!"}
+                </span>
+              )}
+              <button className="px-4 py-2 text-sm border border-border rounded-xl font-semibold hover:bg-secondary transition">Preview</button>
+              <button onClick={handleSend}
+                className="flex items-center gap-2 px-5 py-2 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition"
+                style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}>
+                <Send className="w-4 h-4" />
+                {sendLabel}
+              </button>
+            </div>
           </div>
         </div>
-      </FadeUp>
-
-      {/* Info hint */}
-      <FadeUp delay={80}>
-        <div className="bg-secondary/50 rounded-xl px-4 py-2.5 text-xs text-muted-text mt-4 mb-5">
-          Reusable templates for announcements, tasks, surveys, and events. Load into any tab above with one click.
-        </div>
-      </FadeUp>
-
-      {/* Table */}
-      <FadeUp delay={120}>
-        <SectionCard icon={BookOpen} title="Templates">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
-                  <th className="px-5 py-3 text-left font-semibold w-[38%]">Template</th>
-                  <th className="px-5 py-3 text-left font-semibold">Type</th>
-                  <th className="px-5 py-3 text-left font-semibold">Creator</th>
-                  <th className="px-5 py-3 text-left font-semibold">Last Used</th>
-                  <th className="px-5 py-3 text-left font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((t, i) => {
-                  const tc = TYPE_COLORS[t.type];
-                  const TypeIcon = TYPE_ICONS[t.type];
-                  return (
-                    <tr
-                      key={t.name}
-                      className={`border-b border-border last:border-0 transition-colors ${
-                        i % 2 === 0 ? "bg-card" : "bg-secondary/20"
-                      } hover:bg-teal-soft/20`}
-                    >
-                      <td className="px-5 py-3.5 font-semibold text-foreground">{t.name}</td>
-                      <td className="px-5 py-3.5">
-                        <span
-                          className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full"
-                          style={{ background: tc.bg, color: tc.text, border: `1px solid ${tc.border}` }}
-                        >
-                          <TypeIcon className="w-3 h-3" />
-                          {t.type}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-sm text-muted-text">{t.createdBy}</td>
-                      <td className="px-5 py-3.5 text-sm text-muted-text">{t.lastUsed}</td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex gap-1.5">
-                          <button className="px-3 py-1 rounded-lg bg-teal text-white text-xs font-semibold hover:bg-teal-dark transition">Load</button>
-                          <button className="px-3 py-1 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1">
-                            <Edit3 className="w-3 h-3" /> Edit
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-5 py-12 text-center text-muted-text text-sm">
-                      No templates match your search.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </SectionCard>
       </FadeUp>
     </div>
   );
 }
 
-// ─── My Profile — John Patrick Narvasa ────────────────────────────────────────
+// ─── TemplateLibrary now re-exports ActionCenter ──────────────────────────────
+export function TemplateLibrary({ global = false }: { global?: boolean }) {
+  return <ActionCenter />;
+}
+
+// ─── My Profile ───────────────────────────────────────────────────────────────
 export function MyProfile() {
   const me: Member = {
     initials: "JN", name: "John Patrick Narvasa", id: "STF-2022-0001",
@@ -1716,7 +2004,6 @@ export function MyProfile() {
       </FadeUp>
 
       <div className="grid grid-cols-12 gap-5">
-        {/* Left card */}
         <FadeUp delay={60} className="col-span-4">
           <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
             <div className="bg-teal-dark px-6 pt-6 pb-12">
@@ -1765,38 +2052,22 @@ export function MyProfile() {
           </div>
         </FadeUp>
 
-        {/* Right content */}
         <div className="col-span-8 space-y-4">
           <FadeUp delay={80}>
-            <SectionCard
-              icon={Pencil}
-              title="About Me"
+            <SectionCard icon={Pencil} title="About Me"
               action={
                 <div className="flex items-center gap-2">
-                  {saved && (
-                    <span className="flex items-center gap-1 text-xs font-semibold text-green-700">
-                      <CheckCircle className="w-3.5 h-3.5" /> Saved
-                    </span>
-                  )}
-                  <button
-                    onClick={() => editMode ? handleSave() : setEditMode(true)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-                      editMode ? "bg-teal text-white" : "border border-border text-muted-text hover:bg-secondary"
-                    }`}
-                  >
+                  {saved && <span className="flex items-center gap-1 text-xs font-semibold text-green-700"><CheckCircle className="w-3.5 h-3.5" /> Saved</span>}
+                  <button onClick={() => editMode ? handleSave() : setEditMode(true)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${editMode ? "bg-teal text-white" : "border border-border text-muted-text hover:bg-secondary"}`}>
                     {editMode ? <><Save className="w-3.5 h-3.5" /> Save</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
                   </button>
                 </div>
-              }
-            >
+              }>
               <div className="p-5">
                 {editMode ? (
-                  <textarea
-                    value={bio}
-                    onChange={e => setBio(e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-teal/40 rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none"
-                  />
+                  <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4}
+                    className="w-full px-4 py-3 border border-teal/40 rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none" />
                 ) : (
                   <p className="text-sm text-foreground leading-relaxed">{bio}</p>
                 )}
@@ -1849,102 +2120,445 @@ export function MyProfile() {
   );
 }
 
-// ─── Dispatcher Modal ─────────────────────────────────────────────────────────
+// ─── Dispatcher Modal (legacy, replaced by ActionCenter page) ─────────────────
 export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team 104" }: { scopeLocked?: boolean; scopeLabel?: string }) {
   const { modal, setModal } = usePortal();
-  const [tab, setTab] = useState<"ann" | "task" | "survey">("task");
   if (modal !== "dispatcher") return null;
-
   return (
     <div className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-6" onClick={() => setModal(null)}>
-      <div onClick={e => e.stopPropagation()} className="bg-background w-full max-w-5xl rounded-2xl border border-border overflow-hidden max-h-[92vh] flex flex-col"
+      <div onClick={e => e.stopPropagation()} className="bg-background w-full max-w-2xl rounded-2xl border border-border overflow-hidden"
         style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.22)" }}>
         <div className="px-6 py-4 border-b border-border bg-teal-dark text-white flex items-center justify-between">
-          <h3 className="font-serif text-lg font-bold tracking-wider flex items-center gap-2">
-            <Send className="w-5 h-5 opacity-80" /> Unified Dispatcher
+          <h3 className="font-serif text-lg font-bold flex items-center gap-2">
+            <Send className="w-5 h-5 opacity-80" /> Quick Dispatch
           </h3>
           <button onClick={() => setModal(null)} className="hover:bg-white/10 rounded-lg p-1.5 transition"><X className="w-5 h-5" /></button>
         </div>
-        <div className="flex gap-0 border-b border-border bg-card px-6">
-          {[{ id: "ann" as const, label: "📢 Announcement" }, { id: "task" as const, label: "✅ Task" }, { id: "survey" as const, label: "📋 Survey" }].map(({ id, label }) => (
-            <button key={id} onClick={() => setTab(id)}
-              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${
-                tab === id ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
-              }`}>{label}</button>
-          ))}
+        <div className="p-6 text-sm text-muted-text">
+          Use the <strong className="text-teal-dark">Action Center</strong> tab for full announcement, task, survey, and event creation.
         </div>
-        {scopeLocked && (
-          <div className="bg-amber-status/10 border-b border-amber-status/30 text-xs px-6 py-2.5 text-foreground font-medium flex items-center gap-2">
-            🔒 As Student Leader, you can only target your assigned group: <strong className="text-teal-dark">{scopeLabel}</strong>
+        <div className="px-6 py-4 border-t border-border flex justify-end">
+          <button onClick={() => setModal(null)} className="px-5 py-2 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition">Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+// ─── GE Attendance ────────────────────────────────────────────────────────────
+const geSessions = [
+  ["Art Appreciation — Sec A","GE","Aug 14, 2025","11:30AM–1PM",28,2,1,0,93],
+  ["Sosyedad at Literatura — Sec A","GE","Aug 18, 2025","1:30–3PM",28,1,0,1,96],
+  ["PE4 — Sec A","GE","Aug 25, 2025","3–5PM",25,3,2,0,89],
+  ["DAA — Sec A","GE","Sep 1, 2025","10–11:30AM",27,1,0,0,96],
+  ["The Contemporary World — Sec A","GE","Sep 3, 2025","1–4PM",26,2,0,0,93],
+];
+
+export function GEAttendance() {
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  const [tab, setTab] = useState("ALL");
+  const pct = 93;
+  const r = 36; const circ = 2 * Math.PI * r;
+  const [go, setGo] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
+
+  const filters = ["ALL","ART APPRECIATION","SOSYEDAD","PE4","DAA","CONTEMPORARY WORLD"];
+
+  return (
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Course Attendance</h1>
+            <p className="text-sm text-muted-text mt-1">GE 101 — Section A · Course Records</p>
           </div>
-        )}
-        <div className="grid grid-cols-12 gap-5 p-6 overflow-y-auto flex-1">
-          <div className="col-span-4 space-y-3">
-            <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Target Scope</div>
-            <div className="bg-card border border-border rounded-xl p-3 text-sm space-y-2">
-              <label className="flex items-center gap-2 font-semibold">
-                <input type="checkbox" defaultChecked className="accent-teal" /> {scopeLabel} (55)
-              </label>
-              <div className="pl-5 space-y-1.5 text-xs">
-                <label className="flex items-center gap-2"><input type="checkbox" defaultChecked className="accent-teal" /> All Members</label>
-                {["Natalie Portman","Alex Ammin","Ben Affleck","Maria Santos","Jose Reyes"].map(n => (
-                  <label key={n} className="flex items-center gap-2"><input type="checkbox" className="accent-teal" /> {n}</label>
-                ))}
+          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">GE Monitor View</span>
+        </div>
+      </FadeUp>
+
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <FadeUp delay={60}>
+          <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div className="relative w-20 h-20 shrink-0">
+              <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
+                <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
+                <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
+                  style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
+              </svg>
+              <div className="absolute inset-0 grid place-items-center">
+                <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
               </div>
             </div>
+            <div>
+              <div className="text-xs text-muted-text">Overall Attendance</div>
+              <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
+              <div className="text-xs text-muted-text mt-0.5">5 sessions</div>
+            </div>
           </div>
-          <div className="col-span-8 space-y-3">
-            {tab === "task" && <>
-              <input className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30" defaultValue="Submit Choir Concert Batch" />
-              <textarea className="w-full p-4 border border-border rounded-xl text-sm bg-card focus:outline-none" rows={4} defaultValue="Upload your raw BTS footage (min. 30s, max 5min) to the shared drive." />
-              <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-xs font-semibold text-muted-text block mb-1">Due Date</label><input type="datetime-local" defaultValue="2026-06-15T23:59" className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-card focus:outline-none" /></div>
-                <div><label className="text-xs font-semibold text-muted-text block mb-1">Priority</label><select className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-card focus:outline-none"><option>Normal</option><option>High</option><option>Low</option></select></div>
-                <div><label className="text-xs font-semibold text-muted-text block mb-1">Graded?</label><div className="flex items-center gap-2 px-3 py-2"><input type="checkbox" defaultChecked className="accent-teal" /><span className="text-sm">Graded</span><input defaultValue="100" className="w-16 px-2 py-1 border border-border rounded-lg text-sm bg-card" /></div></div>
-              </div>
-            </>}
-            {tab === "ann" && <>
-              <input className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-card focus:outline-none" defaultValue="Reminder: Pulong Panata" />
-              <textarea className="w-full p-4 border border-border rounded-xl text-sm bg-card focus:outline-none" rows={5} defaultValue="Magandang araw mga kapatid! Please be reminded that this week's Pulong Panata has been scheduled." />
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-xs font-semibold text-muted-text block mb-1">Effectivity Start</label><input type="date" defaultValue="2026-06-08" className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-card focus:outline-none" /></div>
-                <div><label className="text-xs font-semibold text-muted-text block mb-1">Effectivity End</label><input type="date" defaultValue="2026-06-30" className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-card focus:outline-none" /></div>
-              </div>
-            </>}
-            {tab === "survey" && <>
-              <input className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-card focus:outline-none" defaultValue="Choir Concert Batch 3 — Dry Run Poll" />
-              <textarea className="w-full p-4 border border-border rounded-xl text-sm bg-card focus:outline-none" rows={2} defaultValue="Quick poll to confirm member availability for Dec 28 dry run." />
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between px-4 py-2.5 border border-border rounded-xl bg-card">
-                  <span>Q1. Are you available for Choir Concert dry run on Dec 28?</span>
-                  <span className="text-xs text-muted-text">Multiple Choice</span>
-                </div>
-                <div className="flex items-center justify-between px-4 py-2.5 border border-border rounded-xl bg-card">
-                  <span>Q2. Which equipment can you bring?</span>
-                  <span className="text-xs text-muted-text">Selectable Options</span>
-                </div>
-                <div className="flex items-center justify-between px-4 py-2.5 border border-border rounded-xl bg-card">
-                  <span>Q3. Any conflicts to flag?</span>
-                  <span className="text-xs text-muted-text">Text Area</span>
-                </div>
-              </div>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-teal text-teal text-sm font-semibold hover:bg-teal hover:text-white transition">
-                <Plus className="w-4 h-4" /> Add Question
-              </button>
-            </>}
-          </div>
+        </FadeUp>
+        <FadeUp delay={100}><StatCard label="Sessions Tracked" value="5" sub="This semester" /></FadeUp>
+        <FadeUp delay={140}><StatCard label="Students at Risk" value="1 ⚠" accent sub="Below 75% threshold" /></FadeUp>
+      </div>
+
+      <FadeUp delay={180}>
+        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+          {filters.map(f => (
+            <button key={f} onClick={() => setTab(f)}
+              className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
+              {f}
+            </button>
+          ))}
         </div>
-        <div className="px-6 py-4 border-t border-border bg-card flex justify-between gap-2">
-          <button className="px-4 py-2 text-sm border border-border rounded-xl font-semibold hover:bg-secondary transition flex items-center gap-1.5"><BookOpen className="w-4 h-4" /> Load Template</button>
-          <div className="flex gap-2">
+      </FadeUp>
+
+      <FadeUp delay={220}>
+        <SectionCard icon={ClipboardList} title="Session Log">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                  {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
+                    <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {geSessions.map((s, i) => (
+                  <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
+                    {s.map((c, j) => (
+                      <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
+                        {j===1
+                          ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
+                          : j===8 ? `${c}%` : c}
+                      </td>
+                    ))}
+                    <td className="px-4 py-3.5">
+                      <button onClick={() => setViewSession(s)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                        <ClipboardList className="w-3 h-3" /> View Sheet
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      </FadeUp>
+
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
+    </div>
+  );
+}
+
+// ─── Panata Attendance ────────────────────────────────────────────────────────
+const panataSessions = [
+  ["Tupad — CICS2","Panata","Aug 3, 2025","6:45–10AM",14,0,1,0,96],
+  ["Pulong Panata — CICS2","Panata","Aug 10, 2025","2:30–3PM",13,1,0,0,93],
+  ["Komiti Meeting","Panata","Aug 17, 2025","4–4:30PM",14,0,0,0,100],
+  ["Tupad — CICS2","Panata","Aug 24, 2025","6:45–10AM",12,1,1,0,89],
+  ["Pulong Panata — CICS2","Panata","Sep 1, 2025","2:30–3PM",13,0,1,1,96],
+];
+
+export function PanataAttendance() {
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  const [tab, setTab] = useState("ALL");
+  const pct = 95;
+  const r = 36; const circ = 2 * Math.PI * r;
+  const [go, setGo] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
+
+  const filters = ["ALL","TUPAD","PULONG PANATA","KOMITI"];
+
+  return (
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Panata Attendance</h1>
+            <p className="text-sm text-muted-text mt-1">CICS2 — Panata Group · Session Records</p>
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Panata Monitor View</span>
+        </div>
+      </FadeUp>
+
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <FadeUp delay={60}>
+          <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div className="relative w-20 h-20 shrink-0">
+              <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
+                <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
+                <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
+                  style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
+              </svg>
+              <div className="absolute inset-0 grid place-items-center">
+                <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-text">Overall Attendance</div>
+              <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
+              <div className="text-xs text-muted-text mt-0.5">5 sessions</div>
+            </div>
+          </div>
+        </FadeUp>
+        <FadeUp delay={100}><StatCard label="Sessions Tracked" value="5" sub="This semester" /></FadeUp>
+        <FadeUp delay={140}><StatCard label="Members at Risk" value="0" sub="All above threshold" /></FadeUp>
+      </div>
+
+      <FadeUp delay={180}>
+        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+          {filters.map(f => (
+            <button key={f} onClick={() => setTab(f)}
+              className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
+              {f}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={220}>
+        <SectionCard icon={ClipboardList} title="Panata Session Log">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                  {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
+                    <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {panataSessions.map((s, i) => (
+                  <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
+                    {s.map((c, j) => (
+                      <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
+                        {j===1
+                          ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
+                          : j===8 ? `${c}%` : c}
+                      </td>
+                    ))}
+                    <td className="px-4 py-3.5">
+                      <button onClick={() => setViewSession(s)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                        <ClipboardList className="w-3 h-3" /> View Sheet
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      </FadeUp>
+
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
+    </div>
+  );
+}
+
+// ─── Action Center Limited (Announcement + Task only, SVG icons) ──────────────
+type LimitedTab = "announcement" | "task";
+
+const SVG_ICONS = {
+  announcement: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+    </svg>
+  ),
+  task: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <polyline points="9 11 12 14 22 4"/>
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+  ),
+};
+
+export function ActionCenterLimited({ scope = "Group" }: { scope?: string }) {
+  const [activeTab, setActiveTab] = useState<LimitedTab>("announcement");
+  const [sent, setSent] = useState(false);
+
+  const [annTitle, setAnnTitle] = useState("");
+  const [annBody, setAnnBody] = useState("");
+  const [annScope, setAnnScope] = useState("All Members");
+  const [annEffStart, setAnnEffStart] = useState("2026-06-08");
+  const [annEffEnd, setAnnEffEnd] = useState("2026-06-30");
+  const [annPriority, setAnnPriority] = useState("Normal");
+
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDesc, setTaskDesc] = useState("");
+  const [taskScope, setTaskScope] = useState("All Members");
+  const [taskDeadline, setTaskDeadline] = useState("2026-06-15T23:59");
+  const [taskPriority, setTaskPriority] = useState("Normal");
+  const [taskGraded, setTaskGraded] = useState(false);
+  const [taskPoints, setTaskPoints] = useState("100");
+  const [taskEffStart, setTaskEffStart] = useState("2026-06-08");
+  const [taskEffEnd, setTaskEffEnd] = useState("2026-06-30");
+
+  const inputCls = "w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-background focus:outline-none focus:ring-2 focus:ring-teal/30 text-foreground";
+  const selectCls = inputCls;
+
+  const TABS: { id: LimitedTab; label: string }[] = [
+    { id: "announcement", label: "ANNOUNCEMENT" },
+    { id: "task",         label: "TASK" },
+  ];
+
+  return (
+    <div className="p-7">
+      <FadeUp>
+        <div className="mb-1">
+          <h1 className="font-serif text-3xl font-bold text-teal-dark">Action Center</h1>
+          <p className="text-sm text-muted-text mt-1">Compose and dispatch · Scope: {scope}</p>
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={30}>
+        <div className="flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mt-4">
+          <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+          Your scope is limited to: <strong className="text-teal-dark ml-0.5">{scope}</strong>
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={60}>
+        <div className="flex border-b border-border mt-5">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`flex items-center gap-2 px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 -mb-px transition-all whitespace-nowrap ${
+                activeTab === t.id ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+              }`}>
+              <span className={activeTab === t.id ? "text-teal-dark" : "text-muted-text"}>
+                {SVG_ICONS[t.id]}
+              </span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={100}>
+        <div className="bg-card border border-border rounded-2xl mt-5 overflow-hidden" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <span className="text-sm font-semibold text-foreground capitalize">{activeTab}</span>
+            <div className="flex gap-2">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold text-muted-text hover:bg-secondary transition">
+                <BookOpen className="w-3.5 h-3.5" /> Load Template
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold text-muted-text hover:bg-secondary transition">
+                <Save className="w-3.5 h-3.5" /> Save as Template
+              </button>
+            </div>
+          </div>
+
+          <div className="px-6 py-5 space-y-5">
+            {activeTab === "announcement" && (<>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Title</label>
+                <input value={annTitle} onChange={e => setAnnTitle(e.target.value)} placeholder="Announcement title…" className={inputCls} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Body</label>
+                <textarea value={annBody} onChange={e => setAnnBody(e.target.value)} rows={4} placeholder="Write your announcement…" className={inputCls + " resize-none"} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Audience / Scope</label>
+                  <select value={annScope} onChange={e => setAnnScope(e.target.value)} className={selectCls}>
+                    <option>All Members</option>
+                    <option>{scope}</option>
+                  </select>
+                  <div className="text-[11px] text-muted-text flex items-center gap-1">
+                    <Users className="w-3 h-3" /> Reaches members of <strong className="ml-0.5">{scope}</strong>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Priority</label>
+                  <select value={annPriority} onChange={e => setAnnPriority(e.target.value)} className={selectCls}>
+                    <option>Normal</option><option>High</option><option>Low</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity Start</label>
+                  <input type="date" value={annEffStart} onChange={e => setAnnEffStart(e.target.value)} className={inputCls} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity End</label>
+                  <input type="date" value={annEffEnd} onChange={e => setAnnEffEnd(e.target.value)} className={inputCls} />
+                </div>
+              </div>
+            </>)}
+
+            {activeTab === "task" && (<>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Task Title</label>
+                <input value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="Task title…" className={inputCls} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Description</label>
+                <textarea value={taskDesc} onChange={e => setTaskDesc(e.target.value)} rows={4} placeholder="Describe the task…" className={inputCls + " resize-none"} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Audience / Scope</label>
+                  <select value={taskScope} onChange={e => setTaskScope(e.target.value)} className={selectCls}>
+                    <option>All Members</option>
+                    <option>{scope}</option>
+                  </select>
+                  <div className="text-[11px] text-muted-text flex items-center gap-1">
+                    <Users className="w-3 h-3" /> Reaches members of <strong className="ml-0.5">{scope}</strong>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Priority</label>
+                  <select value={taskPriority} onChange={e => setTaskPriority(e.target.value)} className={selectCls}>
+                    <option>Normal</option><option>High</option><option>Low</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Deadline</label>
+                  <input type="datetime-local" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} className={inputCls} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity Start</label>
+                  <input type="date" value={taskEffStart} onChange={e => setTaskEffStart(e.target.value)} className={inputCls} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity End</label>
+                  <input type="date" value={taskEffEnd} onChange={e => setTaskEffEnd(e.target.value)} className={inputCls} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Graded?</label>
+                <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-xl bg-background w-fit">
+                  <input type="checkbox" checked={taskGraded} onChange={e => setTaskGraded(e.target.checked)} className="accent-teal w-4 h-4" />
+                  <span className="text-sm text-foreground">Graded</span>
+                  {taskGraded && (
+                    <input value={taskPoints} onChange={e => setTaskPoints(e.target.value)}
+                      className="w-16 px-2 py-1 border border-border rounded-lg text-sm bg-card focus:outline-none ml-1" />
+                  )}
+                </div>
+              </div>
+            </>)}
+          </div>
+
+          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-secondary/20">
+            {sent && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-500/10 border border-green-300 px-3 py-1.5 rounded-lg">
+                <CheckCircle className="w-3.5 h-3.5" /> Sent successfully!
+              </span>
+            )}
             <button className="px-4 py-2 text-sm border border-border rounded-xl font-semibold hover:bg-secondary transition">Preview</button>
-            <button className="px-4 py-2 text-sm border border-amber-status/60 text-teal-dark bg-amber-status/10 rounded-xl font-semibold hover:bg-amber-status/20 transition">Save as Template</button>
-            <button onClick={() => setModal(null)} className="px-5 py-2 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition" style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}>
-              {tab === "ann" ? "Send Announcement" : tab === "task" ? "Send / Assign" : "Send Survey"}
+            <button onClick={() => { setSent(true); setTimeout(() => setSent(false), 3000); }}
+              className="flex items-center gap-2 px-5 py-2 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition"
+              style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}>
+              <Send className="w-4 h-4" />
+              {activeTab === "announcement" ? "Send Announcement" : "Send / Assign"}
             </button>
           </div>
         </div>
-      </div>
+      </FadeUp>
     </div>
   );
 }

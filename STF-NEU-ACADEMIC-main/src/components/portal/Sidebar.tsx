@@ -56,11 +56,8 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "GE Monitor Tools",
     roleTools: [
-      { id: "roster",          label: "Team Members",        icon: Users },
-      { id: "qr",              label: "QR Generator",        icon: QrCode },
-      { id: "team-attendance", label: "Team Attendance",     icon: ClipboardList },
-      { id: "team-heatmap",    label: "Team Heatmap",        icon: Thermometer },
-      { id: "templates",       label: "Action Center",       icon: Library },
+      { id: "ge-attendance", label: "Course Attendance",    icon: ClipboardList },
+      { id: "templates",     label: "Action Center",        icon: Library },
     ],
     footer: [
       { id: "settings", label: "Settings", icon: Settings },
@@ -77,11 +74,8 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "Panata Monitor Tools",
     roleTools: [
-      { id: "roster",          label: "Panata Members",      icon: Users },
-      { id: "qr",              label: "QR Generator",        icon: QrCode },
-      { id: "team-attendance", label: "Panata Attendance",   icon: ClipboardList },
-      { id: "team-heatmap",    label: "Panata Heatmap",      icon: Thermometer },
-      { id: "templates",       label: "Action Center",       icon: Library },
+      { id: "panata-attendance", label: "Panata Attendance", icon: ClipboardList },
+      { id: "templates",         label: "Action Center",     icon: Library },
     ],
     footer: [
       { id: "settings", label: "Settings", icon: Settings },

@@ -10,7 +10,7 @@ import {
 } from "@/components/portal/StudentScreens";
 import {
   Roster, QRGenerator, TeamAttendance, HeatmapView, Dispatcher,
-  AttendanceLogger, TemplateLibrary,
+  AttendanceLogger, TemplateLibrary,   GEAttendance, PanataAttendance, ActionCenterLimited,
 } from "@/components/portal/LeaderScreens";
 import {
   AdminDashboard, EventDetail, SessionLogs, Operations, Endoar, StudentGroups,
@@ -102,37 +102,32 @@ function Content() {
 
   if (role === "ge-monitor") {
     switch (view) {
-      case "dashboard": return <StudentDashboard />;
-      case "schedule": return <ScheduleView />;
-      case "roster": return <Roster />;
-      case "qr": return <QRGenerator />;
-      case "team-attendance": return <TeamAttendance />;
-      case "team-heatmap": return <HeatmapView scope="GE 101 — Section A" banner="Scoped View Only — Showing GE 101 Sec A members" />;
-      case "tasks": return <TasksView showAssign />;
-      case "announcements": return <AnnouncementsView canCreate />;
-      case "attendance-logs": return <AttendanceLogsView />;
-      case "profile": return <ProfileView />;
-      case "templates": return <TemplateLibrary />;
-      case "settings": return <SettingsView />;
-      default: return <StudentDashboard />;
+      case "dashboard":      return <StudentDashboard />;
+      case "schedule":       return <ScheduleView />;
+      case "tasks":          return <TasksView showAssign />;
+      case "announcements":  return <AnnouncementsView canCreate />;
+      case "attendance-logs":return <AttendanceLogsView />;
+      case "profile":        return <ProfileView />;
+      case "ge-attendance":  return <GEAttendance />;
+      case "templates":      return <ActionCenterLimited scope="GE 101 — Section A" />;
+      case "settings":       return <SettingsView />;
+      default:               return <StudentDashboard />;
     }
   }
 
+
   if (role === "panata-monitor") {
     switch (view) {
-      case "dashboard": return <StudentDashboard />;
-      case "schedule": return <ScheduleView />;
-      case "roster": return <Roster />;
-      case "qr": return <QRGenerator />;
-      case "team-attendance": return <TeamAttendance />;
-      case "team-heatmap": return <HeatmapView scope="CICS2 — Panata Group" banner="Scoped View Only — Showing CICS2 Panata members" />;
-      case "tasks": return <TasksView showAssign />;
-      case "announcements": return <AnnouncementsView canCreate />;
-      case "attendance-logs": return <AttendanceLogsView />;
-      case "profile": return <ProfileView />;
-      case "templates": return <TemplateLibrary />;
-      case "settings": return <SettingsView />;
-      default: return <StudentDashboard />;
+      case "dashboard":          return <StudentDashboard />;
+      case "schedule":           return <ScheduleView />;
+      case "tasks":              return <TasksView showAssign />;
+      case "announcements":      return <AnnouncementsView canCreate />;
+      case "attendance-logs":    return <AttendanceLogsView />;
+      case "profile":            return <ProfileView />;
+      case "panata-attendance":  return <PanataAttendance />;
+      case "templates":          return <ActionCenterLimited scope="CICS2 — Panata Group" />;
+      case "settings":           return <SettingsView />;
+      default:                   return <StudentDashboard />;
     }
   }
 
