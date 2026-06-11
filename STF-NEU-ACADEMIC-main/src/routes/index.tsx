@@ -34,9 +34,11 @@ export const Route = createFileRoute("/")(({
 function Shell() {
   const { role } = usePortal();
   const dispatcherScope =
-    role === "leader" ? { locked: true,  label: "Video Team 104" } :
-    role === "admin"  ? { locked: true,  label: "GE 101 - Sec A" } :
-                        { locked: false, label: "All AEVM" };
+    role === "leader"          ? { locked: true,  label: "Video Team 104" } :
+    role === "ge-monitor"      ? { locked: true,  label: "GE 101 - Sec A" } :
+    role === "panata-monitor"  ? { locked: true,  label: "CICS2 — Panata Group" } :
+    role === "admin"           ? { locked: true,  label: "GE 101 - Sec A" } :
+                                 { locked: false, label: "All AEVM" };
   return (
     <div className="min-h-screen text-foreground" style={{ background: "var(--background)" }}>
       <TopNav />
@@ -85,11 +87,49 @@ function Content() {
       case "schedule": return <ScheduleView />;
       case "roster": return <Roster />;
       case "qr": return <QRGenerator />;
-      case "logger": return <AttendanceLogger />;
       case "team-attendance": return <TeamAttendance />;
       case "team-heatmap": return <HeatmapView scope="Video Team 104" banner="Scoped View Only — Showing Video Team 104 members" />;
       case "tasks": return <TasksView showAssign />;
       case "announcements": return <AnnouncementsView canCreate />;
+      case "templates": return <TemplateLibrary />;
+      case "settings": return <SettingsView />;
+      default: return <StudentDashboard />;
+      case "attendance-logs": return <AttendanceLogsView />;
+      case "profile": return <ProfileView />;
+    }
+  }
+  // ADD after the leader block (after its closing brace), before the DispatcherCTA function:
+
+  if (role === "ge-monitor") {
+    switch (view) {
+      case "dashboard": return <StudentDashboard />;
+      case "schedule": return <ScheduleView />;
+      case "roster": return <Roster />;
+      case "qr": return <QRGenerator />;
+      case "team-attendance": return <TeamAttendance />;
+      case "team-heatmap": return <HeatmapView scope="GE 101 — Section A" banner="Scoped View Only — Showing GE 101 Sec A members" />;
+      case "tasks": return <TasksView showAssign />;
+      case "announcements": return <AnnouncementsView canCreate />;
+      case "attendance-logs": return <AttendanceLogsView />;
+      case "profile": return <ProfileView />;
+      case "templates": return <TemplateLibrary />;
+      case "settings": return <SettingsView />;
+      default: return <StudentDashboard />;
+    }
+  }
+
+  if (role === "panata-monitor") {
+    switch (view) {
+      case "dashboard": return <StudentDashboard />;
+      case "schedule": return <ScheduleView />;
+      case "roster": return <Roster />;
+      case "qr": return <QRGenerator />;
+      case "team-attendance": return <TeamAttendance />;
+      case "team-heatmap": return <HeatmapView scope="CICS2 — Panata Group" banner="Scoped View Only — Showing CICS2 Panata members" />;
+      case "tasks": return <TasksView showAssign />;
+      case "announcements": return <AnnouncementsView canCreate />;
+      case "attendance-logs": return <AttendanceLogsView />;
+      case "profile": return <ProfileView />;
       case "templates": return <TemplateLibrary />;
       case "settings": return <SettingsView />;
       default: return <StudentDashboard />;

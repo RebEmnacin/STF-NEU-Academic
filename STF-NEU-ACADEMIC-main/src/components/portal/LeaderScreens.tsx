@@ -90,21 +90,26 @@ function MiniBar({ pct, color = "var(--teal)" }: { pct: number; color?: string }
 }
 
 function AvatarSVG({ initials, size = 48, isOnLeave = false, className = "" }: { initials: string; size?: number; isOnLeave?: boolean; className?: string }) {
-  const [c1, c2] = isOnLeave ? ["#f59e0b", "#92400e"] : ["#0d9488", "#134e4a"];
-  const id = `grad-${initials}-${isOnLeave ? "leave" : "active"}`;
+  const bg = isOnLeave
+    ? "linear-gradient(135deg, #f59e0b, #92400e)"
+    : "linear-gradient(135deg, #1B6B8F, #4A8FA8)";
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop stopColor={c1} />
-          <stop offset="1" stopColor={c2} />
-        </linearGradient>
-      </defs>
-      <rect width="48" height="48" rx="14" fill={`url(#${id})`} />
-      <circle cx="24" cy="24" r="20" fill="white" fillOpacity="0.07" />
-      <circle cx="24" cy="17" r="8" fill="white" fillOpacity="0.9" />
-      <ellipse cx="24" cy="38" rx="12" ry="9" fill="white" fillOpacity="0.9" />
-    </svg>
+    <div
+      className={className}
+      style={{
+        width: size, height: size, borderRadius: 14,
+        background: bg,
+        display: "grid", placeItems: "center",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        flexShrink: 0,
+      }}
+    >
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+        style={{ width: size * 0.65, height: size * 0.65 }}>
+        <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.92)" />
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.92)" />
+      </svg>
+    </div>
   );
 }
 
@@ -129,7 +134,10 @@ function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose:
           transition: "opacity 0.3s ease, transform 0.3s ease",
         }}
       >
-        <div className="bg-teal-dark px-6 pt-6 pb-10 relative">
+                <div className="px-6 pt-6 pb-10 relative"
+          style={{ background: "linear-gradient(135deg, #0D4A6B 0%, #1B6B8F 50%, #4A8FA8 80%, #5A8FA8 100%)" }}>
+          <div style={{ position:"absolute", top:-20, right:-20, width:100, height:100, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
+          <div style={{ position:"absolute", bottom:0, left:"30%", width:70, height:70, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
           <button onClick={onClose} className="absolute top-4 right-4 text-white/60 hover:text-white transition">
             <X className="w-5 h-5" />
           </button>
@@ -283,84 +291,108 @@ function MessageModal({ member, onClose }: { member: Member; onClose: () => void
   );
 }
 
-// ─── FIXED: MemberCard — clean layout matching the screenshot reference ────────
-function MemberCard({ member, onView, onMessage, onSubmissions }: { member: Member; onView: () => void; onMessage: () => void; onSubmissions: () => void }) {
+// ─── FIXED MemberCard — clean two-tone card matching screenshot reference ─────
+function MemberCard({ member, onView, onMessage, onSubmissions }: {
+  member: Member; onView: () => void; onMessage: () => void; onSubmissions: () => void;
+}) {
   const isActive = member.status === "Active";
   const taskPct = Math.round((member.tasksDone / member.tasksTotal) * 100);
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-lg group flex flex-col"
-      style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
-    >
-      {/* ── Top tinted banner with avatar + status badge ── */}
-      <div className="relative px-4 pt-4 pb-14" style={{ background: isActive ? "rgba(13,148,136,0.07)" : "rgba(245,158,11,0.08)" }}>
-        <div className="flex items-start justify-between">
-          <AvatarSVG initials={member.initials} size={52} isOnLeave={!isActive} className="rounded-2xl shadow-sm" />
-          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
-            isActive ? "bg-green-500/10 text-green-700 border border-green-300" : "bg-amber-400/10 text-amber-600 border border-amber-300"
+    <div className="rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-xl"
+      style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+
+      {/* ── Banner + avatar fully inside, no overlap seam ── */}
+      <div className="relative px-4 pt-5 pb-5"
+        style={{ background: "linear-gradient(135deg, #0D4A6B 0%, #1B6B8F 55%, #4A8FA8 100%)" }}>
+        <div style={{ position:"absolute", top:-20, right:-20, width:80, height:80, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
+        <div style={{ position:"absolute", bottom:-10, left:"35%", width:55, height:55, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
+
+        {/* Status badge top-right */}
+        <div className="flex justify-end mb-3 relative">
+          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+            isActive
+              ? "bg-green-500/20 text-green-200 border-green-400/30"
+              : "bg-amber-400/20 text-amber-200 border-amber-400/30"
           }`}>{member.status}</span>
+        </div>
+
+        {/* Avatar centered */}
+        <div className="flex justify-center mb-3 relative">
+          <AvatarSVG initials={member.initials} size={72} isOnLeave={!isActive} />
+        </div>
+
+        {/* Name + ID inside banner on dark bg */}
+        <div className="text-center relative">
+          <div className="font-bold text-sm text-white leading-snug truncate px-2">{member.name}</div>
+          <div className="text-[10px] font-mono text-white/50 mt-0.5">{member.id}</div>
         </div>
       </div>
 
-      {/* ── Floating info card overlapping the banner ── */}
-      <div className="-mt-10 mx-3 mb-3 bg-card rounded-xl px-3 py-2.5 border border-border" style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.08)" }}>
-        <div className="font-bold text-sm text-foreground leading-tight truncate">{member.name}</div>
-        <div className="text-[10px] font-mono text-muted-text mt-0.5">{member.id}</div>
-        <div className="flex items-center justify-between mt-1.5 gap-1">
+      {/* ── Info row directly below banner, no overlap ── */}
+      <div className="px-4 pt-3 pb-1 border-b border-border">
+        <div className="flex items-center justify-between gap-1">
           <span className="text-[11px] text-muted-text truncate">{member.course}</span>
           <span className="text-[11px] font-semibold text-foreground shrink-0">{member.year}</span>
         </div>
       </div>
 
       {/* ── Body ── */}
-      <div className="px-4 pb-4 flex flex-col gap-3 flex-1">
-        {/* Task completion bar */}
-        <div>
-          <div className="flex justify-between items-center text-[11px] mb-1">
-            <span className="text-muted-text font-medium">Task completion</span>
-            <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-foreground">{member.tasksDone}/{member.tasksTotal}</span>
-              <span
-                className="font-bold px-1.5 py-0.5 rounded-md text-[10px]"
-                style={{ background: isActive ? "var(--teal-soft)" : "#fef3c7", color: isActive ? "var(--teal-dark)" : "#92400e" }}
-              >{taskPct}%</span>
-            </div>
+      <div className="px-4 pt-3 pb-4 flex flex-col gap-2.5 flex-1">
+        {/* Stat strip */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl p-2.5 text-white"
+            style={{ background: "linear-gradient(135deg, #1B6B8F, #4A8FA8)" }}>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-white/70">Attendance</div>
+            <div className="font-serif font-bold text-lg leading-none mt-0.5">{member.attendance}</div>
           </div>
-          <div className="h-2 rounded-full bg-border overflow-hidden">
-            <div className="h-full rounded-full transition-all" style={{ width: `${taskPct}%`, background: isActive ? "var(--teal)" : "#f59e0b" }} />
+          <div className="rounded-xl p-2.5 text-white"
+            style={{ background: taskPct >= 70 ? "linear-gradient(135deg,#1B6B8F,#3D6B7A)" : "linear-gradient(135deg,#d97706,#92400e)" }}>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-white/70">Tasks</div>
+            <div className="font-serif font-bold text-lg leading-none mt-0.5">{member.tasksDone}/{member.tasksTotal}</div>
           </div>
         </div>
 
-        {/* Panata badge */}
+        {/* Progress bar */}
         <div>
+          <div className="flex justify-between text-[10px] mb-1">
+            <span className="text-muted-text font-medium">Completion</span>
+            <span className="font-bold text-teal-dark">{taskPct}%</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-border overflow-hidden">
+            <div className="h-full rounded-full transition-all"
+              style={{ width: `${taskPct}%`, background: taskPct >= 70 ? "var(--teal)" : "#f59e0b" }} />
+          </div>
+        </div>
+
+        {/* Badges */}
+        <div className="flex gap-1.5 flex-wrap">
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20 font-mono">{member.panata}</span>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-secondary text-muted-text border border-border">{member.dept}</span>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-2 mt-auto">
-          <button
-            onClick={onView}
-            className="flex-1 py-2 rounded-xl text-xs font-bold text-white transition hover:opacity-90"
-            style={{ background: "var(--teal-dark)" }}
-          >View Profile</button>
-          <button
-            onClick={onMessage}
-            className="py-2 px-3 rounded-xl border border-border text-muted-text text-xs hover:bg-secondary transition flex items-center"
-            title="Message"
-          ><Send className="w-3 h-3" /></button>
-          <button
-            onClick={onSubmissions}
-            className="py-2 px-3 rounded-xl border border-border text-muted-text text-xs hover:bg-secondary transition flex items-center"
-            title="View Submissions"
-          ><ClipboardList className="w-3 h-3" /></button>
+        {/* Actions */}
+        <div className="flex gap-1.5 mt-auto pt-1">
+          <button onClick={onView}
+            className="flex-1 py-2 rounded-xl text-[11px] font-bold text-white transition hover:opacity-90 active:scale-95"
+            style={{ background: "linear-gradient(135deg, #0D4A6B, #1B6B8F)" }}>
+            View Profile
+          </button>
+          <button onClick={onMessage} title="Message"
+            className="py-2 px-2.5 rounded-xl border border-border text-muted-text hover:bg-secondary transition flex items-center justify-center active:scale-95">
+            <Send className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={onSubmissions} title="Submissions"
+            className="py-2 px-2.5 rounded-xl border border-border text-muted-text hover:bg-secondary transition flex items-center justify-center active:scale-95">
+            <ClipboardList className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── File types, tasks, submissions modal (unchanged) ────────────────────────
+// ─── Submissions types & modal ─────────────────────────────────────────────────
 type FileAttachment = { name: string; type: "pdf" | "sheet" | "doc" | "txt"; size: string; preview: string };
 type MockTask = {
   id: number; title: string; due: string; submitted: boolean;
@@ -623,23 +655,21 @@ export function Roster() {
   );
 }
 
-// ─── FIXED: QR Generator — replaced QR Settings with date/date-range config ──
+// ─── QR Generator — date/time config instead of QR settings ──────────────────
 export function QRGenerator() {
   const [generated, setGenerated] = useState(true);
   const [event, setEvent] = useState("Video Team Practice (Nov 8)");
   const [singleScan, setSingleScan] = useState(true);
   const [timeLimited, setTimeLimited] = useState(true);
-  const [attendanceType, setAttendanceType] = useState("Present");
+  const [attendanceType, setAttendanceType] = useState<"Present" | "Late" | "Excused">("Present");
   const [timeLeft, setTimeLeft] = useState(30 * 60);
 
-  // Date mode: "single" = one date/time, "range" = start+end
   const [dateMode, setDateMode] = useState<"single" | "range">("single");
   const [singleDate, setSingleDate] = useState("2023-11-08");
   const [singleTime, setSingleTime] = useState("15:00");
   const [rangeStart, setRangeStart] = useState("2023-11-08T15:00");
   const [rangeEnd, setRangeEnd]     = useState("2023-11-08T16:30");
 
-  // Copy link state
   const [linkCopied, setLinkCopied] = useState(false);
   const placeholderLink = `https://stf-attend.neu.edu.ph/qr/${event.replace(/\s+/g,"_").toLowerCase().slice(0,20)}_${singleDate}`;
 
@@ -680,9 +710,9 @@ export function QRGenerator() {
       <div className="grid grid-cols-12 gap-5">
         {/* ── Left: Config ── */}
         <div className="col-span-7 space-y-4">
-          {/* Step 1 */}
+          {/* Event selection */}
           <FadeUp delay={60}>
-            <SectionCard icon={Calendar} title="Select Event">
+            <SectionCard icon={Calendar} title="Step 1 — Select Event">
               <div className="p-5 space-y-3">
                 <select value={event} onChange={e => setEvent(e.target.value)}
                   className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
@@ -703,15 +733,14 @@ export function QRGenerator() {
             </SectionCard>
           </FadeUp>
 
-          {/* Step 2 — Date & Time (replaces QR Settings) */}
+          {/* Date & Time */}
           <FadeUp delay={100}>
-            <SectionCard icon={CalendarCheck} title="Date & Time">
+            <SectionCard icon={CalendarCheck} title="Step 2 — Date & Time">
               <div className="p-5 space-y-4">
-                {/* Single vs Range toggle */}
                 <div className="flex rounded-xl overflow-hidden border border-border">
                   {(["single", "range"] as const).map(mode => (
                     <button key={mode} onClick={() => setDateMode(mode)}
-                      className={`flex-1 py-2 text-xs font-bold transition capitalize ${
+                      className={`flex-1 py-2 text-xs font-bold transition ${
                         dateMode === mode ? "bg-teal text-white" : "bg-card text-muted-text hover:bg-secondary"
                       }`}>
                       {mode === "single" ? "Single Day" : "Date Range"}
@@ -750,7 +779,7 @@ export function QRGenerator() {
             </SectionCard>
           </FadeUp>
 
-          <FadeUp delay={160}>
+          <FadeUp delay={180}>
             <button onClick={() => { setGenerated(true); setTimeLeft(30 * 60); }}
               className="w-full bg-teal text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-teal-dark transition flex items-center justify-center gap-2"
               style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.14)" }}>
@@ -792,7 +821,7 @@ export function QRGenerator() {
                         {dateMode === "single"
                           ? `${singleDate} · ${singleTime}`
                           : `${rangeStart.replace("T"," ")} → ${rangeEnd.replace("T"," ")}`}
-                        {" "}· Type: <span className="font-semibold text-teal-dark">{attendanceType}</span>
+                        {" "}· <span className="font-semibold text-teal-dark">{attendanceType}</span>
                       </div>
                     </div>
 
@@ -819,7 +848,6 @@ export function QRGenerator() {
                       </div>
                     </div>
 
-                    {/* FIXED action buttons */}
                     <div className="flex gap-2 w-full">
                       <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-teal text-teal text-xs font-semibold hover:bg-teal hover:text-white transition">
                         <Download className="w-3.5 h-3.5" /> PNG
@@ -872,7 +900,7 @@ const statusColor: Record<string, string> = {
   Absent:  "bg-red-500/15 text-red-600 border border-red-300",
 };
 
-// ─── FIXED: AttendanceLogger — method buttons now control UI panels ───────────
+// ─── AttendanceLogger — method buttons control which UI panel renders ─────────
 export function AttendanceLogger() {
   const [saved, setSaved] = useState(false);
   const [method, setMethod] = useState<"qr" | "manual" | "csv">("manual");
@@ -911,32 +939,41 @@ export function AttendanceLogger() {
           </SectionCard>
         </FadeUp>
         <FadeUp delay={100}>
+          {/* Method selector — clicking a label sets method and shows the correct panel */}
           <SectionCard icon={ScanLine} title="Attendance Method">
             <div className="p-5 space-y-2">
               {[
-                { id: "qr"     as const, icon: QrCode,    label: "QR Code Scan",  desc: "Students scan a generated QR code" },
-                { id: "manual" as const, icon: Pencil,    label: "Manual Entry",  desc: "Mark attendance manually below" },
-                { id: "csv"    as const, icon: Upload,    label: "CSV Upload",    desc: "Upload a CSV attendance sheet" },
+                { id: "qr"     as const, icon: QrCode, label: "QR Code Scan",  desc: "Students scan a generated QR code" },
+                { id: "manual" as const, icon: Pencil, label: "Manual Entry",  desc: "Mark attendance manually below" },
+                { id: "csv"    as const, icon: Upload, label: "CSV Upload",    desc: "Upload a CSV attendance sheet" },
               ].map(({ id, icon: Icon, label, desc }) => (
-                <label key={id}
+                <div
+                  key={id}
                   onClick={() => setMethod(id)}
-                  className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition ${
+                  className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition select-none ${
                     method === id ? "border-teal bg-teal-soft/40" : "border-border hover:bg-teal-soft/20"
-                  }`}>
-                  <input type="radio" name="att-method" checked={method === id} onChange={() => setMethod(id)} className="accent-teal" />
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="att-method"
+                    checked={method === id}
+                    onChange={() => setMethod(id)}
+                    className="accent-teal pointer-events-none"
+                  />
                   <Icon className="w-4 h-4 text-teal shrink-0" />
                   <div>
                     <div className="text-sm font-semibold">{label}</div>
                     <div className="text-[11px] text-muted-text">{desc}</div>
                   </div>
-                </label>
+                </div>
               ))}
             </div>
           </SectionCard>
         </FadeUp>
       </div>
 
-      {/* ── QR method: show QR code preview ── */}
+      {/* ── QR: show QR preview panel ── */}
       {method === "qr" && (
         <FadeUp delay={120}>
           <SectionCard icon={QrCode} title="Step 3 — QR Code Attendance">
@@ -961,7 +998,7 @@ export function AttendanceLogger() {
         </FadeUp>
       )}
 
-      {/* ── Manual method: show attendance table ── */}
+      {/* ── Manual: show attendance table ── */}
       {method === "manual" && (
         <FadeUp delay={160}>
           <SectionCard icon={ClipboardList} title="Step 3 — Mark Attendance">
@@ -1016,7 +1053,7 @@ export function AttendanceLogger() {
         </FadeUp>
       )}
 
-      {/* ── CSV method: show upload UI (no table) ── */}
+      {/* ── CSV: upload UI only, no table ── */}
       {method === "csv" && (
         <FadeUp delay={120}>
           <SectionCard icon={Upload} title="Step 3 — Upload CSV">
@@ -1048,8 +1085,6 @@ export function AttendanceLogger() {
                 )}
               </div>
               <input id="csv-input" type="file" accept=".csv" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setCsvFile(f); }} />
-
-              {/* Template hint */}
               <div className="w-full max-w-lg bg-secondary/60 rounded-xl px-4 py-3 flex items-start gap-3">
                 <AlertCircle className="w-4 h-4 text-teal shrink-0 mt-0.5" />
                 <div className="text-xs text-muted-text">
@@ -1057,7 +1092,6 @@ export function AttendanceLogger() {
                   {" "}<button className="text-teal font-semibold hover:underline">Download template</button>
                 </div>
               </div>
-
               {csvFile && (
                 <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000); }}
                   className="flex items-center gap-2 px-6 py-2.5 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition"
@@ -1078,7 +1112,7 @@ export function AttendanceLogger() {
   );
 }
 
-// ─── Team Attendance (unchanged session records + logger with fixed method) ───
+// ─── Team Attendance ───────────────────────────────────────────────────────────
 const sessions = [
   ["Video Team Practice - DGA Studio","Team","Aug 14, 2025","1–3 PM",50,3,2,0,91],
   ["Choir Orientation - Batch 1","Team","Aug 18, 2025","1–2 PM",112,5,2,1,93],
@@ -1243,22 +1277,21 @@ function heatCell(d: number, h: number) {
   return                             { pct: 85 };
 }
 
-// FIXED: color derived from pct, consistent with legend
 function heatCellColor(pct: number): string {
-  if (pct < 20)  return "rgba(148,163,184,0.20)";     // slate — 0-20%
-  if (pct < 40)  return "rgba(100,116,139,0.30)";     // slate-blue — 20-40%
-  if (pct < 60)  return "rgba(234,179,8,0.55)";       // gold — 40-60%
-  if (pct < 80)  return "rgba(13,148,136,0.50)";      // teal-light — 60-80%
-  return         "rgba(15,78,70,0.85)";               // teal-dark — 80-100%
+  if (pct < 20)  return "rgba(148,163,184,0.20)";
+  if (pct < 40)  return "rgba(100,116,139,0.30)";
+  if (pct < 60)  return "rgba(234,179,8,0.55)";
+  if (pct < 80)  return "rgba(13,148,136,0.50)";
+  return         "rgba(15,78,70,0.85)";
 }
 
-// ─── FIXED HeatmapView: detail panel uses same MemberCard, z-index fixed via
-//     absolute→relative approach (detail replaces heatmap, not overlaid) ─────
+// ─── HeatmapView — detail panel replaces heatmap (no z-index layering issue) ─
 export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: string; banner?: string }) {
   const [selected, setSelected] = useState<{ dayIdx: number; hourIdx: number } | null>(null);
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [msgMember, setMsgMember]   = useState<Member | null>(null);
 
+  // ── Detail view: full page replacement, no layering issues ──
   if (selected !== null) {
     const { dayIdx, hourIdx } = selected;
     const day = HEATMAP_DAYS[dayIdx];
@@ -1305,7 +1338,7 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
           ))}
         </div>
 
-        {/* ── Available: using the SAME MemberCard as Team Members ── */}
+        {/* Available — same MemberCard as Team Members */}
         <FadeUp delay={180}>
           <SectionCard icon={CheckCircle} title={`Available (${availableInitials.length})`}>
             <div className="p-5 grid grid-cols-4 gap-4">
@@ -1323,35 +1356,13 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
           </SectionCard>
         </FadeUp>
 
-        {unavailableInitials.length > 0 && (
-          <FadeUp delay={260}>
-            <div className="mt-5">
-              <SectionCard icon={AlertCircle} title={`Unavailable (${unavailableInitials.length})`}>
-                <div className="p-5 grid grid-cols-4 gap-4">
-                  {unavailableInitials.map(initials => {
-                    const member = INITIALS_MAP[initials];
-                    if (!member) return null;
-                    return (
-                      <div key={initials} className="opacity-60 grayscale">
-                        <MemberCard member={member}
-                          onView={() => setViewMember(member)}
-                          onMessage={() => setMsgMember(member)}
-                          onSubmissions={() => {}} />
-                      </div>
-                    );
-                  })}
-                </div>
-              </SectionCard>
-            </div>
-          </FadeUp>
-        )}
         {viewMember && <ProfileModal member={viewMember} onClose={() => setViewMember(null)} onMessage={() => { setViewMember(null); setMsgMember(viewMember); }} />}
         {msgMember && <MessageModal member={msgMember} onClose={() => setMsgMember(null)} />}
       </div>
     );
   }
 
-  // ── HEATMAP GRID (fixed: tooltip z-index handled properly via overflow-visible) ──
+  // ── Heatmap grid — tooltips rendered in a portal-like wrapper above the grid ──
   return (
     <div className="p-7">
       <FadeUp>
@@ -1379,7 +1390,7 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
       <div className="grid grid-cols-12 gap-5">
         <FadeUp delay={80} className="col-span-9">
           <SectionCard icon={Thermometer} title="Weekly Availability Grid — click a cell to view members">
-            <div className="p-4" style={{ overflow: "visible" }}>
+            <div className="p-4">
               <div className="grid" style={{ gridTemplateColumns: "56px repeat(7, 1fr)" }}>
                 <div />
                 {HEATMAP_DAYS.map(d => (
@@ -1393,27 +1404,38 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
                       const availCount = getAvailableInitialsForCell(di, hi).length;
                       const cellBg = heatCellColor(c.pct);
                       return (
-                        <div key={`${di}-${hi}`} style={{ position: "relative" }} className="group">
+                        // Each cell: relative + overflow-visible so tooltip isn't clipped
+                        <div
+                          key={`${di}-${hi}`}
+                          className="group relative"
+                          style={{ isolation: "isolate" }}
+                        >
                           <div
                             onClick={() => setSelected({ dayIdx: di, hourIdx: hi })}
                             className="h-8 m-0.5 rounded-lg cursor-pointer transition-all hover:scale-105 hover:ring-2 hover:ring-teal/50"
                             style={{ background: cellBg }}
-                            title={`${HEATMAP_DAYS[di]}, ${h}: ${c.pct}% available`}
                           />
-                          {/* Tooltip: positioned absolutely, z-50, above surrounding content */}
+                          {/* Tooltip — z-index 9999 so it floats over everything */}
                           <div
                             className="hidden group-hover:block pointer-events-none"
-                            style={{ position: "absolute", zIndex: 50, top: "calc(100% + 4px)", left: "50%", transform: "translateX(-50%)" }}
+                            style={{
+                              position: "absolute",
+                              zIndex: 9999,
+                              bottom: "calc(100% + 6px)",
+                              left: "50%",
+                              transform: "translateX(-50%)",
+                            }}
                           >
-                            <div className="bg-teal-dark text-white text-[10px] p-2 rounded-xl whitespace-nowrap shadow-lg">
-                              <div className="font-bold mb-1">{HEATMAP_DAYS[di]}, {h} — {c.pct}% available</div>
-                              <div className="flex gap-0.5 flex-wrap max-w-[120px]">
-                                {getAvailableInitialsForCell(di, hi).slice(0, 5).map(x => (
-                                  <span key={x} className="w-4 h-4 rounded-full bg-gold grid place-items-center text-[7px] font-bold text-teal-dark">{x.slice(0,2)}</span>
+                            <div className="bg-teal-dark text-white text-[10px] p-2.5 rounded-xl whitespace-nowrap shadow-xl"
+                              style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                              <div className="font-bold mb-1.5">{HEATMAP_DAYS[di]}, {h} — {c.pct}% available</div>
+                              <div className="flex gap-1 flex-wrap max-w-[140px] mb-1.5">
+                                {getAvailableInitialsForCell(di, hi).slice(0, 6).map(x => (
+                                  <span key={x} className="w-5 h-5 rounded-full bg-white/20 grid place-items-center text-[8px] font-bold">{x.slice(0,2)}</span>
                                 ))}
-                                {availCount > 5 && <span className="text-[9px] text-white/70 ml-1">+{availCount - 5}</span>}
+                                {availCount > 6 && <span className="text-[9px] text-white/70 self-center ml-0.5">+{availCount - 6}</span>}
                               </div>
-                              <div className="text-white/60 mt-1 text-[9px]">Click to view all</div>
+                              <div className="text-white/60 text-[9px]">Click to view all</div>
                             </div>
                           </div>
                         </div>
@@ -1423,7 +1445,7 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
                 ))}
               </div>
 
-              {/* FIXED: color legend with actual descriptive labels matching pct bands */}
+              {/* Color legend matching actual pct bands */}
               <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border text-xs flex-wrap">
                 <span className="text-muted-text font-semibold">Members available:</span>
                 {[
@@ -1482,25 +1504,25 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
   );
 }
 
-// ─── Template Library: FIXED to match Action Center tab style from screenshots ─
+// ─── Template Library — Action Center-style tabs matching the screenshots ──────
 type Tmpl = { name: string; uses: number; lastUsed: string; createdBy?: string; scope?: string; type: string };
 
 const ACTION_CENTER_TEMPLATES: Tmpl[] = [
-  { name: "Weekly Panata Reminder",   type: "Announcement", uses: 12, lastUsed: "Nov 22, 2025", createdBy: "Kuya J. Ramirez", scope: "Video Team" },
-  { name: "STF Training Reschedule",  type: "Announcement", uses: 8,  lastUsed: "Nov 18, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
-  { name: "GE Section Make-up Class", type: "Announcement", uses: 6,  lastUsed: "Nov 10, 2025", createdBy: "Prof. C. Velasco", scope: "GE Sec A" },
-  { name: "Reflection Paper Submission", type: "Task",      uses: 4,  lastUsed: "Nov 22, 2025", createdBy: "Kuya J. Ramirez", scope: "Video Team" },
-  { name: "Poster Brief — Event",     type: "Task",          uses: 3,  lastUsed: "Nov 19, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
-  { name: "Recap Reel Assignment",    type: "Task",          uses: 3,  lastUsed: "Nov 15, 2025", createdBy: "Kuya R. Lim",     scope: "Video Team" },
-  { name: "Event Feedback — Concert", type: "Survey",        uses: 5,  lastUsed: "Nov 23, 2025", createdBy: "STF Operations",  scope: "Org-wide" },
-  { name: "Team Availability Check",  type: "Survey",        uses: 7,  lastUsed: "Nov 20, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
-  { name: "GE Class Sentiment Pulse", type: "Survey",        uses: 3,  lastUsed: "Nov 08, 2025", createdBy: "Prof. C. Velasco", scope: "GE Sec A" },
+  { name: "Weekly Panata Reminder",      type: "Announcement", uses: 12, lastUsed: "Nov 22, 2025", createdBy: "Kuya J. Ramirez", scope: "Video Team" },
+  { name: "STF Training Reschedule",     type: "Announcement", uses: 8,  lastUsed: "Nov 18, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
+  { name: "GE Section Make-up Class",    type: "Announcement", uses: 6,  lastUsed: "Nov 10, 2025", createdBy: "Prof. C. Velasco", scope: "GE Sec A" },
+  { name: "Reflection Paper Submission", type: "Task",          uses: 4,  lastUsed: "Nov 22, 2025", createdBy: "Kuya J. Ramirez", scope: "Video Team" },
+  { name: "Poster Brief — Event",        type: "Task",          uses: 3,  lastUsed: "Nov 19, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
+  { name: "Recap Reel Assignment",       type: "Task",          uses: 3,  lastUsed: "Nov 15, 2025", createdBy: "Kuya R. Lim",     scope: "Video Team" },
+  { name: "Event Feedback — Concert",    type: "Survey",        uses: 5,  lastUsed: "Nov 23, 2025", createdBy: "STF Operations",  scope: "Org-wide" },
+  { name: "Team Availability Check",     type: "Survey",        uses: 7,  lastUsed: "Nov 20, 2025", createdBy: "Ate M. Sandoval",  scope: "Video Team" },
+  { name: "GE Class Sentiment Pulse",    type: "Survey",        uses: 3,  lastUsed: "Nov 08, 2025", createdBy: "Prof. C. Velasco", scope: "GE Sec A" },
 ];
 
 const TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Announcement: { bg: "rgba(239,68,68,0.08)",    text: "#dc2626",  border: "rgba(239,68,68,0.25)" },
-  Task:         { bg: "rgba(13,148,136,0.10)",   text: "#0f766e",  border: "rgba(13,148,136,0.25)" },
-  Survey:       { bg: "rgba(234,179,8,0.12)",    text: "#a16207",  border: "rgba(234,179,8,0.35)" },
+  Announcement: { bg: "rgba(239,68,68,0.08)",   text: "#dc2626",  border: "rgba(239,68,68,0.25)" },
+  Task:         { bg: "rgba(13,148,136,0.10)",  text: "#0f766e",  border: "rgba(13,148,136,0.25)" },
+  Survey:       { bg: "rgba(234,179,8,0.12)",   text: "#a16207",  border: "rgba(234,179,8,0.35)" },
 };
 
 const TYPE_ICONS: Record<string, React.ElementType> = {
@@ -1509,26 +1531,27 @@ const TYPE_ICONS: Record<string, React.ElementType> = {
   Survey:       BarChart2,
 };
 
-const TEMPLATE_TAB_FILTERS = ["All", "Announcement", "Task", "Survey"];
+const TEMPLATE_TABS = ["All", "Announcement", "Task", "Survey"] as const;
 
 export function TemplateLibrary({ global = false }: { global?: boolean }) {
-  const [activeTab, setActiveTab] = useState("All");
+  const [activeTab, setActiveTab] = useState<string>("All");
   const [search, setSearch] = useState("");
 
   const filtered = ACTION_CENTER_TEMPLATES.filter(t => {
     const matchTab = activeTab === "All" || t.type === activeTab;
-    const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.createdBy?.toLowerCase().includes(search.toLowerCase());
+    const matchSearch =
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      (t.createdBy?.toLowerCase().includes(search.toLowerCase()) ?? false);
     return matchTab && matchSearch;
   });
 
   return (
     <div className="p-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex items-end justify-between mb-2">
           <div>
             <h1 className="font-serif text-3xl font-bold text-teal-dark">
-              {global ? "Global Template Library" : "Template Library"}
+              {global ? "Action Center" : "Action Center"}
             </h1>
             <p className="text-sm text-muted-text mt-1">Reusable templates for announcements, tasks &amp; surveys</p>
           </div>
@@ -1546,48 +1569,61 @@ export function TemplateLibrary({ global = false }: { global?: boolean }) {
         </div>
       </FadeUp>
 
-      {/* Scope notice — mirrors Action Center banner */}
-      <FadeUp delay={40}>
-        <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mb-5 flex items-center gap-2">
+      {/* Scope banner — matches Action Center */}
+      <FadeUp delay={30}>
+        <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mt-4 mb-0 flex items-center gap-2">
           <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-          As Student Leader, you can only target your assigned group: <strong className="text-teal-dark ml-1">Video Team / CICS2 / GE Sec A</strong>
+          As Student Leader, you can only target your assigned group:
+          <strong className="text-teal-dark ml-1">Video Team / CICS2 / GE Sec A</strong>
         </div>
       </FadeUp>
 
-      {/* Action Center-style tabs (underline) + search */}
-      <FadeUp delay={80}>
-        <div className="flex items-center justify-between border-b border-border mb-5">
+      {/* Tabs row — Action Center underline style */}
+      <FadeUp delay={60}>
+        <div className="flex items-center justify-between border-b border-border mt-5">
           <div className="flex">
-            {TEMPLATE_TAB_FILTERS.map(t => (
-              <button key={t} onClick={() => setActiveTab(t)}
+            {TEMPLATE_TABS.map(t => (
+              <button
+                key={t}
+                onClick={() => setActiveTab(t)}
                 className={`px-5 py-3 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition-all ${
-                  activeTab === t ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
-                }`}>{t}</button>
+                  activeTab === t
+                    ? "border-teal-dark text-teal-dark"
+                    : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+                }`}
+              >
+                {t}
+              </button>
             ))}
           </div>
+          {/* Search inline with tab bar (right side) */}
           <div className="relative mb-1">
             <Search className="w-4 h-4 absolute left-3 top-2 text-muted-text" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…"
-              className="pl-9 pr-3 py-1.5 text-xs border border-border rounded-xl bg-card w-44 focus:outline-none focus:ring-2 focus:ring-teal/30" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search templates…"
+              className="pl-9 pr-3 py-1.5 text-xs border border-border rounded-xl bg-card w-48 focus:outline-none focus:ring-2 focus:ring-teal/30"
+            />
           </div>
         </div>
       </FadeUp>
 
-      {/* Reusable hint */}
-      <FadeUp delay={100}>
-        <div className="bg-secondary/60 rounded-xl px-4 py-2.5 text-xs text-muted-text mb-5">
+      {/* Info hint */}
+      <FadeUp delay={80}>
+        <div className="bg-secondary/50 rounded-xl px-4 py-2.5 text-xs text-muted-text mt-4 mb-5">
           Reusable templates for announcements, tasks, surveys, and events. Load into any tab above with one click.
         </div>
       </FadeUp>
 
-      {/* Table — matching Action Center screenshot layout */}
-      <FadeUp delay={140}>
+      {/* Table */}
+      <FadeUp delay={120}>
         <SectionCard icon={BookOpen} title="Templates">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
-                  <th className="px-5 py-3 text-left font-semibold w-[40%]">Template</th>
+                  <th className="px-5 py-3 text-left font-semibold w-[38%]">Template</th>
                   <th className="px-5 py-3 text-left font-semibold">Type</th>
                   <th className="px-5 py-3 text-left font-semibold">Creator</th>
                   <th className="px-5 py-3 text-left font-semibold">Last Used</th>
@@ -1599,11 +1635,18 @@ export function TemplateLibrary({ global = false }: { global?: boolean }) {
                   const tc = TYPE_COLORS[t.type];
                   const TypeIcon = TYPE_ICONS[t.type];
                   return (
-                    <tr key={t.name} className={`border-b border-border last:border-0 transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20`}>
+                    <tr
+                      key={t.name}
+                      className={`border-b border-border last:border-0 transition-colors ${
+                        i % 2 === 0 ? "bg-card" : "bg-secondary/20"
+                      } hover:bg-teal-soft/20`}
+                    >
                       <td className="px-5 py-3.5 font-semibold text-foreground">{t.name}</td>
                       <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full"
-                          style={{ background: tc.bg, color: tc.text, border: `1px solid ${tc.border}` }}>
+                        <span
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full"
+                          style={{ background: tc.bg, color: tc.text, border: `1px solid ${tc.border}` }}
+                        >
                           <TypeIcon className="w-3 h-3" />
                           {t.type}
                         </span>
@@ -1622,7 +1665,11 @@ export function TemplateLibrary({ global = false }: { global?: boolean }) {
                   );
                 })}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-text text-sm">No templates match your search.</td></tr>
+                  <tr>
+                    <td colSpan={5} className="px-5 py-12 text-center text-muted-text text-sm">
+                      No templates match your search.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
@@ -1633,12 +1680,13 @@ export function TemplateLibrary({ global = false }: { global?: boolean }) {
   );
 }
 
-// ─── My Profile (placeholder) ─────────────────────────────────────────────────
+// ─── My Profile — John Patrick Narvasa ────────────────────────────────────────
 export function MyProfile() {
   const me: Member = {
     initials: "JN", name: "John Patrick Narvasa", id: "STF-2022-0001",
-    course: "BS Information Technology", year: "Junior", attendance: "94%",
-    tasks: "92%", status: "Active", dept: "CICS", panata: "CICS2",
+    course: "BS Information Technology", year: "Junior",
+    attendance: "94%", tasks: "92%", status: "Active",
+    dept: "CICS", panata: "CICS2",
     email: "john.narvasa@neu.edu.ph",
     bio: "Video Team Leader. Manages scheduling, task distribution, and member welfare for Video Team 104.",
     tasksDone: 23, tasksTotal: 25, attendancePct: 94,
@@ -1647,6 +1695,13 @@ export function MyProfile() {
 
   const [editMode, setEditMode] = useState(false);
   const [bio, setBio] = useState(me.bio);
+  const [saved, setSaved] = useState(false);
+
+  function handleSave() {
+    setEditMode(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  }
 
   return (
     <div className="p-7">
@@ -1661,7 +1716,7 @@ export function MyProfile() {
       </FadeUp>
 
       <div className="grid grid-cols-12 gap-5">
-        {/* Left profile card */}
+        {/* Left card */}
         <FadeUp delay={60} className="col-span-4">
           <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
             <div className="bg-teal-dark px-6 pt-6 pb-12">
@@ -1710,23 +1765,38 @@ export function MyProfile() {
           </div>
         </FadeUp>
 
-        {/* Right details */}
+        {/* Right content */}
         <div className="col-span-8 space-y-4">
           <FadeUp delay={80}>
-            <SectionCard icon={Pencil} title="About Me"
+            <SectionCard
+              icon={Pencil}
+              title="About Me"
               action={
-                <button onClick={() => setEditMode(v => !v)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-                    editMode ? "bg-teal text-white" : "border border-border text-muted-text hover:bg-secondary"
-                  }`}>
-                  {editMode ? <><Save className="w-3.5 h-3.5" /> Save</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
-                </button>
+                <div className="flex items-center gap-2">
+                  {saved && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-green-700">
+                      <CheckCircle className="w-3.5 h-3.5" /> Saved
+                    </span>
+                  )}
+                  <button
+                    onClick={() => editMode ? handleSave() : setEditMode(true)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                      editMode ? "bg-teal text-white" : "border border-border text-muted-text hover:bg-secondary"
+                    }`}
+                  >
+                    {editMode ? <><Save className="w-3.5 h-3.5" /> Save</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
+                  </button>
+                </div>
               }
             >
               <div className="p-5">
                 {editMode ? (
-                  <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4}
-                    className="w-full px-4 py-3 border border-teal/40 rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none" />
+                  <textarea
+                    value={bio}
+                    onChange={e => setBio(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-teal/40 rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none"
+                  />
                 ) : (
                   <p className="text-sm text-foreground leading-relaxed">{bio}</p>
                 )}
@@ -1738,7 +1808,7 @@ export function MyProfile() {
             <SectionCard icon={ClipboardList} title="Recent Activity">
               <div className="divide-y divide-border">
                 {[
-                  { action: "Sent weekly Panata reminder", time: "2 hours ago",  icon: Send },
+                  { action: "Sent weekly Panata reminder to all members", time: "2 hours ago", icon: Send },
                   { action: "Assigned Choir Concert task to 55 members", time: "Yesterday", icon: CheckSquare },
                   { action: "Generated QR code for Video Team Practice", time: "Nov 7", icon: QrCode },
                   { action: "Updated heatmap availability schedule", time: "Nov 5", icon: Calendar },
@@ -1779,7 +1849,7 @@ export function MyProfile() {
   );
 }
 
-// ─── Dispatcher Modal (unchanged) ─────────────────────────────────────────────
+// ─── Dispatcher Modal ─────────────────────────────────────────────────────────
 export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team 104" }: { scopeLocked?: boolean; scopeLabel?: string }) {
   const { modal, setModal } = usePortal();
   const [tab, setTab] = useState<"ann" | "task" | "survey">("task");

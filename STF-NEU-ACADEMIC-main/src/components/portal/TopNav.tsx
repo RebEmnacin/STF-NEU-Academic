@@ -3,22 +3,26 @@ import { Mail, Search, Sun } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
 const roles: { id: Role; label: string }[] = [
-  { id: "guest",      label: "Guest" },
-  { id: "student",    label: "Student" },
-  { id: "leader",     label: "Team Leader" },
-  { id: "admin",      label: "GE Monitor" },
-  { id: "superadmin", label: "Super Admin" },
+  { id: "guest",           label: "Guest" },
+  { id: "student",         label: "Student" },
+  { id: "leader",          label: "Team Leader" },
+  { id: "ge-monitor",      label: "GE Monitor" },
+  { id: "panata-monitor",  label: "Panata Monitor" },
+  { id: "admin",           label: "Admin" },
+  { id: "superadmin",      label: "Super Admin" },
 ];
 
 export function TopNav() {
   const { role, setRole, setView } = usePortal();
 
-  const searchPlaceholder =
-    role === "student"    ? "Search schedule, tasks, announcements…" :
-    role === "leader"     ? "Search team members, sessions, tasks…" :
-    role === "admin"      ? "Search section students, tasks, grades…" :
-    role === "superadmin" ? "Search all students, events, sessions…" :
-    "Search…";
+const searchPlaceholder =
+  role === "student"        ? "Search schedule, tasks, announcements…" :
+  role === "leader"         ? "Search team members, sessions, tasks…" :
+  role === "ge-monitor"     ? "Search GE section students, tasks, grades…" :
+  role === "panata-monitor" ? "Search Panata members, sessions, duties…" :
+  role === "admin"          ? "Search section students, tasks, grades…" :
+  role === "superadmin"     ? "Search all students, events, sessions…" :
+  "Search…";
 
   return (
     <header className="stf-topnav sticky top-0 z-40 shadow-lg" style={{ background: "var(--nav-bg)" }}>

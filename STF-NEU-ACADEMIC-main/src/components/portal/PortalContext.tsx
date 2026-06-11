@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type Role = "guest" | "student" | "leader" | "admin" | "superadmin";
+export type Role = "guest" | "student" | "leader" | "ge-monitor" | "panata-monitor" | "admin" | "superadmin";
 export type View = string;
 
 interface Ctx {

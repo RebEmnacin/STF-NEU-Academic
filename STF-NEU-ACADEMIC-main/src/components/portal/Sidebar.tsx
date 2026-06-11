@@ -2,7 +2,7 @@ import { usePortal, type Role } from "./PortalContext";
 import {
   LayoutDashboard, Calendar, CheckSquare, Megaphone, User, Settings,
   Users, QrCode, ClipboardList, Thermometer, Library, Send,
-  SlidersHorizontal, ListChecks, BookOpen, GraduationCap, Database, ScanLine,
+  SlidersHorizontal, ListChecks, BookOpen, GraduationCap, Database,
 } from "lucide-react";
 
 interface Item { id: string; label: string; icon: any; }
@@ -37,10 +37,51 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     roleTools: [
       { id: "roster",          label: "Team Members",      icon: Users },
       { id: "qr",              label: "QR Generator",      icon: QrCode },
-      { id: "logger",          label: "Attendance Logger", icon: ScanLine },
       { id: "team-attendance", label: "Team Attendance",   icon: ClipboardList },
       { id: "team-heatmap",    label: "Team Heatmap",      icon: Thermometer },
-      { id: "templates",       label: "Template Library",  icon: Library },
+      { id: "templates",       label: "Action Center",  icon: Library },
+    ],
+    footer: [
+      { id: "settings", label: "Settings", icon: Settings },
+    ],
+  },
+  "ge-monitor": {
+    shared: [
+      { id: "dashboard",       label: "Dashboard",           icon: LayoutDashboard },
+      { id: "schedule",        label: "Schedule Management", icon: Calendar },
+      { id: "tasks",           label: "Tasks",               icon: CheckSquare },
+      { id: "announcements",   label: "Announcements",       icon: Megaphone },
+      { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
+      { id: "profile",         label: "My Profile",          icon: User },
+    ],
+    roleLabel: "GE Monitor Tools",
+    roleTools: [
+      { id: "roster",          label: "Team Members",        icon: Users },
+      { id: "qr",              label: "QR Generator",        icon: QrCode },
+      { id: "team-attendance", label: "Team Attendance",     icon: ClipboardList },
+      { id: "team-heatmap",    label: "Team Heatmap",        icon: Thermometer },
+      { id: "templates",       label: "Action Center",       icon: Library },
+    ],
+    footer: [
+      { id: "settings", label: "Settings", icon: Settings },
+    ],
+  },
+  "panata-monitor": {
+    shared: [
+      { id: "dashboard",       label: "Dashboard",           icon: LayoutDashboard },
+      { id: "schedule",        label: "Schedule Management", icon: Calendar },
+      { id: "tasks",           label: "Tasks",               icon: CheckSquare },
+      { id: "announcements",   label: "Announcements",       icon: Megaphone },
+      { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
+      { id: "profile",         label: "My Profile",          icon: User },
+    ],
+    roleLabel: "Panata Monitor Tools",
+    roleTools: [
+      { id: "roster",          label: "Panata Members",      icon: Users },
+      { id: "qr",              label: "QR Generator",        icon: QrCode },
+      { id: "team-attendance", label: "Panata Attendance",   icon: ClipboardList },
+      { id: "team-heatmap",    label: "Panata Heatmap",      icon: Thermometer },
+      { id: "templates",       label: "Action Center",       icon: Library },
     ],
     footer: [
       { id: "settings", label: "Settings", icon: Settings },
@@ -60,7 +101,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "dispatcher", label: "Dispatcher",              icon: Send },
       { id: "attendance", label: "Attendance Tracker",      icon: ClipboardList },
       { id: "grader",     label: "Task Evaluator & Grader", icon: ListChecks },
-      { id: "templates",  label: "Template Library",        icon: Library },
+      { id: "templates",  label: "Action Center",        icon: Library },
     ],
     footer: [
       { id: "settings", label: "Settings", icon: Settings },
@@ -78,7 +119,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "heatmap",    label: "Global Heatmap",                  icon: Thermometer },
       { id: "sessions",   label: "Session & Attendance Analytics",  icon: ClipboardList },
       { id: "endoar",     label: "Grade Manager",                   icon: BookOpen },
-      { id: "templates",  label: "Global Template Library",         icon: Library },
+      { id: "templates",  label: "Action Centers",         icon: Library },
       { id: "operations", label: "Operations Control",              icon: SlidersHorizontal },
     ],
     footer: [
@@ -88,9 +129,11 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
 };
 
 const SCOPE_LABELS: Record<string, string> = {
-  leader:     "Music · Writing · Video · Photo · DGA",
-  admin:      "GE 101 — Section A",
-  superadmin: "Full Organization · All STF-NEU",
+  leader:          "Music · Writing · Video · Photo · DGA",
+  "ge-monitor":    "GE 101 — Section A",
+  "panata-monitor":"CICS2 — Panata Group",
+  admin:           "GE 101 — Section A",
+  superadmin:      "Full Organization · All STF-NEU",
 };
 
 function NavItem({ item, active, onClick }: { item: Item; active: boolean; onClick: () => void }) {
@@ -134,7 +177,12 @@ export function Sidebar() {
           className="text-[9px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-full"
           style={{ background: "rgba(245,197,24,0.18)", color: "var(--gold)" }}
         >
-          {role === "student" ? "Student" : role === "leader" ? "Team Leader" : role === "admin" ? "GE Monitor" : "Super Admin"}
+          {role === "student"         ? "Student" :
+          role === "leader"          ? "Team Leader" :
+          role === "ge-monitor"      ? "GE Monitor" :
+          role === "panata-monitor"  ? "Panata Monitor" :
+          role === "admin"           ? "Admin" :
+                             "Super Admin"}
         </span>
       </div>
 
