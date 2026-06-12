@@ -1,51 +1,118 @@
 import { usePortal } from "./PortalContext";
-import { useState, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
+import { 
+  Shield, Building2, Mail, Hash, Activity, Award, CheckCircle, 
+  Users, SlidersHorizontal, AlertCircle, Clock, BookOpen, BookMarked, 
+  Calendar, ChevronLeft, ChevronRight, Tv2, Info
+} from "lucide-react";
 
 // ============ Section Admin (Professor) Screens ============
 
+// ─── Shared Constants & Helper Tools ──────────────────────────────────────────
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
 // AD1: Section Dashboard (scoped)
+// 🟢 ADDED: Professor/Teacher Schedule Datasets mapped into the Master Calendar structure
+const teacherCalData: Record<number, { events: { label: string; color: string }[]; deadline?: boolean }> = {
+  2:  { events: [{ label: "Choir Orientation", color: "bg-amber-status text-white" }] },
+  6:  { events: [{ label: "GE 101 Sec A (8 AM)", color: "bg-teal text-white" }, { label: "Office Hours", color: "bg-teal-light text-white" }] },
+  8:  { events: [{ label: "GE 101 Sec A (8 AM)", color: "bg-teal text-white" }, { label: "Section Workshop", color: "bg-gold text-teal-dark" }] },
+  9:  { events: [{ label: "Office Hours", color: "bg-teal-light text-white" }] },
+  13: { events: [{ label: "GE 101 Sec A (8 AM)", color: "bg-teal text-white" }] }
+};
+
 export function SectionDashboard() {
+  // 🟢 ADDED: Hooks matching StudentDashboard layout tracking systems
+  const { setDrawerDay } = usePortal();
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const startOffset = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+  
+  // 🟢 ADDED: Specific schedule tracking filter state configuration for section tasks
+  const [sectionFilter, setSectionFilter] = useState<"all" | "lectures" | "tasks">("all");
+
+  // 🔄 CHANGED: Converted flat tabular statistics array to standardized Summary Strip button items
+  const summaryCards = [
+    { count: "30", period: "enrolled",  category: "Students in Sec", Icon: Users,      bg: "bg-teal" },
+    { count: "84%", period: "average",   category: "Attendance Rate",  Icon: BookOpen,   bg: "bg-teal-light" },
+    { count: "12",  period: "pending",   category: "Awaiting Grading", Icon: BookMarked, bg: "bg-amber-status" },
+    { count: "2",   period: "upcoming",  category: "Section Events",   Icon: Calendar,   bg: "bg-gold text-teal-dark" },
+  ];
+
   return (
-    <div className="p-6">
-      <div className="flex items-baseline justify-between mb-4">
+    <div className="p-7">
+      {/* 🔄 CHANGED: Formatted Heading block style to perfectly reflect Student View structure */}
+      <div className="flex items-end justify-between mb-6">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-teal-dark">Section Dashboard — GE 101, Sec A</h1>
-          <p className="text-xs text-muted-text">Updated November 2, 2023</p>
+          <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Dashboard — GE 101, Sec A</h1>
+          <p className="text-sm text-muted-text mt-1">{MONTHS[month]} {year} — GE Subject Group Teacher View</p>
         </div>
-        <span className="chip bg-gold text-teal-dark">Admin · Section Scoped</span>
+        <span className="chip bg-gold text-teal-dark text-sm px-3 py-1">Admin · Section Scoped</span>
       </div>
-      <div className="grid grid-cols-4 gap-3 mb-5">
-        {[
-          ["Students in Section","30","bg-teal text-white"],
-          ["Avg Attendance","84%","bg-teal-light text-white"],
-          ["Pending Tasks","12","bg-amber-status text-white"],
-          ["Upcoming Events","2","bg-gold text-teal-dark"],
-        ].map(([k,v,c]) => (
-          <div key={k} className={`${c} rounded-lg p-4 card-soft`}>
-            <div className="text-xs uppercase opacity-85 tracking-wider">{k}</div>
-            <div className="font-serif text-3xl font-bold mt-1">{v}</div>
-          </div>
+
+      {/* 🔄 CHANGED: Injected the responsive Summary Strip layout Grid */}
+      <div className="grid grid-cols-4 gap-3 mb-6">
+        {summaryCards.map((c) => (
+          <button key={c.category} className={`${c.bg} rounded-xl px-4 py-3 flex items-center gap-3 w-full text-left hover:opacity-90 active:scale-95 transition-all`}>
+            <c.Icon className={`w-7 h-7 shrink-0 ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/80"}`} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className={`font-serif font-bold text-2xl leading-none ${c.bg.includes("text-teal-dark") ? "text-teal-dark" : "text-white"}`}>{c.count}</span>
+                <span className={`text-xs font-medium ${c.bg.includes("text-teal-dark") ? "text-teal-dark/80" : "text-white/80"}`}>{c.period}</span>
+              </div>
+              <div className={`text-[11px] font-medium mt-0.5 truncate ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/70"}`}>{c.category}</div>
+            </div>
+          </button>
         ))}
       </div>
 
-      <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-        <div className="px-4 py-2.5 bg-teal-dark text-white text-xs font-bold uppercase">Week of Nov 6 — Section Calendar</div>
-        <table className="w-full text-sm">
-          <thead className="bg-secondary text-xs uppercase">
-            <tr>{["Time","Mon","Tue","Wed","Thu","Fri"].map(h => <th key={h} className="px-2 py-2 text-left">{h}</th>)}</tr>
-          </thead>
-          <tbody>
-            {[
-              ["08:00–09:30","GE 101 Sec A","—","GE 101 Sec A","—","GE 101 Sec A"],
-              ["10:00–11:30","—","Office Hours","—","Office Hours","—"],
-              ["13:00–15:00","—","—","Section Workshop","—","Choir Orientation (Nov 2)"],
-            ].map((r,i) => (
-              <tr key={i} className="row-alt border-b border-border">
-                {r.map((c,j) => <td key={j} className={`px-2 py-2 ${j===0?"font-mono text-xs":""} ${c.includes("GE 101")?"text-teal-dark font-semibold":c.includes("Choir")?"text-amber-status font-semibold":""}`}>{c}</td>)}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* 🔄 CHANGED: Modified calendar control nav elements to embed custom Filter Tab controllers */}
+      <div className="flex items-center gap-3 mb-4">
+        <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronLeft className="w-4 h-4" /></button>
+        <span className="font-serif font-bold text-teal-dark text-lg min-w-[180px] text-center">{MONTHS[month]} {year}</span>
+        <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronRight className="w-4 h-4" /></button>
+        
+        <div className="ml-auto flex border border-border bg-secondary p-0.5 rounded-lg text-xs font-medium">
+          <button onClick={() => setSectionFilter("all")} className={`px-3 py-1 rounded-md transition ${sectionFilter === "all" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>All Entries</button>
+          <button onClick={() => setSectionFilter("lectures")} className={`px-3 py-1 rounded-md transition ${sectionFilter === "lectures" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Lectures</button>
+          <button onClick={() => setSectionFilter("tasks")} className={`px-3 py-1 rounded-md transition ${sectionFilter === "tasks" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Tasks/Hours</button>
+        </div>
+      </div>
+
+      {/* 🔄 CHANGED: Transformed simple HTML table block to the standardized `educ-calendar-grid` component */}
+      <div className="educ-calendar-grid">
+        {DAYS_SHORT.map(d => <div key={d} className="educ-day-label">{d}</div>)}
+        {Array.from({ length: totalCells }).map((_, i) => {
+          const day = i - startOffset + 1;
+          const valid = day >= 1 && day <= daysInMonth;
+          const data = valid ? teacherCalData[day] : undefined;
+          
+          const filteredEvents = (data?.events ?? []).filter(e => {
+            if (sectionFilter === "lectures") return e.label.includes("GE 101");
+            if (sectionFilter === "tasks") return !e.label.includes("GE 101");
+            return true;
+          });
+
+          return (
+            <div key={i} onClick={() => valid && setDrawerDay(`${MONTHS[month]} ${day}, ${year}`)} className={`educ-date-cell${!valid ? " empty" : ""}`}>
+              {valid && (
+                <>
+                  <div className="educ-day-num">{day}</div>
+                  <div className="space-y-0.5">
+                    {filteredEvents.map((e, j) => (
+                      <span key={j} className={`educ-chip text-[10px] p-1 rounded font-semibold leading-tight block truncate ${e.color}`}>{e.label}</span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -180,77 +247,109 @@ export function SectionAttendance() {
 
 // ============ Super Admin Screens ============
 
-// SA1: Institutional Dashboard
-const adminEvents = [
-  { day: 0, hour: 9, label: "Weekly Panata (Wk3)", color: "bg-teal text-white" },
-  { day: 1, hour: 9, label: "STF-NEU Parents Orientation", color: "bg-teal text-white" },
-  { day: 1, hour: 10, label: "STF Photo Team Profiling", color: "bg-gold text-teal-dark" },
-  { day: 2, hour: 8, label: "CBI Weekly Panata Prep", color: "bg-teal-light text-white" },
-  { day: 3, hour: 13, label: "STF-NEU Choir Orientation Batch 1", color: "bg-gold text-teal-dark", span: 2 },
-  { day: 4, hour: 14, label: "CBI Peer Counseling Seminar", color: "bg-amber-status text-white" },
-  { day: 2, hour: 20, label: "Weekly Panata Prep Sync", color: "bg-slate-blue text-white" },
-  { day: 5, hour: 9, label: "DGA Team Sync", color: "bg-gold text-teal-dark" },
-];
+// 🟢 ADDED: Master Overseer Institutional data model representing specialized Panata, Team, and Event modules
+const adminCalData: Record<number, { events: { label: string; color: string }[]; deadline?: boolean }> = {
+  1:  { events: [{ label: "Weekly Panata (Wk3)", color: "bg-teal text-white" }] },
+  4:  { events: [{ label: "Parents Orientation", color: "bg-teal text-white" }, { label: "Photo Profiling", color: "bg-gold text-teal-dark" }] },
+  5:  { events: [{ label: "CBI Weekly Panata", color: "bg-teal-light text-white" }, { label: "Panata Sync", color: "bg-slate-blue text-white" }] },
+  6:  { events: [{ label: "Choir Orientation B1", color: "bg-gold text-teal-dark" }] },
+  7:  { events: [{ label: "Peer Counsel Seminar", color: "bg-amber-status text-white" }] },
+  8:  { events: [{ label: "DGA Team Sync", color: "bg-gold text-teal-dark" }] }
+};
 
 export function AdminDashboard() {
-  const { setView } = usePortal();
-  const hours = [8,9,10,11,12,13,14,15,16,17,18,19,20];
-  const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  // 🟢 ADDED: Hooks mapping standard system navigation targets
+  const { setDrawerDay, setView } = usePortal();
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const startOffset = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+  // 🟢 ADDED: Overseer perspective schedule tracking filter state configuration
+  const [adminFilter, setAdminFilter] = useState<"all" | "panata" | "teams" | "events">("all");
+
+  // 🔄 CHANGED: Restructured analytical metric row items into interactive visual card metrics
+  const summaryCards = [
+    { count: "3 Total",  period: "active",    category: "Church Events",         Icon: Calendar,   bg: "bg-teal" },
+    { count: "4 Total",  period: "mandatory", category: "Mandatory Activities",  Icon: Tv2,        bg: "bg-gold text-teal-dark" },
+    { count: "2 Critical",period: "urgent",    category: "Institutional Deadlines",Icon: Info,       bg: "bg-slate-blue" },
+    { count: "28 Total", period: "assigned",  category: "Total GE Subject Groups",Icon: BookMarked, bg: "bg-card border border-border !text-teal-dark" },
+  ];
+
   return (
-    <div className="p-6">
-      <div className="flex items-baseline justify-between mb-4">
-        <h1 className="font-serif text-2xl font-bold text-teal-dark">Admin Dashboard: Institutional Calendar View</h1>
-        <span className="text-xs text-muted-text">Updated November 6, 2023</span>
+    <div className="p-7">
+      {/* 🔄 CHANGED: Modified Heading component layouts to mimic Student Dashboard style constraints */}
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-teal-dark">Admin Dashboard</h1>
+          <p className="text-sm text-muted-text mt-1">{MONTHS[month]} {year} — Comprehensive Institutional Control Overview</p>
+        </div>
+        <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
       </div>
-      <div className="grid grid-cols-4 gap-3 mb-5">
-        <div className="bg-teal text-white rounded-lg p-4 card-soft">
-          <div className="text-xs uppercase opacity-85 tracking-wider">Upcoming Church Events</div>
-          <div className="text-xs mt-2 opacity-90">Weekly Panata (Wk3) - Google Meet · Monthly Pulong Panalangin - UHall</div>
-          <div className="font-serif text-2xl font-bold mt-2">3 Total</div>
-        </div>
-        <div className="bg-gold text-teal-dark rounded-lg p-4 card-soft">
-          <div className="text-xs uppercase opacity-85 tracking-wider">Mandatory Team Activities</div>
-          <div className="text-xs mt-2">STF Photo Team Profiling - IS Bldg B, 233 · DGA Team Sync - IS Bldg B, 236</div>
-          <div className="font-serif text-2xl font-bold mt-2">4 Total</div>
-        </div>
-        <div className="bg-slate-blue text-white rounded-lg p-4 card-soft">
-          <div className="text-xs uppercase opacity-85 tracking-wider">Institutional Deadlines</div>
-          <div className="text-xs mt-2 opacity-90">STF-NEU Choir Concert Batch 3 Jan 2 · Research Fieldwork QC Jan 24</div>
-          <div className="font-serif text-2xl font-bold mt-2">2 Critical</div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs uppercase text-muted-text tracking-wider">Total GE Subject Groups</div>
-          <div className="text-xs mt-2">GE 101 - 8 Sections · PE 1 - 10 Sections</div>
-          <div className="font-serif text-2xl font-bold mt-2 text-teal-dark">28 Total</div>
+
+      {/* 🔄 CHANGED: Implemented full-width 4-column master summary panel items */}
+      <div className="grid grid-cols-4 gap-3 mb-6">
+        {summaryCards.map((c) => (
+          <button key={c.category} className={`${c.bg} rounded-xl px-4 py-3 flex items-center gap-3 w-full text-left hover:opacity-90 transition-all shadow-sm`}>
+            <c.Icon className={`w-7 h-7 shrink-0 ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/80"}`} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className={`font-serif font-bold text-2xl leading-none ${c.bg.includes("text-teal-dark") ? "text-teal-dark" : "text-white"}`}>{c.count}</span>
+                <span className={`text-xs font-medium ${c.bg.includes("text-teal-dark") ? "text-teal-dark/80" : "text-white/80"}`}>{c.period}</span>
+              </div>
+              <div className={`text-[11px] font-medium mt-0.5 truncate ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/70"}`}>{c.category}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* 🔄 CHANGED: Integrated an expansive multi-layer structural sub-filter menu array */}
+      <div className="flex items-center gap-3 mb-4">
+        <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronLeft className="w-4 h-4" /></button>
+        <span className="font-serif font-bold text-teal-dark text-lg min-w-[180px] text-center">{MONTHS[month]} {year}</span>
+        <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronRight className="w-4 h-4" /></button>
+        
+        <div className="ml-auto flex border border-border bg-secondary p-0.5 rounded-lg text-xs font-medium">
+          <button onClick={() => setAdminFilter("all")} className={`px-3 py-1 rounded-md transition ${adminFilter === "all" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>All Schedules</button>
+          <button onClick={() => setAdminFilter("panata")} className={`px-3 py-1 rounded-md transition ${adminFilter === "panata" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Panata Overseer</button>
+          <button onClick={() => setAdminFilter("teams")} className={`px-3 py-1 rounded-md transition ${adminFilter === "teams" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Team Overseer</button>
+          <button onClick={() => setAdminFilter("events")} className={`px-3 py-1 rounded-md transition ${adminFilter === "events" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Clear view of Events</button>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-        <div className="grid bg-teal-dark text-white text-xs font-bold" style={{gridTemplateColumns:"60px repeat(7,1fr)"}}>
-          <div className="px-2 py-2"/>
-          {days.map(d => <div key={d} className="px-2 py-2 text-center">{d}</div>)}
-        </div>
-        <div className="grid relative" style={{gridTemplateColumns:"60px repeat(7,1fr)"}}>
-          {hours.map(h => (
-            <Fragment key={"hrow"+h}>
-              <div className="text-xs text-muted-text px-2 py-3 font-mono border-t border-border">{h}:00</div>
-              {days.map((_,di) => {
-                const evt = adminEvents.find(e => e.day === di && e.hour === h);
-                return (
-                  <div key={di+"-"+h} className="border-t border-l border-border min-h-[44px] p-0.5">
-                    {evt && (
-                      <button onClick={() => setView("event-detail")}
-                        className={`w-full text-left text-[10px] p-1.5 rounded ${evt.color} font-semibold leading-tight hover:brightness-105`}
-                        style={evt.span?{minHeight: evt.span*44}:undefined}>
-                        {evt.label}
-                      </button>
-                    )}
+      {/* 🔄 CHANGED: Rewrote basic hourly week layout into highly scannable uniform `educ-calendar-grid` cells */}
+      <div className="educ-calendar-grid">
+        {DAYS_SHORT.map(d => <div key={d} className="educ-day-label">{d}</div>)}
+        {Array.from({ length: totalCells }).map((_, i) => {
+          const day = i - startOffset + 1;
+          const valid = day >= 1 && day <= daysInMonth;
+          const data = valid ? adminCalData[day] : undefined;
+          
+          const filteredEvents = (data?.events ?? []).filter(e => {
+            if (adminFilter === "panata") return e.label.toLowerCase().includes("panata");
+            if (adminFilter === "teams") return e.label.toLowerCase().includes("team") || e.label.includes("Profiling");
+            if (adminFilter === "events") return e.label.toLowerCase().includes("orientation") || e.label.includes("Seminar");
+            return true;
+          });
+
+          return (
+            <div key={i} onClick={() => valid && setView("event-detail")} className={`educ-date-cell${!valid ? " empty" : ""} cursor-pointer hover:bg-teal-soft/10 transition-colors`}>
+              {valid && (
+                <>
+                  <div className="educ-day-num">{day}</div>
+                  <div className="space-y-0.5">
+                    {filteredEvents.map((e, j) => (
+                      <span key={j} className={`educ-chip text-[10px] p-1 rounded font-semibold leading-tight block truncate ${e.color}`}>{e.label}</span>
+                    ))}
                   </div>
-                );
-              })}
-            </Fragment>
-          ))}
-        </div>
+                </>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -887,6 +986,270 @@ export function StudentGroups() {
             ))}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+// Fade-up structural layout hook
+function useFadeUp(delay = 0) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), delay + 40);
+    return () => clearTimeout(t);
+  }, [delay]);
+  return visible;
+}
+
+function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const visible = useFadeUp(delay);
+  return (
+    <div className={className} style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(14px)",
+      transition: "opacity 0.4s ease, transform 0.4s ease",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+export function AdminProfile() {
+  const { role } = usePortal();
+  
+  // Guard clause checking for allowed administrative views
+  if (role !== "admin" && role !== "superadmin") {
+    return (
+      <div className="p-7 text-center text-red-status font-semibold flex items-center gap-2 justify-center">
+        <AlertCircle className="w-5 h-5" /> Access Denied: Administrative Scope Required.
+      </div>
+    );
+  }
+
+  const isAdmin = role === "admin";
+  
+  // 🌟 HIGHLIGHTED CHANGE: Configuration of tabs depending on what they have for AdminScreens vs SuperAdmin
+  const adminTabs = [
+    { id: "overview", label: "Overview Metrics" },
+    { id: "assigned-scope", label: "Class Section Control" },
+    { id: "audit", label: "Monitor Logs" }
+  ];
+
+  const superAdminTabs = [
+    { id: "overview", label: "Institutional Overview" },
+    { id: "org-control", label: "Global Operations Control" },
+    { id: "audit", label: "System Security Logs" }
+  ];
+
+  const activeTabs = isAdmin ? adminTabs : superAdminTabs;
+  const [currentTab, setCurrentTab] = useState("overview");
+
+  // Mock Administrative Profile State Model Definitions
+  const profileData = {
+    name: isAdmin ? "Prof. Eleanor Vance" : "Dr. Alistair Sterling",
+    title: isAdmin ? "Academic Course Monitor" : "Chief Institutional Admin",
+    employeeId: isAdmin ? "EMP-2023-8841" : "EMP-2018-0001",
+    email: isAdmin ? "e.vance@stf-neu.edu.ph" : "a.sterling@stf-neu.edu.ph",
+    department: isAdmin ? "College of Information and Computer Studies" : "Office of Institutional Operations",
+    scopeLabel: isAdmin ? "GE 101 — Section A" : "Full Organization (All STF-NEU)",
+    status: "Active Duty"
+  };
+
+  return (
+    <div className="p-7 max-w-6xl">
+      {/* Header Profile Badge Sheet Row */}
+      <FadeUp>
+        <div className="bg-card border border-border rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6"
+             style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-teal-dark flex items-center justify-center shadow-md">
+              <Shield className="w-8 h-8 text-white text-gold" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-serif text-2xl font-bold text-teal-dark">{profileData.name}</h1>
+                <span className={`chip text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                  isAdmin ? "bg-teal-soft text-teal-dark" : "bg-gold/20 text-teal-dark border border-gold/40"
+                }`}>
+                  {isAdmin ? "Admin" : "Super Admin"}
+                </span>
+              </div>
+              <p className="text-sm font-medium text-muted-text mt-0.5">{profileData.title} · {profileData.department}</p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-muted-text font-mono">
+                <span className="flex items-center gap-1"><Hash className="w-3.5 h-3.5" /> {profileData.employeeId}</span>
+                <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> {profileData.email}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col text-left md:text-right border-l md:border-l-0 md:border-r border-border pl-4 md:pl-0 md:pr-6 gap-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-text">Managed Scope Target</span>
+            <span className="text-sm font-bold text-teal-dark flex items-center gap-1.5 justify-start md:justify-end">
+              <Building2 className="w-4 h-4 text-teal" /> {profileData.scopeLabel}
+            </span>
+          </div>
+        </div>
+      </FadeUp>
+
+      {/* 🌟 HIGHLIGHTED CHANGE: Content and Tab render switcher evaluation blocks depends on role scope layout structures */}
+      <FadeUp delay={60}>
+        <div className="flex gap-0 border-b border-border mb-6 overflow-x-auto">
+          {activeTabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setCurrentTab(tab.id)}
+              className={`px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                currentTab === tab.id 
+                  ? "border-teal-dark text-teal-dark font-bold" 
+                  : "border-transparent text-foreground/50 hover:text-teal-dark"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {/* Tab Panel Processing Segment Engines */}
+      <div className="space-y-6">
+        {currentTab === "overview" && (
+          <FadeUp delay={100}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {isAdmin ? (
+                <>
+                  {/* Admin Specific Metric Sheets */}
+                  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                    <Users className="w-8 h-8 text-teal shrink-0" />
+                    <div>
+                      <div className="text-2xl font-serif font-bold text-teal-dark">42</div>
+                      <div className="text-xs font-semibold text-muted-text">Monitored Students</div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                    <CheckCircle className="w-8 h-8 text-green-status shrink-0" />
+                    <div>
+                      <div className="text-2xl font-serif font-bold text-teal-dark">94.2%</div>
+                      <div className="text-xs font-semibold text-muted-text">Average Attendance Sync</div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                    <BookOpen className="w-8 h-8 text-gold shrink-0" />
+                    <div>
+                      <div className="text-2xl font-serif font-bold text-teal-dark">8 Pending</div>
+                      <div className="text-xs font-semibold text-muted-text">Tasks Awaiting Grading Evaluation</div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* SuperAdmin Specific Metric Sheets */}
+                  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                    <Building2 className="w-8 h-8 text-teal shrink-0" />
+                    <div>
+                      <div className="text-2xl font-serif font-bold text-teal-dark">1,480</div>
+                      <div className="text-xs font-semibold text-muted-text">Total Active Institutional Enrolments</div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                    <SlidersHorizontal className="w-8 h-8 text-slate-blue shrink-0" />
+                    <div>
+                      <div className="text-2xl font-serif font-bold text-teal-dark">24 Clusters</div>
+                      <div className="text-xs font-semibold text-muted-text">Active Operations Command Nodes</div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                    <Activity className="w-8 h-8 text-gold shrink-0" />
+                    <div>
+                      <div className="text-2xl font-serif font-bold text-teal-dark">99.98%</div>
+                      <div className="text-xs font-semibold text-muted-text">Portal Engine System Uptime Logs</div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="bg-card border border-border rounded-xl p-5">
+              <h3 className="font-serif font-bold text-teal-dark text-base mb-3">System Access Profile Parameters</h3>
+              <div className="text-sm text-muted-text leading-relaxed space-y-2">
+                <p>This administrative profile sheet controls access tokens routing automated verification pipelines.</p>
+                <div className="p-3 bg-secondary/40 border border-border rounded-xl text-xs font-mono text-foreground space-y-1">
+                  <div>Security Matrix Clearances: Tier-{isAdmin ? "2 (Course Monitor)" : "1 (Global Root)"}</div>
+                  <div>Assigned Signature Node: {isAdmin ? "STF-NEU-SEC-MON-ALPHA" : "STF-NEU-SEC-ROOT-SYSTEM"}</div>
+                  <div>Terminal Session IP Clearance: Authorized via Single Sign On Proxy Protocol</div>
+                </div>
+              </div>
+            </div>
+          </FadeUp>
+        )}
+
+        {/* 🌟 HIGHLIGHTED CHANGE: Content Tab Switcher logic blocks mapped to different screen capabilities */}
+        {currentTab === "assigned-scope" && isAdmin && (
+          <FadeUp delay={100}>
+            <div className="bg-card border border-border rounded-xl p-5">
+              <h3 className="font-serif font-bold text-teal-dark text-base mb-2">Class Section Assignments control</h3>
+              <p className="text-sm text-muted-text mb-4">The master parameters below delineate your explicit tracking jurisdictions over course nodes.</p>
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-sm text-left">
+                  <tr className="bg-teal-dark text-white text-xs font-semibold uppercase">
+                    <th className="p-3">Section Code</th>
+                    <th className="p-3">Course Description</th>
+                    <th className="p-3">Schedule Slot</th>
+                    <th className="p-3">Status</th>
+                  </tr>
+                  <tr className="border-b border-border text-xs">
+                    <td className="p-3 font-bold text-teal-dark">GE101-SECA</td>
+                    <td className="p-3">Art Appreciation</td>
+                    <td className="p-3 font-mono">TUE/THU 11:30-13:00</td>
+                    <td className="p-3"><span className="text-green-700 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20 font-semibold">Track Active</span></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </FadeUp>
+        )}
+
+        {currentTab === "org-control" && !isAdmin && (
+          <FadeUp delay={100}>
+            <div className="bg-card border border-border rounded-xl p-5">
+              <h3 className="font-serif font-bold text-teal-dark text-base mb-2">Global Operations Control Parameters</h3>
+              <p className="text-sm text-muted-text mb-4">Super-Admin architectural controls to override master tracking matrix synchronization intervals.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 border border-border bg-secondary/20 rounded-xl">
+                  <div className="text-sm font-bold text-teal-dark mb-1">Global Lock-out Triggers</div>
+                  <div className="text-xs text-muted-text mb-3">Enforces a global read-only freeze context across all student profiles.</div>
+                  <button className="px-3 py-1.5 bg-red-status text-white text-xs font-bold rounded-lg hover:opacity-90">Deploy Master Freeze</button>
+                </div>
+                <div className="p-4 border border-border bg-secondary/20 rounded-xl">
+                  <div className="text-sm font-bold text-teal-dark mb-1">COM Scheduling Integration</div>
+                  <div className="text-xs text-muted-text mb-3">Triggers automated background cron compilation tasks matching COM master records.</div>
+                  <button className="px-3 py-1.5 bg-teal-dark text-white text-xs font-bold rounded-lg hover:opacity-90">Force COM Sync</button>
+                </div>
+              </div>
+            </div>
+          </FadeUp>
+        )}
+
+        {currentTab === "audit" && (
+          <FadeUp delay={100}>
+            <div className="bg-card border border-border rounded-xl p-5">
+              <h3 className="font-serif font-bold text-teal-dark text-base mb-3">Recent Security Access & Mutation Logs</h3>
+              <div className="space-y-2 font-mono text-xs">
+                <div className="flex items-start gap-2 text-muted-text py-1.5 border-b border-border/40">
+                  <Clock className="w-3.5 h-3.5 mt-0.5 text-teal shrink-0" />
+                  <div>
+                    <span className="text-foreground font-semibold">[2026-06-12 14:22:01]</span> Verified session tokens via Single Sign On proxy pipeline protocol.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 text-muted-text py-1.5 border-b border-border/40">
+                  <Clock className="w-3.5 h-3.5 mt-0.5 text-teal shrink-0" />
+                  <div>
+                    <span className="text-foreground font-semibold">[2026-06-11 09:15:34]</span> Compiled tracking node sheets for matching session metrics.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeUp>
+        )}
       </div>
     </div>
   );
