@@ -105,6 +105,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     shared: [
       { id: "dashboard", label: "Institutional Dashboard",  icon: LayoutDashboard },
       { id: "schedule",  label: "Institutional Scheduling", icon: Calendar },
+      { id: "announcements", label: "Announcements",        icon: Megaphone },
       { id: "dispatcher",label: "Dispatcher (Full Org)",    icon: Send },
     ],
     roleLabel: "Admin Tools",

@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Lock,
   GripVertical, MapPin, Calendar, Send, Pencil, Trash2, Link,
   Upload, FileText, Megaphone, CheckSquare, BarChart2, CalendarCheck,
-  BookOpen, CalendarDays,
+  BookOpen, CalendarDays, CalendarPlus,
 } from "lucide-react";
 
 // ─── Shared animation primitives ──────────────────────────────────────────────
@@ -989,6 +989,10 @@ export function AttendanceLogger() {
                   <CheckCircle className="w-4 h-4" /> Attendance saved
                 </span>
               )}
+              <button onClick={() => setStatuses(Object.fromEntries(loggerRoster.map((_, i) => [i, "Present"])))}
+                className="px-4 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white transition">
+                Mark All Present
+              </button>
               <button className="px-4 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white transition">Export Log</button>
               <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000); }}
                 className="flex items-center gap-2 px-5 py-2 text-sm bg-teal text-white rounded-xl font-bold hover:bg-teal-dark transition"
@@ -1567,7 +1571,7 @@ function SurveyQuestion({ idx, question, type, onRemove }: {
   );
 }
 
-export function ActionCenter() {
+export function ActionCenter({ global = false }: { global?: boolean }) {
   const [activeTab, setActiveTab] = useState<ActionTab>("announcement");
   const [saved, setSaved] = useState(false);
   const [sent, setSent] = useState(false);
@@ -1640,11 +1644,12 @@ export function ActionCenter() {
       <FadeUp>
         <div className="mb-1">
           <h1 className="font-serif text-3xl font-bold text-teal-dark">Action Center</h1>
-          <p className="text-sm text-muted-text mt-1">Compose, schedule and dispatch · Scope: Group</p>
+          <p className="text-sm text-muted-text mt-1">{global ? "Full organizational dispatch" : "Compose, schedule and dispatch · Scope: Group"}</p>
         </div>
       </FadeUp>
 
       {/* Scope lock banner */}
+      {!global && (
       <FadeUp delay={30}>
         <div className="flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mt-4">
           <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
@@ -1652,6 +1657,14 @@ export function ActionCenter() {
           <strong className="text-teal-dark ml-0.5">Video Team / CICS2 / GE Sec A</strong>
         </div>
       </FadeUp>
+      )}
+      {global && (
+      <FadeUp delay={30}>
+        <div className="flex items-center gap-2 bg-teal-soft border border-teal/30 rounded-xl px-4 py-2.5 text-xs font-medium text-foreground mt-4">
+          Full organizational dispatch — target any department, team, or panata group.
+        </div>
+      </FadeUp>
+      )}
 
       {/* Tab bar — underline style matching screenshots */}
       <FadeUp delay={60}>
@@ -1690,7 +1703,38 @@ export function ActionCenter() {
             </div>
           </div>
 
-          <div className="px-6 py-5 space-y-5">
+          <div className="grid grid-cols-12 gap-5 p-5">
+            <div className="col-span-4 space-y-3">
+              <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Audience / Scope</div>
+              <div className="bg-secondary/50 border border-border rounded-xl p-3 text-sm space-y-2 max-h-80 overflow-y-auto">
+                <label className="flex items-center gap-2 font-semibold">
+                  <input type="checkbox" defaultChecked className="accent-teal"/> Video Team / CICS2 / GE Sec A
+                </label>
+                <div className="pl-5 space-y-1.5 text-xs">
+                  <label className="flex items-center gap-2"><input type="checkbox" defaultChecked className="accent-teal"/> All Members</label>
+                  <label className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> Leads Only</label>
+                  <label className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> Monitors Only</label>
+                  <div className="text-muted-text font-bold mt-2 pt-1 border-t border-border">Specific People</div>
+                  {["Natalie Portman", "Alex Ammin", "Ben Affleck", "Maria Santos"].map(n => (
+                    <label key={n} className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> {n}</label>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-teal-soft border border-teal/30 rounded-xl p-3 text-xs">
+                <strong>Reach preview:</strong> this will be sent to <strong>55</strong> members.
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Recurrence & Effectivity</div>
+                <select className={selectCls}>
+                  <option>Does not repeat</option><option>Daily</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option>
+                </select>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><label className="text-[10px] text-muted-text">Start</label><input type="date" defaultValue="2026-06-08" className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/></div>
+                  <div><label className="text-[10px] text-muted-text">End</label><input type="date" defaultValue="2026-07-08" className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/></div>
+                </div>
+              </div>
+            </div>
+            <div className="col-span-8 space-y-5">
 
             {/* ── ANNOUNCEMENT ── */}
             {activeTab === "announcement" && (
@@ -1933,6 +1977,7 @@ export function ActionCenter() {
               </>
             )}
 
+            </div>
           </div>
 
           {/* Card footer */}
@@ -1965,7 +2010,7 @@ export function ActionCenter() {
 
 // ─── TemplateLibrary now re-exports ActionCenter ──────────────────────────────
 export function TemplateLibrary({ global = false }: { global?: boolean }) {
-  return <ActionCenter />;
+  return <ActionCenter global={global} />;
 }
 
 // ─── My Profile ───────────────────────────────────────────────────────────────
