@@ -1,8 +1,10 @@
+// 🌟 HIGHLIGHTED CHANGE: Profile view for admin / superadmin linking within the sidebar to open the profile
 import { usePortal, type Role } from "./PortalContext";
 import {
   LayoutDashboard, Calendar, CheckSquare, Megaphone, User, Settings,
   Users, QrCode, ClipboardList, Thermometer, Library, Send,
   SlidersHorizontal, ListChecks, BookOpen, GraduationCap, Database,
+  UserCircle // 🌟 HIGHLIGHTED CHANGE: Added UserCircle icon for AdminProfile link
 } from "lucide-react";
 
 interface Item { id: string; label: string; icon: any; }
@@ -16,12 +18,12 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "tasks",           label: "Tasks",               icon: CheckSquare },
       { id: "announcements",   label: "Announcements",       icon: Megaphone },
       { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
-      { id: "profile",         label: "My Profile",          icon: User },
     ],
     roleLabel: "Student Tools",
     roleTools: [],
     footer: [
-      { id: "settings", label: "Settings", icon: Settings },
+      { id: "profile",         label: "My Profile",          icon: User },
+      { id: "settings",        label: "Settings",            icon: Settings },
     ],
   },
   leader: {
@@ -31,7 +33,6 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "tasks",         label: "Tasks",               icon: CheckSquare },
       { id: "announcements", label: "Announcements",       icon: Megaphone },
       { id: "attendance-logs", label: "Attendance Logs",   icon: ClipboardList },
-      { id: "profile",       label: "My Profile",          icon: User },
     ],
     roleLabel: "Leader Tools",
     roleTools: [
@@ -39,10 +40,11 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "qr",              label: "QR Generator",      icon: QrCode },
       { id: "team-attendance", label: "Team Attendance",   icon: ClipboardList },
       { id: "team-heatmap",    label: "Team Heatmap",      icon: Thermometer },
-      { id: "templates",       label: "Action Center",  icon: Library },
+      { id: "templates",       label: "Action Center",     icon: Library },
     ],
     footer: [
-      { id: "settings", label: "Settings", icon: Settings },
+      { id: "profile",       label: "My Profile",          icon: User },
+      { id: "settings",      label: "Settings",            icon: Settings },
     ],
   },
   "ge-monitor": {
@@ -52,7 +54,6 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "tasks",           label: "Tasks",               icon: CheckSquare },
       { id: "announcements",   label: "Announcements",       icon: Megaphone },
       { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
-      { id: "profile",         label: "My Profile",          icon: User },
     ],
     roleLabel: "GE Monitor Tools",
     roleTools: [
@@ -60,7 +61,8 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "templates",     label: "Action Center",        icon: Library },
     ],
     footer: [
-      { id: "settings", label: "Settings", icon: Settings },
+      { id: "profile",         label: "My Profile",          icon: User },
+      { id: "settings",        label: "Settings",            icon: Settings },
     ],
   },
   "panata-monitor": {
@@ -70,7 +72,6 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "tasks",           label: "Tasks",               icon: CheckSquare },
       { id: "announcements",   label: "Announcements",       icon: Megaphone },
       { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
-      { id: "profile",         label: "My Profile",          icon: User },
     ],
     roleLabel: "Panata Monitor Tools",
     roleTools: [
@@ -78,7 +79,8 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "templates",         label: "Action Center",     icon: Library },
     ],
     footer: [
-      { id: "settings", label: "Settings", icon: Settings },
+      { id: "profile",         label: "My Profile",          icon: User },
+      { id: "settings",        label: "Settings",            icon: Settings },
     ],
   },
   admin: {
@@ -92,33 +94,35 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     roleTools: [
       { id: "students",   label: "My Students",             icon: GraduationCap },
       { id: "heatmap",    label: "Section Heatmap",         icon: Thermometer },
-      { id: "dispatcher", label: "Dispatcher",              icon: Send },
       { id: "attendance", label: "Attendance Tracker",      icon: ClipboardList },
       { id: "grader",     label: "Task Evaluator & Grader", icon: ListChecks },
-      { id: "templates",  label: "Action Center",        icon: Library },
+      { id: "templates",  label: "Action Center",           icon: Library },
     ],
     footer: [
-      { id: "settings", label: "Settings", icon: Settings },
+      // 🌟 HIGHLIGHTED CHANGE: Rerouted profile item ID targeting for admin to trigger AdminProfile
+      { id: "admin-profile",   label: "Admin Profile",       icon: UserCircle },
+      { id: "settings",        label: "Settings",            icon: Settings },
     ],
   },
   superadmin: {
     shared: [
-      { id: "dashboard", label: "Institutional Dashboard",  icon: LayoutDashboard },
-      { id: "schedule",  label: "Institutional Scheduling", icon: Calendar },
+      { id: "dashboard",     label: "Institutional Dashboard",  icon: LayoutDashboard },
+      { id: "schedule",      label: "Institutional Scheduling", icon: Calendar },
       { id: "announcements", label: "Announcements",        icon: Megaphone },
-      { id: "dispatcher",label: "Dispatcher (Full Org)",    icon: Send },
     ],
     roleLabel: "Admin Tools",
     roleTools: [
       { id: "groups",     label: "Student Management",              icon: Database },
       { id: "heatmap",    label: "Global Heatmap",                  icon: Thermometer },
       { id: "sessions",   label: "Session & Attendance Analytics",  icon: ClipboardList },
-      { id: "endoar",     label: "Grade Manager",                   icon: BookOpen },
-      { id: "templates",  label: "Action Centers",         icon: Library },
       { id: "operations", label: "Operations Control",              icon: SlidersHorizontal },
+      { id: "templates",  label: "Action Centers",                  icon: Library },
+      { id: "endoar",     label: "Grade Manager",                   icon: BookOpen },
     ],
     footer: [
-      { id: "settings", label: "System Settings", icon: Settings },
+      // 🌟 HIGHLIGHTED CHANGE: Rerouted profile item ID targeting for superadmin to trigger AdminProfile
+      { id: "admin-profile",   label: "SuperAdmin Profile",  icon: UserCircle },
+      { id: "settings",        label: "System Settings",     icon: Settings },
     ],
   },
 };
@@ -173,22 +177,29 @@ export function Sidebar() {
           style={{ background: "rgba(245,197,24,0.18)", color: "var(--gold)" }}
         >
           {role === "student"         ? "Student" :
-          role === "leader"          ? "Team Leader" :
-          role === "ge-monitor"      ? "GE Monitor" :
-          role === "panata-monitor"  ? "Panata Monitor" :
-          role === "admin"           ? "Admin" :
-                             "Super Admin"}
+           role === "leader"          ? "Team Leader" :
+           role === "ge-monitor"      ? "GE Monitor" :
+           role === "panata-monitor"  ? "Panata Monitor" :
+           role === "admin"           ? "Admin" :
+                                        "Super Admin"}
         </span>
       </div>
 
       {/* Nav */}
       <nav className="flex flex-col gap-0.5 px-2.5 flex-1">
-
         {/* Shared items */}
-        {shared.map(item => (
-          <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
-        ))}
-
+        {shared.map(item => {
+          // Ensure "dashboard" isn't accidentally highlighted when admin-profile is live
+          const isItemActive = view === item.id;
+          return (
+            <NavItem 
+              key={item.id} 
+              item={item} 
+              active={isItemActive} 
+              onClick={() => setView(item.id)} 
+            />
+          );
+        })}
         {/* Role-specific divider + tools */}
         {hasRoleTools && (<>
           <div className="flex items-center gap-2 px-1 pt-3 pb-1">
@@ -206,13 +217,12 @@ export function Sidebar() {
           ))}
         </>)}
 
-        {/* Footer items (Settings) — separated at the bottom */}
+        {/* Footer items (Settings / Profile) */}
         <div className="flex-1" />
         <div className="h-px mx-1 mb-1" style={{ background: "rgba(255,255,255,0.08)" }} />
         {footer.map(item => (
           <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
         ))}
-
       </nav>
 
       {/* Version tag */}

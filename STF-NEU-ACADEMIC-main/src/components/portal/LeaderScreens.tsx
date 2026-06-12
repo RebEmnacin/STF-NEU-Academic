@@ -527,7 +527,7 @@ function SubmissionsModal({ member, onClose }: { member: Member; onClose: () => 
 // ─── Roster ───────────────────────────────────────────────────────────────────
 export function Roster() {
   const [search, setSearch]       = useState("");
-  const [viewMode, setViewMode]   = useState<"list" | "grid">("grid");
+  const [viewMode, setViewMode]   = useState<"list" | "grid">("list");
   const [viewMember, setViewMember]   = useState<Member | null>(null);
   const [msgMember, setMsgMember]     = useState<Member | null>(null);
   const [subsMember, setSubsMember]   = useState<Member | null>(null);
@@ -2189,16 +2189,16 @@ export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team 104" }
     </div>
   );
 }
-// ─── GE Attendance ────────────────────────────────────────────────────────────
+
+
 const geSessions = [
-  ["Art Appreciation — Sec A","GE","Aug 14, 2025","11:30AM–1PM",28,2,1,0,93],
-  ["Sosyedad at Literatura — Sec A","GE","Aug 18, 2025","1:30–3PM",28,1,0,1,96],
-  ["PE4 — Sec A","GE","Aug 25, 2025","3–5PM",25,3,2,0,89],
-  ["DAA — Sec A","GE","Sep 1, 2025","10–11:30AM",27,1,0,0,96],
-  ["The Contemporary World — Sec A","GE","Sep 3, 2025","1–4PM",26,2,0,0,93],
+  ["Sosyedad at Literatura Group 1 Class","Class","Aug 3, 2025","6:45–10AM",14,0,1,0,96],
+  ["PE 4 Group 3 Class","Class","Aug 10, 2025","2:30–3PM",13,0,1,1,96]
 ];
 
 export function GEAttendance() {
+  // HIGHLIGHT: Added mainTab switcher state to toggle between Records and Logger
+  const [mainTab, setMainTab] = useState<"records" | "logger">("records");
   const [viewSession, setViewSession] = useState<any[] | null>(null);
   const [tab, setTab] = useState("ALL");
   const pct = 93;
@@ -2206,7 +2206,9 @@ export function GEAttendance() {
   const [go, setGo] = useState(false);
   useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
 
+
   const filters = ["ALL","ART APPRECIATION","SOSYEDAD","PE4","DAA","CONTEMPORARY WORLD"];
+
 
   return (
     <div className="p-7">
@@ -2216,95 +2218,122 @@ export function GEAttendance() {
             <h1 className="font-serif text-3xl font-bold text-teal-dark">Course Attendance</h1>
             <p className="text-sm text-muted-text mt-1">GE 101 — Section A · Course Records</p>
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">GE Monitor View</span>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">GE Monitor View</span>
         </div>
       </FadeUp>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <FadeUp delay={60}>
-          <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-            <div className="relative w-20 h-20 shrink-0">
-              <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
-                <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
-                <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
-                  style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
-              </svg>
-              <div className="absolute inset-0 grid place-items-center">
-                <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-muted-text">Overall Attendance</div>
-              <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
-              <div className="text-xs text-muted-text mt-0.5">5 sessions</div>
-            </div>
-          </div>
-        </FadeUp>
-        <FadeUp delay={100}><StatCard label="Sessions Tracked" value="5" sub="This semester" /></FadeUp>
-        <FadeUp delay={140}><StatCard label="Students at Risk" value="1 ⚠" accent sub="Below 75% threshold" /></FadeUp>
-      </div>
 
-      <FadeUp delay={180}>
-        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
-          {filters.map(f => (
-            <button key={f} onClick={() => setTab(f)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
-              {f}
-            </button>
+      {/* HIGHLIGHT: Added standard Sub-Tabs layout switcher navigation */}
+      <FadeUp delay={40}>
+        <div className="flex gap-0 border-b border-border mb-6">
+          {([["records","Session Records"],["logger","Attendance Logger"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setMainTab(key)}
+              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${
+                mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+              }`}>{label}</button>
           ))}
         </div>
       </FadeUp>
 
-      <FadeUp delay={220}>
-        <SectionCard icon={ClipboardList} title="Session Log">
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="bg-teal-dark text-white uppercase tracking-wider">
-                  {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {geSessions.map((s, i) => (
-                  <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
-                    {s.map((c, j) => (
-                      <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
-                        {j===1
-                          ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
-                          : j===8 ? `${c}%` : c}
-                      </td>
-                    ))}
-                    <td className="px-4 py-3.5">
-                      <button onClick={() => setViewSession(s)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
-                        <ClipboardList className="w-3 h-3" /> View Sheet
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+      {/* HIGHLIGHT: Wrapped interactive visual board into conditions checking for "records" */}
+      {mainTab === "records" && (<>
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <FadeUp delay={60}>
+            <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+              <div className="relative w-20 h-20 shrink-0">
+                <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
+                  <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
+                  <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
+                    style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
+                </svg>
+                <div className="absolute inset-0 grid place-items-center">
+                  <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-text">Overall Attendance</div>
+                <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
+                <div className="text-xs text-muted-text mt-0.5">5 sessions</div>
+              </div>
+            </div>
+          </FadeUp>
+          <FadeUp delay={100}><StatCard label="Sessions Tracked" value="5" sub="This semester" /></FadeUp>
+          <FadeUp delay={140}><StatCard label="Students at Risk" value="1 ⚠" accent sub="Below 75% threshold" /></FadeUp>
+        </div>
+
+
+        <FadeUp delay={180}>
+          <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+            {filters.map(f => (
+              <button key={f} onClick={() => setTab(f)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
+                {f}
+              </button>
+            ))}
           </div>
-        </SectionCard>
-      </FadeUp>
+        </FadeUp>
+
+
+        <FadeUp delay={220}>
+          <SectionCard icon={ClipboardList} title="Session Log">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
+                      <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {geSessions.map((s, i) => (
+                    <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
+                      {s.map((c, j) => (
+                        <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
+                          {j===1
+                            ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
+                            : j===8 ? `${c}%` : c}
+                        </td>
+                      ))}
+                      <td className="px-4 py-3.5">
+                        <button onClick={() => setViewSession(s)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                          <ClipboardList className="w-3 h-3" /> View Sheet
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        </FadeUp>
+      </>)}
+
+
+      {/* HIGHLIGHT: Added layout integration hooks for attendance registration module fallback */}
+      {mainTab === "logger" && <AttendanceLogger />}
+
 
       {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>
   );
 }
 
-// ─── Panata Attendance ────────────────────────────────────────────────────────
+
+
+
+// ─── Panata Attendance (Refactored to match TeamAttendance) ────────────────────
 const panataSessions = [
-  ["Tupad — CICS2","Panata","Aug 3, 2025","6:45–10AM",14,0,1,0,96],
-  ["Pulong Panata — CICS2","Panata","Aug 10, 2025","2:30–3PM",13,1,0,0,93],
-  ["Komiti Meeting","Panata","Aug 17, 2025","4–4:30PM",14,0,0,0,100],
-  ["Tupad — CICS2","Panata","Aug 24, 2025","6:45–10AM",12,1,1,0,89],
-  ["Pulong Panata — CICS2","Panata","Sep 1, 2025","2:30–3PM",13,0,1,1,96],
+  ["Panata — CICS1","Panata","Aug 3, 2025","6:45–10AM",14,0,1,0,96],
+  ["Panata — CICS1","Panata","Aug 24, 2025","6:45–10AM",12,1,1,0,89],
 ];
 
+
 export function PanataAttendance() {
+  // HIGHLIGHT: Added mainTab switcher state to toggle between Records and Logger
+  const [mainTab, setMainTab] = useState<"records" | "logger">("records");
   const [viewSession, setViewSession] = useState<any[] | null>(null);
   const [tab, setTab] = useState("ALL");
   const pct = 95;
@@ -2312,7 +2341,9 @@ export function PanataAttendance() {
   const [go, setGo] = useState(false);
   useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
 
+
   const filters = ["ALL","TUPAD","PULONG PANATA","KOMITI"];
+
 
   return (
     <div className="p-7">
@@ -2322,79 +2353,103 @@ export function PanataAttendance() {
             <h1 className="font-serif text-3xl font-bold text-teal-dark">Panata Attendance</h1>
             <p className="text-sm text-muted-text mt-1">CICS2 — Panata Group · Session Records</p>
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Panata Monitor View</span>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Panata Monitor View</span>
         </div>
       </FadeUp>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <FadeUp delay={60}>
-          <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-            <div className="relative w-20 h-20 shrink-0">
-              <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
-                <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
-                <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
-                  style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
-              </svg>
-              <div className="absolute inset-0 grid place-items-center">
-                <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-muted-text">Overall Attendance</div>
-              <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
-              <div className="text-xs text-muted-text mt-0.5">5 sessions</div>
-            </div>
-          </div>
-        </FadeUp>
-        <FadeUp delay={100}><StatCard label="Sessions Tracked" value="5" sub="This semester" /></FadeUp>
-        <FadeUp delay={140}><StatCard label="Members at Risk" value="0" sub="All above threshold" /></FadeUp>
-      </div>
 
-      <FadeUp delay={180}>
-        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
-          {filters.map(f => (
-            <button key={f} onClick={() => setTab(f)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
-              {f}
-            </button>
+      {/* HIGHLIGHT: Added standard Sub-Tabs layout switcher navigation */}
+      <FadeUp delay={40}>
+        <div className="flex gap-0 border-b border-border mb-6">
+          {([["records","Session Records"],["logger","Attendance Logger"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setMainTab(key)}
+              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${
+                mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+              }`}>{label}</button>
           ))}
         </div>
       </FadeUp>
 
-      <FadeUp delay={220}>
-        <SectionCard icon={ClipboardList} title="Panata Session Log">
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="bg-teal-dark text-white uppercase tracking-wider">
-                  {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {panataSessions.map((s, i) => (
-                  <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
-                    {s.map((c, j) => (
-                      <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
-                        {j===1
-                          ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
-                          : j===8 ? `${c}%` : c}
-                      </td>
-                    ))}
-                    <td className="px-4 py-3.5">
-                      <button onClick={() => setViewSession(s)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
-                        <ClipboardList className="w-3 h-3" /> View Sheet
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+      {/* HIGHLIGHT: Wrapped interactive visual board into conditions checking for "records" */}
+      {mainTab === "records" && (<>
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <FadeUp delay={60}>
+            <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+              <div className="relative w-20 h-20 shrink-0">
+                <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
+                  <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
+                  <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
+                    style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
+                </svg>
+                <div className="absolute inset-0 grid place-items-center">
+                  <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-text">Overall Attendance</div>
+                <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
+                <div className="text-xs text-muted-text mt-0.5">5 sessions</div>
+              </div>
+            </div>
+          </FadeUp>
+          <FadeUp delay={100}><StatCard label="Sessions Tracked" value="5" sub="This semester" /></FadeUp>
+          <FadeUp delay={140}><StatCard label="Members at Risk" value="0" sub="All above threshold" /></FadeUp>
+        </div>
+
+
+        <FadeUp delay={180}>
+          <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+            {filters.map(f => (
+              <button key={f} onClick={() => setTab(f)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
+                {f}
+              </button>
+            ))}
           </div>
-        </SectionCard>
-      </FadeUp>
+        </FadeUp>
+
+
+        <FadeUp delay={220}>
+          <SectionCard icon={ClipboardList} title="Panata Session Log">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => (
+                      <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {panataSessions.map((s, i) => (
+                    <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
+                      {s.map((c, j) => (
+                        <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
+                          {j===1
+                            ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span>
+                            : j===8 ? `${c}%` : c}
+                        </td>
+                      ))}
+                      <td className="px-4 py-3.5">
+                        <button onClick={() => setViewSession(s)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                          <ClipboardList className="w-3 h-3" /> View Sheet
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        </FadeUp>
+      </>)}
+
+
+      {/* HIGHLIGHT: Added layout integration hooks for attendance registration module fallback */}
+      {mainTab === "logger" && <AttendanceLogger />}
+
 
       {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>

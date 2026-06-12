@@ -43,36 +43,40 @@ function FadeUp({ children, delay = 0, className = "" }: { children: React.React
 // ─── Calendar data (November 2023) ────────────────────────────────────────────
 type DayEvt = { label: string; color: string };
 const calData: Record<number, { events: DayEvt[]; deadline?: boolean }> = {
-  1:  { events:[{label:"MS Lab 10AM",color:"major"},{label:"Panata Prep",color:"panata"},{label:"Personal Study",color:"personal"}]},
-  2:  { events:[{label:"Art Appreciation",color:"ge"},{label:"Panata Sync 1PM",color:"panata"}], deadline:true},
-  3:  { events:[{label:"OOP Lecture 7PM",color:"major"},{label:"Personal Study",color:"personal"}], deadline:true},
+  1:  { events:[{label:"MS Lab 10AM",color:"major"},{label:"Personal Study",color:"personal"}]},
+  2:  { events:[{label:"Personal Study",color:"personal"}]},
+  3:  { events:[{label:"Personal Study",color:"personal"}]},
   4:  { events:[{label:"Adv Statistics 7AM",color:"major"},{label:"OOP Lab 10AM",color:"major"},{label:"Sosyedad 1:30PM",color:"ge"}], deadline:true},
   5:  { events:[{label:"PE4 3PM",color:"ge"},{label:"Personal Study",color:"personal"}]},
-  6:  { events:[{label:"Networking Lab 7AM",color:"major"},{label:"DGA Training 5:30PM",color:"team"}]},
-  7:  { events:[{label:"MS Lab",color:"major"},{label:"Komiti 4PM",color:"panata"},{label:"Video Team",color:"team"}]},
-  8:  { events:[{label:"Art Appreciation",color:"ge"},{label:"Panata Sync 1PM",color:"panata"}], deadline:true},
-  9:  { events:[{label:"OOP Lecture",color:"major"},{label:"Panata Prep",color:"panata"}]},
-  10: { events:[{label:"Adv Statistics",color:"major"},{label:"OOP Lab",color:"major"}]},
-  11: { events:[{label:"PE4",color:"ge"}]},
-  12: { events:[{label:"Networking Lab",color:"major"},{label:"DGA Training",color:"team"}]},
-  13: { events:[{label:"Tupad 6:45AM",color:"panata"},{label:"Pulong Panata 2:30PM",color:"panata"}]},
-  14: { events:[{label:"MS Lab",color:"major"},{label:"Personal Study",color:"personal"}]},
-  15: { events:[{label:"Art Appreciation",color:"ge"}]},
-  16: { events:[{label:"OOP Lecture",color:"major"}]},
-  17: { events:[{label:"Adv Statistics",color:"major"},{label:"OOP Lab",color:"major"},{label:"Sosyedad",color:"ge"}]},
-  18: { events:[{label:"PE4",color:"ge"},{label:"Video Team",color:"team"},{label:"Personal Time",color:"personal"}]},
-  19: { events:[{label:"DGA Training",color:"team"},{label:"Panata Prep",color:"panata"}], deadline:true},
-  20: { events:[{label:"Tupad",color:"panata"},{label:"Pulong Panata",color:"panata"}]},
-  21: { events:[{label:"MS Lab",color:"major"},{label:"Panata Prep",color:"panata"},{label:"Personal Study",color:"personal"}], deadline:true},
-  22: { events:[{label:"Art Appreciation",color:"ge"},{label:"Panata Sync",color:"panata"},{label:"Personal Study",color:"personal"}], deadline:true},
-  23: { events:[{label:"OOP Lecture",color:"major"},{label:"Panata Prep",color:"panata"}], deadline:true},
-  24: { events:[{label:"Adv Statistics",color:"major"},{label:"Engineering Lab",color:"team"},{label:"Personal Time",color:"personal"}], deadline:true},
-  25: { events:[{label:"PE4",color:"ge"},{label:"Panata Prep",color:"panata"},{label:"Personal Study",color:"personal"}]},
-  26: { events:[{label:"DGA Training",color:"team"}]},
-  27: { events:[{label:"MS Lab",color:"major"},{label:"Panata Prep",color:"panata"},{label:"Personal Study",color:"personal"}]},
-  28: { events:[{label:"Art Appreciation",color:"ge"}]},
-  29: { events:[{label:"OOP Lecture",color:"major"},{label:"Panata Prep",color:"panata"},{label:"Personal Study",color:"personal"}], deadline:true},
-  30: { events:[{label:"Adv Statistics",color:"major"},{label:"Library Study",color:"personal"}], deadline:true},
+  6:  { events:[{label:"Networking Lab 7AM",color:"major"},{label:"Komiti 4PM",color:"personal"},{label:"DGA Training 5:30PM",color:"team"}]},
+  7:  { events:[{label:"Tupad 6:45AM",color:"personal"},{label:"Pulong Panata 2:30PM",color:"personal"}]},
+  
+  8:  { events:[{label:"MS Lab 10AM",color:"major"},{label:"Personal Study",color:"personal"}]},
+  9:  { events:[{label:"Personal Study",color:"personal"}]},
+  10: { events:[{label:"Personal Study",color:"personal"}]},
+  11: { events:[{label:"Adv Statistics 7AM",color:"major"},{label:"OOP Lab 10AM",color:"major"},{label:"Sosyedad 1:30PM",color:"ge"}], deadline:true},
+  12: { events:[{label:"PE4 3PM",color:"ge"},{label:"Personal Study",color:"personal"}]},
+  13: { events:[{label:"Networking Lab 7AM",color:"major"},{label:"Komiti 4PM",color:"personal"},{label:"DGA Training 5:30PM",color:"team"}]},
+  14: { events:[{label:"Tupad 6:45AM",color:"personal"},{label:"Pulong Panata 2:30PM",color:"personal"}]},
+  
+  15: { events:[{label:"MS Lab 10AM",color:"major"},{label:"Personal Study",color:"personal"}]},
+  16: { events:[{label:"Personal Study",color:"personal"}]},
+  17: { events:[{label:"Personal Study",color:"personal"}]},
+  18: { events:[{label:"Adv Statistics 7AM",color:"major"},{label:"OOP Lab 10AM",color:"major"},{label:"Sosyedad 1:30PM",color:"ge"}], deadline:true},
+  19: { events:[{label:"PE4 3PM",color:"ge"},{label:"Personal Study",color:"personal"}]},
+  20: { events:[{label:"Networking Lab 7AM",color:"major"},{label:"Komiti 4PM",color:"personal"},{label:"DGA Training 5:30PM",color:"team"}]},
+  21: { events:[{label:"Tupad 6:45AM",color:"personal"},{label:"Pulong Panata 2:30PM",color:"personal"}]},
+  
+  22: { events:[{label:"MS Lab 10AM",color:"major"},{label:"Personal Study",color:"personal"}]},
+  23: { events:[{label:"Personal Study",color:"personal"}]},
+  24: { events:[{label:"Personal Study",color:"personal"}]},
+  25: { events:[{label:"Adv Statistics 7AM",color:"major"},{label:"OOP Lab 10AM",color:"major"},{label:"Sosyedad 1:30PM",color:"ge"}], deadline:true},
+  26: { events:[{label:"PE4 3PM",color:"ge"},{label:"Personal Study",color:"personal"}]},
+  27: { events:[{label:"Networking Lab 7AM",color:"major"},{label:"Komiti 4PM",color:"personal"},{label:"DGA Training 5:30PM",color:"team"}]},
+  28: { events:[{label:"Tupad 6:45AM",color:"personal"},{label:"Pulong Panata 2:30PM",color:"personal"}]},
+  
+  29: { events:[{label:"MS Lab 10AM",color:"major"},{label:"Personal Study",color:"personal"}]},
+  30: { events:[{label:"Personal Study",color:"personal"}]},
 };
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -88,6 +92,9 @@ export function StudentDashboard() {
   const startOffset = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+  // 🟢 ADDED: Filter controller state definition
+  const [calendarFilter, setCalendarFilter] = useState<"all" | "personal" | "general">("all");
+
 
   const summaryCards = [
     { count: 2, period: "today",     category: "Major Subjects",  Icon: BookOpen,   bg: "bg-teal",         scheduleTab: "comprehensive" as const, comprehensiveTab: "major"       as const },
@@ -96,6 +103,7 @@ export function StudentDashboard() {
     { count: 1, period: "practice",  category: "STF Activities",  Icon: Tv2,        bg: "bg-slate-blue",   scheduleTab: "comprehensive" as const, comprehensiveTab: "stf"         as const },
     { count: 3, period: "this week", category: "Upcoming Events", Icon: Calendar,   bg: "bg-amber-status", scheduleTab: "comprehensive" as const, comprehensiveTab: "institutional" as const },
   ];
+
 
   return (
     <div className="p-7">
@@ -108,6 +116,7 @@ export function StudentDashboard() {
           <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Student View</span>
         </div>
       </FadeUp>
+
 
       {/* Summary strip — clickable, links to relevant tabs */}
       <div className="grid grid-cols-5 gap-3 mb-6">
@@ -135,6 +144,7 @@ export function StudentDashboard() {
         ))}
       </div>
 
+
       {/* Calendar nav */}
       <FadeUp delay={350}>
         <div className="flex items-center gap-3 mb-4">
@@ -157,11 +167,39 @@ export function StudentDashboard() {
             className="text-sm border border-border rounded-lg px-3 py-1.5 bg-card">
             {Array.from({ length: 11 }, (_, i) => 2020 + i).map(y => <option key={y} value={y}>{y}</option>)}
           </select>
+         
           <button onClick={() => setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1))}
-            className="ml-auto text-sm font-semibold text-teal border border-teal/40 px-4 py-1.5 rounded-lg hover:bg-teal hover:text-white transition">
+            className="text-sm font-semibold text-teal border border-teal/40 px-4 py-1.5 rounded-lg hover:bg-teal hover:text-white transition">
             Today
           </button>
+
+
+          {/* 🟢 ADDED: Tab Group Element for Filtering Selection */}
+          <div className="ml-auto flex border border-border bg-secondary p-0.5 rounded-lg text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setCalendarFilter("all")}
+              className={`px-3 py-1 rounded-md transition ${calendarFilter === "all" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text hover:text-body"}`}
+            >
+              All Schedule
+            </button>
+            <button
+              type="button"
+              onClick={() => setCalendarFilter("personal")}
+              className={`px-3 py-1 rounded-md transition ${calendarFilter === "personal" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text hover:text-body"}`}
+            >
+              Personal
+            </button>
+            <button
+              type="button"
+              onClick={() => setCalendarFilter("general")}
+              className={`px-3 py-1 rounded-md transition ${calendarFilter === "general" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text hover:text-body"}`}
+            >
+              General
+            </button>
+          </div>
         </div>
+
 
         <div className="educ-calendar-grid">
           {DAYS_SHORT.map(d => <div key={d} className="educ-day-label">{d}</div>)}
@@ -170,15 +208,28 @@ export function StudentDashboard() {
             const valid = day >= 1 && day <= daysInMonth;
             const data = valid ? calData[day] : undefined;
             const isToday = valid && day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+            // 🟢 ADDED: Layout evaluation sequence based on selected filter option
+            const filteredEvents = (data?.events ?? []).filter(e => {
+              const isPersonalItem = e.label.toLowerCase().includes("personal");
+              if (calendarFilter === "personal") return isPersonalItem;
+              if (calendarFilter === "general") return !isPersonalItem;
+              return true;
+            });
+           
             return (
               <div key={i}
                 onClick={() => valid && setDrawerDay(`${MONTHS[month]} ${day}, ${year}`)}
                 className={`educ-date-cell${!valid ? " empty" : ""}${isToday ? " today" : ""}`}>
                 {valid && (<>
-                  {data?.deadline && <span className="educ-deadline-dot" />}
+
+
+                  {/* 🔄 CHANGED: Render cutoff indicator dynamically if events are visible */}
+                  {data?.deadline && filteredEvents.length > 0 && <span className="educ-deadline-dot" />}
                   <div className="educ-day-num">{day}</div>
                   <div className="space-y-0.5">
-                    {(data?.events ?? []).map((e, j) => (
+                   
+                    {/* 🔄 CHANGED: Iterating over filteredEvents instead of baseline array directly */}
+                    {filteredEvents.map((e, j) => (
                       <span key={j} className={`educ-chip ${e.color}`}>{e.label}</span>
                     ))}
                   </div>
@@ -187,6 +238,7 @@ export function StudentDashboard() {
             );
           })}
         </div>
+
 
         <div className="flex flex-wrap gap-5 mt-4 text-sm text-muted-text">
           {[
@@ -207,42 +259,37 @@ export function StudentDashboard() {
   );
 }
 
+
 // ─── Day Drawer ────────────────────────────────────────────────────────────────
 const dayScheduleMap: Record<string, { start: number; time: string; label: string; venue: string; locked: boolean }[]> = {
   Monday:    [
     { start:10, time:"10:00–13:00", label:"MS Lab",                venue:"M415 A",        locked:true  },
-    { start:16, time:"16:00–16:30", label:"Komiti",                venue:"Sagana Condo",  locked:true  },
-    { start:19, time:"19:00–21:00", label:"MS Lecture",            venue:"M415 A",        locked:true  },
   ],
   Tuesday:   [
-    { start:11, time:"11:30–13:00", label:"Art Appreciation",      venue:"M414 B",        locked:true  },
-    { start:15, time:"15:00–16:30", label:"Video Team Practice",   venue:"Main Studio",   locked:true  },
+    { start:8,  time:"08:00–22:00", label:"Personal Study",        venue:"Home/Library",  locked:false },
   ],
   Wednesday: [
-    { start:15, time:"15:00–16:00", label:"Library Study Block",   venue:"Library Pod 4", locked:false },
-    { start:19, time:"19:00–21:00", label:"OOP Lecture",           venue:"M411 A",        locked:true  },
+    { start:8,  time:"08:00–22:00", label:"Personal Study",        venue:"Home/Library",  locked:false },
   ],
   Thursday:  [
     { start:7,  time:"07:00–10:00", label:"Advanced Statistics",   venue:"M413 B",        locked:true  },
     { start:10, time:"10:00–13:00", label:"OOP Lab",               venue:"M102",          locked:true  },
     { start:13, time:"13:30–15:00", label:"Sosyedad at Literatura", venue:"IS 233 B",     locked:true  },
-    { start:17, time:"17:00–18:00", label:"Church Prep Block",     venue:"Home",          locked:false },
   ],
   Friday:    [
-    { start:7,  time:"07:00–10:00", label:"Advanced Statistics",   venue:"M413 B",        locked:true  },
-    { start:10, time:"10:00–11:00", label:"Personal Review",       venue:"Room 101",      locked:false },
     { start:15, time:"15:00–17:00", label:"PE4",                   venue:"IS 234 B",      locked:true  },
   ],
   Saturday:  [
     { start:7,  time:"07:00–10:00", label:"Networking Concepts Lab",venue:"M106",         locked:true  },
-    { start:10, time:"10:00–11:30", label:"DAA",                   venue:"M414 B",        locked:true  },
+    { start:16, time:"16:00–16:30", label:"Komiti",                venue:"Sagana Condo",  locked:false }, // changed locked to false as it is categorized as personal
     { start:17, time:"17:30–19:00", label:"DGA Multimedia Training",venue:"M411 A",       locked:true  },
   ],
   Sunday:    [
     { start:7,  time:"06:45–10:00", label:"Tupad",                 venue:"Sagana Homes 1",locked:true  },
-    { start:14, time:"14:30–15:00", label:"Pulong Panata",         venue:"Church",        locked:true  },
+    { start:14, time:"14:30–15:00", label:"Pulong Panata",         venue:"Church",        locked:false }, // changed locked to false as it is categorized as personal
   ],
 };
+
 const DOW_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
 export function DayDrawer() {
@@ -501,7 +548,6 @@ export function ScheduleView() {
   return (
     <div className="p-7">
       <FadeUp>
-        {/* Sub-tabs */}
         <div className="flex gap-0 border-b border-border mb-6 overflow-x-auto">
           {([
             { id:"manage" as const, label:"Schedule" },
@@ -619,108 +665,447 @@ export function ScheduleView() {
   );
 }
 
-export function ScheduleModal() { return null; }
+/* ──────────────────────────────────────────────────────────────────────────────
+   🌟 CHANGED: ScheduleModal 🌟
+   Filled empty shell to handle explicit inline updating / editing data sheets.
+   ────────────────────────────────────────────────────────────────────────────── */
+export function ScheduleModal({ isOpen, onClose, entry, onSave }: {
+  isOpen: boolean;
+  onClose: () => void;
+  entry: ScheduleEntry | null;
+  onSave: (updated: ScheduleEntry) => void;
+}) {
+  const [form, setForm] = useState<ScheduleEntry>({ day: "MON", timeSlot: "00:00–00:00", label: "", venue: "", sourceType: "" });
 
-// ─── Comprehensive Schedule View ──────────────────────────────────────────────
-type ScheduleEntry = { day: string; timeSlot: string; label: string; venue: string; sourceType: string; editable?: boolean; category?: string };
-type TabId = "all"|"major"|"ge"|"panata"|"stf"|"personal"|"institutional";
-type PanataCategory = "lokal"|"stf"|"pulong";
-const PAGE_SIZE = 7;
+  useEffect(() => {
+    if (entry) setForm(entry);
+  }, [entry]);
 
-const allScheduleEntries: Record<string, ScheduleEntry[]> = {
-  major: [
-    {day:"MON",timeSlot:"10:00–13:00",label:"MS Lab",venue:"M415 A",sourceType:"System (MAJOR)"},
-    {day:"MON",timeSlot:"19:00–21:00",label:"MS Lecture",venue:"M415 A",sourceType:"System (MAJOR)"},
-    {day:"THU",timeSlot:"07:00–10:00",label:"Advanced Statistics",venue:"M413 B",sourceType:"System (MAJOR)"},
-    {day:"THU",timeSlot:"10:00–13:00",label:"OOP Lab",venue:"M102",sourceType:"System (MAJOR)"},
-    {day:"WED",timeSlot:"19:00–21:00",label:"OOP Lecture",venue:"M411 A",sourceType:"System (MAJOR)"},
-    {day:"SAT",timeSlot:"07:00–10:00",label:"Networking Concepts Lab",venue:"M106",sourceType:"System (MAJOR)"},
-    {day:"SAT",timeSlot:"19:00–21:00",label:"Networking Concepts Lec",venue:"M413 A",sourceType:"System (MAJOR)"},
-    {day:"TUE",timeSlot:"10:00–13:00",label:"Info Management Lab",venue:"M415 B",sourceType:"System (MAJOR)"},
-    {day:"TUE",timeSlot:"13:00–15:00",label:"Info Management Lec",venue:"M411 B",sourceType:"System (MAJOR)"},
-    {day:"FRI",timeSlot:"07:00–10:00",label:"Advanced Calculus",venue:"M41B",sourceType:"System (MAJOR)"},
-    {day:"FRI",timeSlot:"10:00–11:00",label:"Discrete Structures",venue:"M41-B",sourceType:"System (MAJOR)"},
-    {day:"WED",timeSlot:"14:30–16:00",label:"Filipino sa Ibat Ibang Disiplina",venue:"M412",sourceType:"System (MAJOR)"},
-  ],
-  ge: [
-    {day:"TUE",timeSlot:"11:30–13:00",label:"Art Appreciation",venue:"M414 B",sourceType:"System (GE)"},
-    {day:"THU",timeSlot:"13:30–15:00",label:"Sosyedad at Literatura",venue:"IS 233 B",sourceType:"System (GE)"},
-    {day:"FRI",timeSlot:"15:00–17:00",label:"PE4",venue:"IS 234 B",sourceType:"System (GE)"},
-    {day:"SAT",timeSlot:"10:00–11:30",label:"DAA",venue:"M414 B",sourceType:"System (GE)"},
-    {day:"MON",timeSlot:"16:00–17:30",label:"The Life & Works of Rizal",venue:"TBA",sourceType:"System (GE)"},
-    {day:"WED",timeSlot:"08:30–10:00",label:"Science, Tech & Society",venue:"TBA",sourceType:"System (GE)"},
-    {day:"THU",timeSlot:"13:00–16:00",label:"The Contemporary World",venue:"TBA",sourceType:"System (GE)"},
-    {day:"WED",timeSlot:"10:00–12:00",label:"Individual/Dual Sports",venue:"TBA",sourceType:"System (GE)"},
-  ],
-  panata: [
-    {day:"SUN",timeSlot:"06:45–10:00",label:"Tupad",venue:"Sagana Homes 1",sourceType:"System (PANATA)"},
-    {day:"SUN",timeSlot:"14:30–15:00",label:"Pulong Panata",venue:"Church",sourceType:"System (PANATA)"},
-    {day:"MON",timeSlot:"16:00–16:30",label:"Komiti",venue:"Sagana Condo Bldg 1",sourceType:"System (PANATA)"},
-    {day:"FRI",timeSlot:"16:00–17:30",label:"CICS1 Panata",venue:"Sagana Homes 1",sourceType:"System (PANATA)"},
-    {day:"SAT",timeSlot:"06:45–10:00",label:"CICS2 Panata",venue:"Sagana Condo Bldg 1",sourceType:"System (PANATA)"},
-    {day:"SAT",timeSlot:"10:00–12:00",label:"CICS3 Panata",venue:"Church Main Hall",sourceType:"System (PANATA)"},
-  ],
-  stf: [
-    {day:"SAT",timeSlot:"17:30–19:00",label:"DGA Multimedia Training",venue:"M411 A",sourceType:"System (TEAM)"},
-    {day:"TUE",timeSlot:"15:00–16:30",label:"Video Team Practice",venue:"Main Studio",sourceType:"System (TEAM)"},
-    {day:"THU",timeSlot:"15:00–16:30",label:"Video Team Practice",venue:"Main Studio",sourceType:"System (TEAM)"},
-  ],
-  personal: [
-    {day:"WED",timeSlot:"15:00–16:00",label:"Library Study Block",venue:"Library Pod 4",sourceType:"Manual (PERSONAL)",editable:true},
-    {day:"FRI",timeSlot:"10:00–11:00",label:"Personal Review Session",venue:"Room 101",sourceType:"Manual (PERSONAL)",editable:true},
-    {day:"THU",timeSlot:"17:00–18:00",label:"Church Prep Block",venue:"Home",sourceType:"Manual (PERSONAL)",editable:true},
-    {day:"MON",timeSlot:"18:00–19:00",label:"Personal Reading Block",venue:"Library Pod 2",sourceType:"Manual (PERSONAL)",editable:true},
-  ],
-  institutional: [
-    {day:"Nov 2",timeSlot:"13:00–15:00",label:"STF-NEU Choir Orientation Batch 1",venue:"IS Bldg B, Room 234",sourceType:"System (EVENT)"},
-    {day:"Nov 8",timeSlot:"09:00–10:30",label:"CBI Peer Counseling Seminar",venue:"Google Meet",sourceType:"System (EVENT)"},
-    {day:"Nov 12",timeSlot:"14:00–15:30",label:"DGA Sync Meeting",venue:"IS Bldg B, 236",sourceType:"System (EVENT)"},
-  ],
-};
+  if (!isOpen || !entry) return null;
 
-const panataCategories: { id: PanataCategory; title: string; subtitle: string; Icon: any; color: string }[] = [
-  { id:"lokal",  title:"Panata sa Lokal",           subtitle:"Barangay-level nga mga panata",     Icon:Home,   color:"from-teal-dark to-teal" },
-  { id:"stf",    title:"STF Panata Groups",          subtitle:"CICS1, CICS2 & CICS3 group duties", Icon:Users,  color:"from-teal to-teal-light" },
-  { id:"pulong", title:"Organization Pulong Panata", subtitle:"Broader school organization duties",Icon:School, color:"from-slate-blue to-teal" },
-];
-
-const panataTableEntries: Record<PanataCategory, { day:string; timeSlot:string; label:string; venue:string; editable?:boolean }[]> = {
-  lokal: [
-    {day:"SUN",timeSlot:"06:45–10:00",label:"Tupad",venue:"Sagana Homes 1"},
-    {day:"MON",timeSlot:"16:00–16:30",label:"Komiti",venue:"Sagana Condo Bldg 1"},
-  ],
-  stf: [
-    {day:"FRI",timeSlot:"16:00–17:30",label:"CICS1 Panata",venue:"Sagana Homes 1"},
-    {day:"SAT",timeSlot:"06:45–10:00",label:"CICS2 Panata",venue:"Sagana Condo Bldg 1"},
-    {day:"SAT",timeSlot:"10:00–12:00",label:"CICS3 Panata",venue:"Church Main Hall"},
-    {day:"TUE",timeSlot:"15:00–16:30",label:"Video Team Worship Prep",venue:"Main Studio"},
-    {day:"THU",timeSlot:"15:00–16:30",label:"Video Team Panata Sync",venue:"Main Studio"},
-    {day:"SAT",timeSlot:"17:30–19:00",label:"DGA Group Panata Meeting",venue:"M411 A"},
-  ],
-  pulong: [
-    {day:"SUN",timeSlot:"14:30–15:00",label:"Pulong Panata",venue:"Church"},
-    {day:"MON",timeSlot:"14:00–15:30",label:"General Org Pulong",venue:"IS Bldg B, Room 234"},
-    {day:"WED",timeSlot:"12:00–13:00",label:"School Org Coordination",venue:"Google Meet"},
-  ],
-};
-
-type AddScheduleForm = { day:string; timeSlot:string; label:string; venue:string; category?:string; recurrence?:string; notes?:string };
-const DAYS_OF_WEEK = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-
-function getCombinedScheduleRows(extraRows: Record<string, ScheduleEntry[]>): ScheduleEntry[] {
-  const cats: { key: string; label: string }[] = [
-    { key: "major", label: "Major" }, { key: "ge", label: "GE" }, { key: "panata", label: "Panata" },
-    { key: "stf", label: "STF Team" }, { key: "personal", label: "Personal" }, { key: "institutional", label: "Event" },
-  ];
-  return cats.flatMap(({ key, label }) =>
-    [...(allScheduleEntries[key] ?? []), ...(extraRows[key] ?? [])].map(r => ({ ...r, category: label }))
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in" onClick={onClose}>
+      <div className="bg-card rounded-2xl border border-border p-7 w-[480px] shadow-2xl scale-in" onClick={e=>e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="font-serif font-bold text-teal-dark text-xl">Edit Schedule Entry</h2>
+          <button onClick={onClose} className="hover:bg-secondary rounded-lg p-1.5"><X className="w-5 h-5"/></button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Schedule Label</label>
+            <input value={form.label} onChange={e=>setForm(f=>({...f,label:e.target.value}))}
+              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Day</label>
+              <input value={form.day} onChange={e=>setForm(f=>({...f,day:e.target.value.toUpperCase()}))}
+                className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Time Slot</label>
+              <input value={form.timeSlot} onChange={e=>setForm(f=>({...f,timeSlot:e.target.value}))}
+                className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Venue</label>
+            <input value={form.venue} onChange={e=>setForm(f=>({...f,venue:e.target.value}))}
+              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:ring-2 focus:ring-teal/30 outline-none"/>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-secondary transition">Cancel</button>
+            <button onClick={() => { onSave(form); onClose(); }} className="flex-1 py-2.5 rounded-xl bg-teal-dark text-white text-sm font-semibold hover:bg-teal transition">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
+// ─── Comprehensive Schedule View Data Definitions ──────────────────────────────
+type ScheduleEntry = { day: string; timeSlot: string; label: string; venue: string; sourceType: string; editable?: boolean; category?: string; specialTag?: string };
+type TabId = "all"|"major"|"ge"|"panata"|"stf"|"personal"|"institutional";
+type AddScheduleForm = { day:string; timeSlot:string; label:string; venue:string; category?:string; recurrence?:string; notes?:string };
+const PAGE_SIZE = 7;
+
+const COURSE_CODE_MAP: Record<string, string> = {
+  "MS Lab":"IT331","MS Lecture":"IT331","OOP Lab":"IT312","OOP Lecture":"IT312L",
+  "Networking Concepts Lab":"IT321","Networking Concepts Lec":"IT321L",
+  "Advanced Statistics":"MATH31","Advanced Calculus":"MATH21",
+  "Info Management Lab":"IT315","Info Management Lec":"IT315L",
+  "Discrete Structures":"CS201","Filipino sa Ibat Ibang Disiplina":"FIL101",
+  "Art Appreciation":"GE101","Sosyedad at Literatura":"GE102","PE4":"PE4",
+  "DAA":"GE201","The Life & Works of Rizal":"GE301","Science, Tech & Society":"GE302",
+  "The Contemporary World":"GE303","Individual/Dual Sports":"PE5",
+  "DGA Multimedia Training":"STF-DGA","Video Team Practice":"STF-VT",
+  "Tupad":"PAN-TUP","Pulong Panata":"PAN-PUL","Komiti":"PAN-KOM",
+  "CICS1 Panata":"PAN-C1","CICS2 Panata":"PAN-C2","CICS3 Panata":"PAN-C3",
+};
+
+/* ──────────────────────────────────────────────────────────────────────────────
+   🌟 CHANGED: ScheduleTable 🌟
+   Added `onEdit` callback parameter and conditional tag injection framework.
+   ────────────────────────────────────────────────────────────────────────────── */
+function ScheduleTable({ rows, showSourceType=true, showCode=true, onDelete, onEdit }: {
+  rows: ScheduleEntry[]; showSourceType?:boolean; showCode?:boolean; onDelete?:(i:number) => void; onEdit?:(r: ScheduleEntry, i: number) => void;
+}) {
+  const colSpan = [4, showCode?1:0, showSourceType?1:0, 1].reduce((a,b)=>a+b, 0);
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden" style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
+            <th className="px-5 py-3.5 text-left font-semibold w-20">Day</th>
+            <th className="px-5 py-3.5 text-left font-semibold w-36">Time Slot</th>
+            {showCode && <th className="px-5 py-3.5 text-left font-semibold w-24">Code</th>}
+            <th className="px-5 py-3.5 text-left font-semibold">Schedule Label</th>
+            <th className="px-5 py-3.5 text-left font-semibold">Venue</th>
+            {showSourceType && <th className="px-5 py-3.5 text-left font-semibold">Source/Type</th>}
+            <th className="px-5 py-3.5 text-left font-semibold w-28">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0
+            ? <tr><td colSpan={colSpan} className="px-5 py-12 text-center text-muted-text">No schedules found.</td></tr>
+            : rows.map((r,i) => (
+              <tr key={i} className={`border-b border-border last:border-0 transition-colors ${i%2===0?"bg-card":"bg-secondary/20"} hover:bg-teal-soft/20`}>
+                <td className="px-5 py-3.5">
+                  {r.day.length <= 3
+                    ? <span className="font-bold text-xs text-teal-dark bg-teal-soft px-2.5 py-1 rounded-lg">{r.day}</span>
+                    : <div className="text-center leading-tight">
+                        <div className="font-bold text-[10px] text-teal-dark uppercase">{r.day.split(" ")[0]}</div>
+                        <div className="font-bold text-sm text-teal-dark leading-none">{r.day.split(" ")[1]}</div>
+                      </div>
+                  }
+                </td>
+                <td className="px-5 py-3.5 text-sm text-muted-text font-mono">{r.timeSlot}</td>
+                {showCode && (
+                  <td className="px-5 py-3.5">
+                    {COURSE_CODE_MAP[r.label]
+                      ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20 font-mono">{COURSE_CODE_MAP[r.label]}</span>
+                      : <span className="text-[11px] text-muted-text/50">—</span>
+                    }
+                  </td>
+                )}
+                <td className="px-5 py-3.5 font-medium text-foreground text-sm">
+                  <div className="flex flex-col gap-1.5 items-start">
+                    <span>{r.label}</span>
+                    {/* 🟢 ADDED: Condition check to inject visual special tag layout strip */}
+                    {r.specialTag && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                        <Star className="w-3 h-3 fill-amber-500 text-amber-500" /> {r.specialTag}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-5 py-3.5 text-sm text-muted-text">{r.venue}</td>
+                {showSourceType && <td className="px-5 py-3.5 text-xs text-muted-text">{r.sourceType}</td>}
+                <td className="px-5 py-3.5">
+                  {r.editable
+                    ? <div className="flex items-center gap-2">
+                        {/* 🟢 ADDED: Executing edit tracking trigger callback */}
+                        <button onClick={() => onEdit?.(r, i)} className="p-2 rounded-lg border border-teal/40 text-teal hover:bg-teal hover:text-white transition" title="Edit"><Pencil className="w-4 h-4"/></button>
+                        <button onClick={()=>onDelete?.(i)} className="p-2 rounded-lg border border-red-status/40 text-red-status hover:bg-red-status hover:text-white transition" title="Delete"><Trash2 className="w-4 h-4"/></button>
+                      </div>
+                    : <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm font-medium text-muted-text hover:border-teal hover:text-teal transition">
+                        <Lock className="w-3.5 h-3.5"/> View
+                      </button>
+                  }
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────────
+   🌟 CHANGED: ScheduleViewComprehensive 🌟
+   Converted tracking mechanism into a unified responsive state structure.
+   ────────────────────────────────────────────────────────────────────────────── */
+export function ScheduleViewComprehensive() {
+  const [tab, setTab] = useState<TabId>(() => {
+    const t = scheduleDeepLink.comprehensiveTab ?? "all";
+    scheduleDeepLink.comprehensiveTab = undefined;
+    return t;
+  });
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [showRequest, setShowRequest] = useState(false);
+
+  // 🟢 ADDED: Dynamic state container pre-loaded with configured categories, editable tags, and migrated items
+  const [scheduleData, setScheduleData] = useState<Record<string, ScheduleEntry[]>>({
+    major: [
+      /* 🌟 CHANGED: Major elements initialized with direct editable configuration flags 🌟 */
+      {day:"MON",timeSlot:"10:00–13:00",label:"MS Lab",venue:"M415 A",sourceType:"System (MAJOR)",editable:true},
+      {day:"MON",timeSlot:"19:00–21:00",label:"MS Lecture",venue:"M415 A",sourceType:"System (MAJOR)",editable:true},
+      {day:"THU",timeSlot:"07:00–10:00",label:"Advanced Statistics",venue:"M413 B",sourceType:"System (MAJOR)",editable:true},
+      {day:"THU",timeSlot:"10:00–13:00",label:"OOP Lab",venue:"M102",sourceType:"System (MAJOR)",editable:true},
+      {day:"WED",timeSlot:"19:00–21:00",label:"OOP Lecture",venue:"M411 A",sourceType:"System (MAJOR)",editable:true},
+      {day:"SAT",timeSlot:"07:00–10:00",label:"Networking Concepts Lab",venue:"M106",sourceType:"System (MAJOR)",editable:true},
+      {day:"SAT",timeSlot:"19:00–21:00",label:"Networking Concepts Lec",venue:"M413 A",sourceType:"System (MAJOR)",editable:true},
+      {day:"TUE",timeSlot:"10:00–13:00",label:"Info Management Lab",venue:"M415 B",sourceType:"System (MAJOR)",editable:true},
+      {day:"TUE",timeSlot:"13:00–15:00",label:"Info Management Lec",venue:"M411 B",sourceType:"System (MAJOR)",editable:true},
+      {day:"FRI",timeSlot:"07:00–10:00",label:"Advanced Calculus",venue:"M41B",sourceType:"System (MAJOR)",editable:true},
+      {day:"FRI",timeSlot:"10:00–11:00",label:"Discrete Structures",venue:"M41-B",sourceType:"System (MAJOR)",editable:true},
+      {day:"WED",timeSlot:"14:30–16:00",label:"Filipino sa Ibat Ibang Disiplina",venue:"M412",sourceType:"System (MAJOR)",editable:true},
+    ],
+    ge: [
+      {day:"TUE",timeSlot:"11:30–13:00",label:"Art Appreciation",venue:"M414 B",sourceType:"System (GE)"},
+      {day:"THU",timeSlot:"13:30–15:00",label:"Sosyedad at Literatura",venue:"IS 233 B",sourceType:"System (GE)"},
+      {day:"FRI",timeSlot:"15:00–17:00",label:"PE4",venue:"IS 234 B",sourceType:"System (GE)"},
+      {day:"SAT",timeSlot:"10:00–11:30",label:"DAA",venue:"M414 B",sourceType:"System (GE)"},
+      {day:"MON",timeSlot:"16:00–17:30",label:"The Life & Works of Rizal",venue:"TBA",sourceType:"System (GE)"},
+      {day:"WED",timeSlot:"08:30–10:00",label:"Science, Tech & Society",venue:"TBA",sourceType:"System (GE)"},
+      {day:"THU",timeSlot:"13:00–16:00",label:"The Contemporary World",venue:"TBA",sourceType:"System (GE)"},
+      {day:"WED",timeSlot:"10:00–12:00",label:"Individual/Dual Sports",venue:"TBA",sourceType:"System (GE)"},
+    ],
+    panata: [
+      /* 🌟 CHANGED: Retains only the active STF Panata Group duties 🌟 */
+      {day:"FRI",timeSlot:"16:00–17:30",label:"CICS1 Panata",venue:"Sagana Homes 1",sourceType:"System (PANATA)"},
+      {day:"SAT",timeSlot:"06:45–10:00",label:"CICS2 Panata",venue:"Sagana Condo Bldg 1",sourceType:"System (PANATA)"},
+      {day:"SAT",timeSlot:"10:00–12:00",label:"CICS3 Panata",venue:"Church Main Hall",sourceType:"System (PANATA)"},
+    ],
+    stf: [
+      {day:"SAT",timeSlot:"17:30–19:00",label:"DGA Multimedia Training",venue:"M411 A",sourceType:"System (TEAM)"},
+      {day:"TUE",timeSlot:"15:00–16:30",label:"Video Team Practice",venue:"Main Studio",sourceType:"System (TEAM)"},
+      {day:"THU",timeSlot:"15:00–16:30",label:"Video Team Practice",venue:"Main Studio",sourceType:"System (TEAM)"},
+    ],
+    personal: [
+      /* 🌟 CHANGED: Moved items here with an explicitly configured special tag annotation 🌟 */
+      {day:"SUN",timeSlot:"06:45–10:00",label:"Tupad",venue:"Sagana Homes 1",sourceType:"Manual (PERSONAL)",editable:true,specialTag:"Important Personal Activity"},
+      {day:"SUN",timeSlot:"14:30–15:00",label:"Pulong Panata",venue:"Church",sourceType:"Manual (PERSONAL)",editable:true,specialTag:"Important Personal Activity"},
+      {day:"MON",timeSlot:"16:00–16:30",label:"Komiti",venue:"Sagana Condo Bldg 1",sourceType:"Manual (PERSONAL)",editable:true,specialTag:"Important Personal Activity"},
+      
+      {day:"WED",timeSlot:"15:00–16:00",label:"Library Study Block",venue:"Library Pod 4",sourceType:"Manual (PERSONAL)",editable:true},
+      {day:"FRI",timeSlot:"10:00–11:00",label:"Personal Review Session",venue:"Room 101",sourceType:"Manual (PERSONAL)",editable:true},
+      {day:"THU",timeSlot:"17:00–18:00",label:"Church Prep Block",venue:"Home",sourceType:"Manual (PERSONAL)",editable:true},
+      {day:"MON",timeSlot:"18:00–19:00",label:"Personal Reading Block",venue:"Library Pod 2",sourceType:"Manual (PERSONAL)",editable:true},
+    ],
+    institutional: [
+      {day:"Nov 2",timeSlot:"13:00–15:00",label:"STF-NEU Choir Orientation Batch 1",venue:"IS Bldg B, Room 234",sourceType:"System (EVENT)"},
+      {day:"Nov 8",timeSlot:"09:00–10:30",label:"CBI Peer Counseling Seminar",venue:"Google Meet",sourceType:"System (EVENT)"},
+      {day:"Nov 12",timeSlot:"14:00–15:30",label:"DGA Sync Meeting",venue:"IS Bldg B, 236",sourceType:"System (EVENT)"},
+    ],
+  });
+
+  // 🟢 ADDED: Tracking references to determine active inline edit targets
+  const [editingEntry, setEditingEntry] = useState<{ item: ScheduleEntry; category: string; index: number } | null>(null);
+
+  const handleSaveAdd = (form: AddScheduleForm) => {
+    const key = tab === "all" ? "personal" : tab;
+    const newEntry: ScheduleEntry = {
+      day: form.day,
+      timeSlot: form.timeSlot,
+      label: form.label,
+      venue: form.venue || "TBA",
+      sourceType: key === "major" ? "Manual (MAJOR)" : "Manual (PERSONAL)",
+      editable: true
+    };
+    setScheduleData(prev => ({ ...prev, [key]: [...(prev[key] || []), newEntry] }));
+    setShowModal(false);
+  };
+
+  const handleEditClick = (item: ScheduleEntry, indexInPage: number) => {
+    const globalIndex = (page - 1) * PAGE_SIZE + indexInPage;
+    const originalItem = filtered[globalIndex];
+    
+    let foundCategory = tab;
+    let foundIndex = -1;
+    
+    if (tab === "all") {
+      for (const key in scheduleData) {
+        const idx = scheduleData[key].indexOf(originalItem);
+        if (idx !== -1) {
+          foundCategory = key;
+          foundIndex = idx;
+          break;
+        }
+      }
+    } else {
+      foundIndex = scheduleData[tab].indexOf(originalItem);
+    }
+
+    if (foundIndex !== -1) {
+      setEditingEntry({ item: originalItem, category: foundCategory, index: foundIndex });
+    }
+  };
+
+  const handleSaveEdit = (updatedItem: ScheduleEntry) => {
+    if (!editingEntry) return;
+    setScheduleData(prev => {
+      const updated = { ...prev };
+      updated[editingEntry.category] = [...updated[editingEntry.category]];
+      updated[editingEntry.category][editingEntry.index] = updatedItem;
+      return updated;
+    });
+    setEditingEntry(null);
+  };
+
+  const handleDeleteMain = (indexInPage: number) => {
+    const globalIndex = (page - 1) * PAGE_SIZE + indexInPage;
+    const itemToDelete = filtered[globalIndex];
+    setScheduleData(prev => {
+      const updated = { ...prev };
+      for (const key in updated) {
+        updated[key] = updated[key].filter(r => r !== itemToDelete);
+      }
+      return updated;
+    });
+  };
+
+  const tabs: {id:TabId;label:string}[] = [
+    {id:"all",label:"All"},
+    {id:"major",label:"Major Subjects"},{id:"ge",label:"GE / Minor Subjects"},
+    {id:"panata",label:"Panata Groups"},{id:"stf",label:"STF Teams"},
+    {id:"personal",label:"Personal Responsibilities"},{id:"institutional",label:"Institutional Events"},
+  ];
+
+  const allowCreate = tab === "all" || tab === "major" || tab === "personal";
+  const majorOnlyModal = tab === "major";
+
+  const getCategoryTextLabel = (key: string) => {
+    if (key === "major") return "Major";
+    if (key === "ge") return "GE";
+    if (key === "panata") return "Panata";
+    if (key === "stf") return "STF Team";
+    if (key === "personal") return "Personal";
+    return "Event";
+  };
+
+  const baseRows = tab === "all"
+    ? Object.keys(scheduleData).flatMap(key => 
+        scheduleData[key].map(r => ({ ...r, category: getCategoryTextLabel(key) }))
+      )
+    : (scheduleData[tab] ?? []);
+
+  const filtered = baseRows.filter(r =>
+    r.label.toLowerCase().includes(search.toLowerCase())||
+    r.venue.toLowerCase().includes(search.toLowerCase())||
+    r.day.toLowerCase().includes(search.toLowerCase())
+  );
+  const totalPages = Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
+  const pageRows   = filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+
+  const handleTabChange = (t:TabId) => { setTab(t); setSearch(""); setPage(1); };
+
+  function Pagination({total,cur,set}:{total:number;cur:number;set:(n:number)=>void}) {
+    if (total<=1) return null;
+    return (
+      <div className="flex items-center justify-end gap-1.5 mt-5">
+        <button onClick={()=>set(Math.max(1,cur-1))} disabled={cur===1}
+          className="w-8 h-8 rounded-lg border border-border text-sm flex items-center justify-center hover:bg-secondary disabled:opacity-40">
+          <ChevronLeft className="w-4 h-4"/>
+        </button>
+        {Array.from({length:total},(_,i)=>i+1).map(n=>(
+          <button key={n} onClick={()=>set(n)}
+            className={`w-8 h-8 rounded-lg border text-sm font-semibold transition ${cur===n?"bg-teal-dark text-white border-teal-dark":"border-border hover:bg-secondary"}`}>
+            {n}
+          </button>
+        ))}
+        <button onClick={()=>set(Math.min(total,cur+1))} disabled={cur===total}
+          className="w-8 h-8 rounded-lg border border-border text-sm flex items-center justify-center hover:bg-secondary disabled:opacity-40">
+          <ChevronRight className="w-4 h-4"/>
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl">
+      <FadeUp>
+        <div className="mb-2 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Comprehensive Schedule Management</h1>
+            <p className="text-sm text-muted-text mt-1">GE, Panata, STF and Events are managed by monitors. Majors and personal items are editable.</p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            {/* 🌟 CHANGED: Request Change button removed conditionally when viewing Major Subjects 🌟 */}
+            {tab !== "major" && tab !== "institutional" && tab !== "personal" && (
+              <button onClick={()=>setShowRequest(true)}
+                className="flex items-center gap-2 border border-amber-status/50 text-amber-status px-4 py-2 rounded-xl text-sm font-semibold hover:bg-amber-status/10 transition">
+                <AlertTriangle className="w-4 h-4"/> Request Change
+              </button>
+            )}
+            {allowCreate && (
+              <button onClick={()=>setShowModal(true)}
+                className="flex items-center gap-2 bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-teal transition-colors">
+                <Plus className="w-4 h-4"/> Add {tab === "major" ? "Major" : "Personal"} Schedule
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="flex gap-0 border-b border-border mb-6 mt-5 overflow-x-auto">
+          {tabs.map(t=>(
+            <button key={t.id} onClick={()=>handleTabChange(t.id)}
+              className={`px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                tab===t.id?"border-teal-dark text-teal-dark":"border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
+              }`}>{t.label}</button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {tab !== "panata" && !allowCreate && (
+        <FadeUp delay={40}>
+          <div className="mb-4 bg-teal-soft/40 border border-teal/20 rounded-xl px-4 py-2.5 text-xs text-muted-text">
+            Add-schedule is disabled for this tab. Use <strong className="text-teal-dark">Request Change</strong> for switch/drop/join requests.
+          </div>
+        </FadeUp>
+      )}
+
+      {/* 🌟 CHANGED: Render data directly in a table format when the Panata tab is activated 🌟 */}
+      <FadeUp delay={60}>
+        <div className="flex items-center justify-between mb-5 gap-3">
+          <div className="relative w-72">
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-muted-text"/>
+            <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Search schedules..."
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-border rounded-xl bg-card focus:outline-none focus:ring-2 focus:ring-teal/30"/>
+          </div>
+        </div>
+        <ScheduleTable 
+          rows={pageRows} 
+          showSourceType={tab !== "panata"} 
+          showCode={tab === "major" || tab === "ge"} 
+          onDelete={handleDeleteMain} 
+          onEdit={handleEditClick}
+        />
+        <Pagination total={totalPages} cur={page} set={setPage}/>
+      </FadeUp>
+
+      {showModal && <AddScheduleModal majorOnly={majorOnlyModal} onClose={()=>setShowModal(false)} onSave={handleSaveAdd}/>}
+      {showRequest && <RequestScheduleChangeModal onClose={()=>setShowRequest(false)}/>}
+      
+      {/* 🟢 ADDED: Wire active item editor window container template */}
+      <ScheduleModal 
+        isOpen={editingEntry !== null} 
+        onClose={() => setEditingEntry(null)} 
+        entry={editingEntry ? editingEntry.item : null} 
+        onSave={handleSaveEdit}
+      />
+    </div>
+  );
+}
+
+// ─── Request Schedule Change Modal ───────────────────────────────────────────
 function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
   const [context, setContext] = useState<"Team" | "Panata Group" | "GE Subject Group">("GE Subject Group");
   const actions = context === "Team" ? ["Join"] : context === "Panata Group" ? ["Switch"] : ["Switch", "Drop"];
   const [action, setAction] = useState(actions[0]);
+
+  // Mock data for dropdowns
+  const availableSchedules = {
+    "GE Subject Group": ["Sosyedad at Literatura — IS234A", "Ethics — PHI101B", "Math in the Modern World — MAT200C"],
+    "Panata Group": ["CICS4", "CICS5", "CICS6"],
+    "Team": ["Writers Team", "Technical Team", "Marketing Team"]
+  };
+
+  const currentSchedules = ["Sosyedad at Literatura — IS233B", "Ethics — PHI101A"];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
@@ -731,8 +1116,10 @@ function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="p-6 space-y-3.5">
           <div className="bg-amber-status/10 border border-amber-status/30 rounded-xl px-4 py-2.5 text-xs">
-            Request window closes <strong>Oct 14, 2025</strong> (middle of midterms). Late submissions are auto-rejected.
+            Request window closes <strong>Oct 14, 2025</strong>. Late submissions are auto-rejected.
           </div>
+          
+          {/* 1 — Context */}
           <div>
             <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">1 — Context (required)</label>
             <select value={context} onChange={e=>{const v=e.target.value as typeof context;setContext(v);setAction(v==="Team"?"Join":"Switch");}}
@@ -740,32 +1127,43 @@ function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
               <option>GE Subject Group</option><option>Panata Group</option><option>Team</option>
             </select>
           </div>
+
+          {/* 2 — Action */}
           <div>
             <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">2 — Action (required)</label>
             <select value={action} onChange={e=>setAction(e.target.value)} className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
               {actions.map(a=><option key={a}>{a}</option>)}
             </select>
           </div>
-          <div>
-            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">3 — Target</label>
-            <input placeholder={context==="Team"?"e.g. Writers Team":context==="Panata Group"?"e.g. CICS4":"e.g. Sosyedad at Literatura — IS234A"}
-              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none"/>
-          </div>
-          {context==="GE Subject Group"&&action==="Switch"&&(
+
+          {/* 3 — Target (Now a Dropdown) */}
+          {action !== "Drop" && (
             <div>
-              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Current Group</label>
-              <input placeholder="e.g. Sosyedad at Literatura — IS233B" className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none"/>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">3 — Target Schedule</label>
+              <select className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
+                <option value="" disabled selected>Select a target group...</option>
+                {availableSchedules[context].map(s => <option key={s}>{s}</option>)}
+              </select>
             </div>
           )}
+
+          {/* Current Group (Conditional Dropdown) */}
+          {action === "Switch" && (
+            <div>
+              <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Current Group</label>
+              <select className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
+                <option value="" disabled selected>Select your current group...</option>
+                {currentSchedules.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Reason (required)</label>
-            <textarea placeholder="Explain the schedule conflict and why this change is necessary." rows={3}
+            <textarea placeholder="Explain the schedule conflict..." rows={3}
               className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none resize-none"/>
           </div>
-          <div>
-            <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Attach evidence (optional)</label>
-            <input type="file" className="w-full text-sm border border-border rounded-xl px-4 py-2 bg-background"/>
-          </div>
+          
           <div className="flex gap-3 pt-1">
             <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-secondary transition">Cancel</button>
             <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-teal-dark text-white text-sm font-semibold hover:bg-teal transition">Submit Request</button>
@@ -776,6 +1174,7 @@ function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Add Schedule Modal ──────────────────────────────────────────────────────
 function AddScheduleModal({ onClose, onSave, majorOnly = false }: { onClose:()=>void; onSave:(e:AddScheduleForm)=>void; majorOnly?: boolean }) {
   const [form, setForm] = useState<AddScheduleForm>({day:"MON",timeSlot:"08:00–09:00",label:"",venue:"",category:majorOnly?"Major Subject":"Personal",recurrence:"One-time",notes:""});
   const [conflict, setConflict] = useState(false);
@@ -827,7 +1226,7 @@ function AddScheduleModal({ onClose, onSave, majorOnly = false }: { onClose:()=>
               <label className="text-xs font-bold text-muted-text uppercase tracking-wider mb-1.5 block">Day</label>
               <select value={form.day} onChange={e=>setForm(f=>({...f,day:e.target.value}))}
                 className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background outline-none">
-                {DAYS_OF_WEEK.map(d=><option key={d}>{d}</option>)}
+                {["SUN","MON","TUE","WED","THU","FRI","SAT"].map(d=><option key={d}>{d}</option>)}
               </select>
             </div>
             <div>
@@ -862,292 +1261,6 @@ function AddScheduleModal({ onClose, onSave, majorOnly = false }: { onClose:()=>
     </div>
   );
 }
-
-const COURSE_CODE_MAP: Record<string, string> = {
-  "MS Lab":"IT331","MS Lecture":"IT331","OOP Lab":"IT312","OOP Lecture":"IT312L",
-  "Networking Concepts Lab":"IT321","Networking Concepts Lec":"IT321L",
-  "Advanced Statistics":"MATH31","Advanced Calculus":"MATH21",
-  "Info Management Lab":"IT315","Info Management Lec":"IT315L",
-  "Discrete Structures":"CS201","Filipino sa Ibat Ibang Disiplina":"FIL101",
-  "Art Appreciation":"GE101","Sosyedad at Literatura":"GE102","PE4":"PE4",
-  "DAA":"GE201","The Life & Works of Rizal":"GE301","Science, Tech & Society":"GE302",
-  "The Contemporary World":"GE303","Individual/Dual Sports":"PE5",
-  "DGA Multimedia Training":"STF-DGA","Video Team Practice":"STF-VT",
-  "Tupad":"PAN-TUP","Pulong Panata":"PAN-PUL","Komiti":"PAN-KOM",
-  "CICS1 Panata":"PAN-C1","CICS2 Panata":"PAN-C2","CICS3 Panata":"PAN-C3",
-};
-
-function ScheduleTable({ rows, showSourceType=true, showCode=true, onDelete }: {
-  rows: (ScheduleEntry&{id?:number})[]; showSourceType?:boolean; showCode?:boolean; onDelete?:(i:number)=>void;
-}) {
-  const colSpan = [4, showCode?1:0, showSourceType?1:0, 1].reduce((a,b)=>a+b, 0);
-  return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden" style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
-            <th className="px-5 py-3.5 text-left font-semibold w-20">Day</th>
-            <th className="px-5 py-3.5 text-left font-semibold w-36">Time Slot</th>
-            {showCode && <th className="px-5 py-3.5 text-left font-semibold w-24">Code</th>}
-            <th className="px-5 py-3.5 text-left font-semibold">Schedule Label</th>
-            <th className="px-5 py-3.5 text-left font-semibold">Venue</th>
-            {showSourceType && <th className="px-5 py-3.5 text-left font-semibold">Source/Type</th>}
-            <th className="px-5 py-3.5 text-left font-semibold w-28">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.length === 0
-            ? <tr><td colSpan={colSpan} className="px-5 py-12 text-center text-muted-text">No schedules found.</td></tr>
-            : rows.map((r,i) => (
-              <tr key={i} className={`border-b border-border last:border-0 transition-colors ${i%2===0?"bg-card":"bg-secondary/20"} hover:bg-teal-soft/20`}>
-                <td className="px-5 py-3.5">
-                  {r.day.length <= 3
-                    ? <span className="font-bold text-xs text-teal-dark bg-teal-soft px-2.5 py-1 rounded-lg">{r.day}</span>
-                    : <div className="text-center leading-tight">
-                        <div className="font-bold text-[10px] text-teal-dark uppercase">{r.day.split(" ")[0]}</div>
-                        <div className="font-bold text-sm text-teal-dark leading-none">{r.day.split(" ")[1]}</div>
-                      </div>
-                  }
-                </td>
-                <td className="px-5 py-3.5 text-sm text-muted-text font-mono">{r.timeSlot}</td>
-                {showCode && (
-                  <td className="px-5 py-3.5">
-                    {COURSE_CODE_MAP[r.label]
-                      ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20 font-mono">{COURSE_CODE_MAP[r.label]}</span>
-                      : <span className="text-[11px] text-muted-text/50">—</span>
-                    }
-                  </td>
-                )}
-                <td className="px-5 py-3.5 font-medium text-foreground text-sm">{r.label}</td>
-                <td className="px-5 py-3.5 text-sm text-muted-text">{r.venue}</td>
-                {showSourceType && <td className="px-5 py-3.5 text-xs text-muted-text">{r.sourceType}</td>}
-                <td className="px-5 py-3.5">
-                  {r.editable
-                    ? <div className="flex items-center gap-2">
-                        <button className="p-2 rounded-lg border border-teal/40 text-teal hover:bg-teal hover:text-white transition" title="Edit"><Pencil className="w-4 h-4"/></button>
-                        <button onClick={()=>onDelete?.(i)} className="p-2 rounded-lg border border-red-status/40 text-red-status hover:bg-red-status hover:text-white transition" title="Delete"><Trash2 className="w-4 h-4"/></button>
-                      </div>
-                    : <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm font-medium text-muted-text hover:border-teal hover:text-teal transition">
-                        <Lock className="w-3.5 h-3.5"/> View
-                      </button>
-                  }
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-export function ScheduleViewComprehensive() {
-  const [tab, setTab] = useState<TabId>(() => {
-    const t = scheduleDeepLink.comprehensiveTab ?? "all";
-    scheduleDeepLink.comprehensiveTab = undefined;
-    return t;
-  });
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [panataView, setPanataView] = useState<PanataCategory|null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [showRequest, setShowRequest] = useState(false);
-  const [extraRows, setExtraRows] = useState<Record<string,ScheduleEntry[]>>({
-    major:[],ge:[],panata:[],stf:[],personal:[],institutional:[],lokal:[],stfPanata:[],pulong:[],
-  });
-
-  const handleSave = (form: AddScheduleForm) => {
-    const key = panataView ? (panataView==="stf"?"stfPanata":panataView) : (tab === "all" ? "personal" : tab);
-    setExtraRows(prev => ({...prev,[key]:[...(prev[key]||[]),{...form,sourceType:"Manual (PERSONAL)",editable:true}]}));
-    setShowModal(false);
-  };
-
-  const tabs: {id:TabId;label:string}[] = [
-    {id:"all",label:"All"},
-    {id:"major",label:"Major Subjects"},{id:"ge",label:"GE / Minor Subjects"},
-    {id:"panata",label:"Panata Groups"},{id:"stf",label:"STF Teams"},
-    {id:"personal",label:"Personal Responsibilities"},{id:"institutional",label:"Institutional Events"},
-  ];
-
-  const allowCreate = tab === "all" || tab === "major" || tab === "personal";
-  const majorOnlyModal = tab === "major";
-
-  const baseRows = tab === "all"
-    ? getCombinedScheduleRows(extraRows)
-    : tab !== "panata" && tab !== "all"
-      ? (allScheduleEntries[tab] ?? [])
-      : [];
-  const allRows  = tab === "all" ? baseRows : [...baseRows, ...(extraRows[tab] || [])];
-  const filtered = allRows.filter(r =>
-    r.label.toLowerCase().includes(search.toLowerCase())||
-    r.venue.toLowerCase().includes(search.toLowerCase())||
-    r.day.toLowerCase().includes(search.toLowerCase())
-  );
-  const totalPages = Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
-  const pageRows   = filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
-
-  const handleTabChange = (t:TabId) => { setTab(t); setSearch(""); setPage(1); setPanataView(null); };
-
-  const panataKey = panataView==="stf"?"stfPanata":panataView??"lokal";
-  const basePanata = panataView ? panataTableEntries[panataView] : [];
-  const allPanata  = [...basePanata,...(extraRows[panataKey]||[])];
-  const filtPanata = allPanata.filter(r =>
-    r.label.toLowerCase().includes(search.toLowerCase())||
-    r.venue.toLowerCase().includes(search.toLowerCase())||
-    r.day.toLowerCase().includes(search.toLowerCase())
-  );
-  const panataPages   = Math.max(1,Math.ceil(filtPanata.length/PAGE_SIZE));
-  const panataPageRows = filtPanata.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
-  const activeCat = panataCategories.find(c=>c.id===panataView);
-
-  const handleDeleteMain = (i:number) => {
-    const row = filtered[(page-1)*PAGE_SIZE+i];
-    const baseFiltered = baseRows.filter(r =>
-      r.label.toLowerCase().includes(search.toLowerCase())||r.venue.toLowerCase().includes(search.toLowerCase())||r.day.toLowerCase().includes(search.toLowerCase())
-    );
-    if ((page-1)*PAGE_SIZE+i >= baseFiltered.length)
-      setExtraRows(prev=>({...prev,[tab]:prev[tab].filter(r=>r!==row)}));
-  };
-  const handleDeletePanata = (i:number) => {
-    const row = filtPanata[(page-1)*PAGE_SIZE+i];
-    const baseFiltered = basePanata.filter(r =>
-      r.label.toLowerCase().includes(search.toLowerCase())||r.venue.toLowerCase().includes(search.toLowerCase())||r.day.toLowerCase().includes(search.toLowerCase())
-    );
-    if ((page-1)*PAGE_SIZE+i >= baseFiltered.length)
-      setExtraRows(prev=>({...prev,[panataKey]:prev[panataKey].filter(r=>r!==row)}));
-  };
-
-  function Pagination({total,cur,set}:{total:number;cur:number;set:(n:number)=>void}) {
-    if (total<=1) return null;
-    return (
-      <div className="flex items-center justify-end gap-1.5 mt-5">
-        <button onClick={()=>set(Math.max(1,cur-1))} disabled={cur===1}
-          className="w-8 h-8 rounded-lg border border-border text-sm flex items-center justify-center hover:bg-secondary disabled:opacity-40">
-          <ChevronLeft className="w-4 h-4"/>
-        </button>
-        {Array.from({length:total},(_,i)=>i+1).map(n=>(
-          <button key={n} onClick={()=>set(n)}
-            className={`w-8 h-8 rounded-lg border text-sm font-semibold transition ${cur===n?"bg-teal-dark text-white border-teal-dark":"border-border hover:bg-secondary"}`}>
-            {n}
-          </button>
-        ))}
-        <button onClick={()=>set(Math.min(total,cur+1))} disabled={cur===total}
-          className="w-8 h-8 rounded-lg border border-border text-sm flex items-center justify-center hover:bg-secondary disabled:opacity-40">
-          <ChevronRight className="w-4 h-4"/>
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-6xl">
-      <FadeUp>
-        <div className="mb-2 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Comprehensive Schedule Management</h1>
-            <p className="text-sm text-muted-text mt-1">GE, Panata, STF and Events are managed by monitors. Majors and personal items are editable.</p>
-          </div>
-          <div className="flex gap-2 shrink-0">
-            <button onClick={()=>setShowRequest(true)}
-              className="flex items-center gap-2 border border-amber-status/50 text-amber-status px-4 py-2 rounded-xl text-sm font-semibold hover:bg-amber-status/10 transition">
-              <AlertTriangle className="w-4 h-4"/> Request Change
-            </button>
-            {allowCreate && (
-              <button onClick={()=>setShowModal(true)}
-                className="flex items-center gap-2 bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-teal transition-colors">
-                <Plus className="w-4 h-4"/> Add {tab === "major" ? "Major" : "Personal"} Schedule
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="flex gap-0 border-b border-border mb-6 mt-5 overflow-x-auto">
-          {tabs.map(t=>(
-            <button key={t.id} onClick={()=>handleTabChange(t.id)}
-              className={`px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
-                tab===t.id?"border-teal-dark text-teal-dark":"border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"
-              }`}>{t.label}</button>
-          ))}
-        </div>
-      </FadeUp>
-
-      {tab !== "panata" && !allowCreate && (
-        <FadeUp delay={40}>
-          <div className="mb-4 bg-teal-soft/40 border border-teal/20 rounded-xl px-4 py-2.5 text-xs text-muted-text">
-            Add-schedule is disabled for this tab. Use <strong className="text-teal-dark">Request Change</strong> for switch/drop/join requests.
-          </div>
-        </FadeUp>
-      )}
-
-      {tab==="panata" && (<>
-        {!panataView && (
-          <FadeUp delay={80}>
-            <div className="grid grid-cols-3 gap-5 mt-2" style={{gridAutoRows:"1fr"}}>
-              {panataCategories.map((cat,i)=>(
-                <FadeUp key={cat.id} delay={i*80}>
-                  <button onClick={()=>{setPanataView(cat.id);setSearch("");setPage(1);}}
-                    className="w-full aspect-square text-left bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-teal hover:shadow-lg transition-all group flex flex-col"
-                    style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
-                    <div className={`bg-gradient-to-br ${cat.color} flex-1 flex flex-col items-center justify-center gap-3 p-5`}>
-                      <cat.Icon className="w-12 h-12 text-white" strokeWidth={1.5}/>
-                      <span className="text-white font-serif font-bold text-lg text-center leading-snug">{cat.title}</span>
-                    </div>
-                    <div className="px-5 py-3 bg-card">
-                      <p className="text-sm text-muted-text">{cat.subtitle}</p>
-                      <p className="text-sm text-teal font-semibold mt-1 group-hover:underline">View schedules →</p>
-                    </div>
-                  </button>
-                </FadeUp>
-              ))}
-            </div>
-          </FadeUp>
-        )}
-        {panataView && (
-          <FadeUp>
-            <div className="flex items-center gap-2 mb-5">
-              <button onClick={()=>{setPanataView(null);setSearch("");setPage(1);}}
-                className="flex items-center gap-1.5 text-sm font-semibold text-teal-dark hover:underline">
-                <ChevronLeft className="w-4 h-4"/> Panata Groups
-              </button>
-              <span className="text-muted-text text-sm">/</span>
-              <span className="text-sm font-semibold text-foreground">{activeCat?.title}</span>
-            </div>
-            <div className="flex items-center justify-between mb-5 gap-3">
-              <div className="relative w-72">
-                <Search className="w-4 h-4 absolute left-3.5 top-3 text-muted-text"/>
-                <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Search schedules..."
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-border rounded-xl bg-card focus:outline-none focus:ring-2 focus:ring-teal/30"/>
-              </div>
-              <button onClick={()=>setShowModal(true)}
-                className="flex items-center gap-2 bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-teal transition-colors">
-                <Plus className="w-4 h-4"/> Add Schedule
-              </button>
-            </div>
-            <ScheduleTable rows={panataPageRows as ScheduleEntry[]} showSourceType={false} showCode={false} onDelete={handleDeletePanata}/>
-            <Pagination total={panataPages} cur={page} set={setPage}/>
-          </FadeUp>
-        )}
-      </>)}
-
-      {tab!=="panata" && (
-        <FadeUp delay={60}>
-          <div className="flex items-center justify-between mb-5 gap-3">
-            <div className="relative w-72">
-              <Search className="w-4 h-4 absolute left-3.5 top-3 text-muted-text"/>
-              <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Search schedules..."
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-border rounded-xl bg-card focus:outline-none focus:ring-2 focus:ring-teal/30"/>
-            </div>
-          </div>
-          <ScheduleTable rows={pageRows} showSourceType onDelete={handleDeleteMain} showCode={tab==="major"||tab==="ge"}/>
-          <Pagination total={totalPages} cur={page} set={setPage}/>
-        </FadeUp>
-      )}
-
-      {showModal && <AddScheduleModal majorOnly={majorOnlyModal} onClose={()=>setShowModal(false)} onSave={handleSave}/>}
-      {showRequest && <RequestScheduleChangeModal onClose={()=>setShowRequest(false)}/>}
-    </div>
-  );
-}
-
 // ─── Tasks View — redesigned to match boss reference ─────────────────────────
 type TaskStatus = "ALL"|"PENDING"|"SUBMITTED"|"GRADED"|"MISSING"|"OVERDUE";
 
@@ -1569,6 +1682,10 @@ export function TasksView({ showAssign = false }: { showAssign?: boolean }) {
     </div>
   );
 }
+
+
+
+
 export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }) {
   const [activeCategory, setActiveCategory] = useState<"ALL"|"TEAM"|"PANATA"|"GE SUBJECT GROUP"|"INSTITUTIONAL">("ALL");
   const [annPage, setAnnPage] = useState(0);
@@ -1868,6 +1985,11 @@ export function AttendanceLogsView() {
     {event:"CBI Peer Counseling",       category:"Event" as const, date:"Aug 2025",     time:"9–10:30AM",   status:"Present" as const, remarks:""},
   ];
 
+  // Calculate Stats
+  const total = logs.length;
+  const attended = logs.filter(l => l.status === "Present" || l.status === "Late").length;
+  const rate = Math.round((attended / total) * 100);
+
   const filters = ["ALL","MAJOR SUBJECTS","GE SUBJECTS","PANATA","STF TEAMS","EVENTS"] as const;
   const filterMap: Record<string,string[]> = {
     "MAJOR SUBJECTS":["Major"], "GE SUBJECTS":["GE"],
@@ -1889,6 +2011,22 @@ export function AttendanceLogsView() {
     <div className="p-7">
       <FadeUp>
         <h1 className="font-serif text-3xl font-bold text-teal-dark mb-2">My Attendance Records</h1>
+        
+        {/* New Stat Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
+            <p className="text-xs font-bold text-muted-text uppercase">Attendance Rate</p>
+            <p className={`text-2xl font-bold ${rate >= 80 ? "text-green-600" : "text-red-600"}`}>{rate}%</p>
+          </div>
+          <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
+            <p className="text-xs font-bold text-muted-text uppercase">Meetings Attended</p>
+            <p className="text-2xl font-bold text-teal-dark">{attended}</p>
+          </div>
+          <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
+            <p className="text-xs font-bold text-muted-text uppercase">Total Records</p>
+            <p className="text-2xl font-bold text-foreground">{total}</p>
+          </div>
+        </div>
 
         {/* Filter buttons */}
         <div className="flex gap-2 mt-4 mb-5 flex-wrap">
