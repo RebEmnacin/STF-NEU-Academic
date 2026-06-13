@@ -6,6 +6,7 @@ import {
   SlidersHorizontal, ListChecks, BookOpen, GraduationCap, Database,
   UserCircle // 🌟 HIGHLIGHTED CHANGE: Added UserCircle icon for AdminProfile link
 } from "lucide-react";
+import sidebarBg from "../../assets/sidebar-bg.png";
 
 interface Item { id: string; label: string; icon: any; }
 interface MenuDef { shared: Item[]; roleLabel: string; roleTools: Item[]; footer: Item[]; }
@@ -28,23 +29,23 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   },
   leader: {
     shared: [
-      { id: "dashboard",     label: "Dashboard",           icon: LayoutDashboard },
-      { id: "schedule",      label: "Schedule Management", icon: Calendar },
-      { id: "tasks",         label: "Tasks",               icon: CheckSquare },
-      { id: "announcements", label: "Announcements",       icon: Megaphone },
-      { id: "attendance-logs", label: "Attendance Logs",   icon: ClipboardList },
+      { id: "dashboard",       label: "Dashboard",           icon: LayoutDashboard },
+      { id: "schedule",        label: "Schedule Management", icon: Calendar },
+      { id: "tasks",           label: "Tasks",               icon: CheckSquare },
+      { id: "announcements",   label: "Announcements",       icon: Megaphone },
+      { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
     ],
     roleLabel: "Leader Tools",
     roleTools: [
-      { id: "roster",          label: "Team Members",      icon: Users },
-      { id: "qr",              label: "QR Generator",      icon: QrCode },
-      { id: "team-attendance", label: "Team Attendance",   icon: ClipboardList },
-      { id: "team-heatmap",    label: "Team Heatmap",      icon: Thermometer },
-      { id: "templates",       label: "Action Center",     icon: Library },
+      { id: "roster",          label: "Team Members",        icon: Users },
+      { id: "qr",              label: "QR Generator",        icon: QrCode },
+      { id: "team-attendance", label: "Team Attendance",     icon: ClipboardList },
+      { id: "team-heatmap",    label: "Team Heatmap",        icon: Thermometer },
+      { id: "templates",       label: "Action Center",       icon: Library },
     ],
     footer: [
-      { id: "profile",       label: "My Profile",          icon: User },
-      { id: "settings",      label: "Settings",            icon: Settings },
+      { id: "profile",         label: "My Profile",          icon: User },
+      { id: "settings",        label: "Settings",            icon: Settings },
     ],
   },
   "ge-monitor": {
@@ -57,8 +58,8 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "GE Monitor Tools",
     roleTools: [
-      { id: "ge-attendance", label: "Course Attendance",    icon: ClipboardList },
-      { id: "templates",     label: "Action Center",        icon: Library },
+      { id: "ge-attendance",   label: "Course Attendance",   icon: ClipboardList },
+      { id: "templates",       label: "Action Center",       icon: Library },
     ],
     footer: [
       { id: "profile",         label: "My Profile",          icon: User },
@@ -85,18 +86,18 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   },
   admin: {
     shared: [
-      { id: "dashboard",     label: "Dashboard",           icon: LayoutDashboard },
-      { id: "schedule",      label: "Schedule Management", icon: Calendar },
-      { id: "announcements", label: "Announcements",       icon: Megaphone },
-      { id: "attendance-logs", label: "Attendance Logs",   icon: ClipboardList },
+      { id: "dashboard",       label: "Dashboard",           icon: LayoutDashboard },
+      { id: "schedule",        label: "Schedule Management", icon: Calendar },
+      { id: "announcements",   label: "Announcements",       icon: Megaphone },
+      { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
     ],
     roleLabel: "Monitor Tools",
     roleTools: [
-      { id: "students",   label: "My Students",             icon: GraduationCap },
-      { id: "heatmap",    label: "Section Heatmap",         icon: Thermometer },
-      { id: "attendance", label: "Attendance Tracker",      icon: ClipboardList },
-      { id: "grader",     label: "Task Evaluator & Grader", icon: ListChecks },
-      { id: "templates",  label: "Action Center",           icon: Library },
+      { id: "students",        label: "My Students",             icon: GraduationCap },
+      { id: "heatmap",         label: "Section Heatmap",         icon: Thermometer },
+      { id: "attendance",      label: "Attendance Tracker",      icon: ClipboardList },
+      { id: "grader",         label: "Task Evaluator & Grader",  icon: ListChecks },
+      { id: "templates",       label: "Action Center",           icon: Library },
     ],
     footer: [
       // 🌟 HIGHLIGHTED CHANGE: Rerouted profile item ID targeting for admin to trigger AdminProfile
@@ -106,18 +107,18 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   },
   superadmin: {
     shared: [
-      { id: "dashboard",     label: "Institutional Dashboard",  icon: LayoutDashboard },
-      { id: "schedule",      label: "Institutional Scheduling", icon: Calendar },
-      { id: "announcements", label: "Announcements",        icon: Megaphone },
+      { id: "dashboard",       label: "Institutional Dashboard",  icon: LayoutDashboard },
+      { id: "schedule",        label: "Institutional Scheduling", icon: Calendar },
+      { id: "announcements",   label: "Announcements",            icon: Megaphone },
     ],
     roleLabel: "Admin Tools",
     roleTools: [
-      { id: "groups",     label: "Student Management",              icon: Database },
-      { id: "heatmap",    label: "Global Heatmap",                  icon: Thermometer },
-      { id: "sessions",   label: "Session & Attendance Analytics",  icon: ClipboardList },
-      { id: "operations", label: "Operations Control",              icon: SlidersHorizontal },
-      { id: "templates",  label: "Action Centers",                  icon: Library },
-      { id: "endoar",     label: "Grade Manager",                   icon: BookOpen },
+      { id: "groups",          label: "Student Management",             icon: Database },
+      { id: "heatmap",         label: "Global Heatmap",                 icon: Thermometer },
+      { id: "sessions",        label: "Session & Attendance Analytics", icon: ClipboardList },
+      { id: "operations",      label: "Operations Control",             icon: SlidersHorizontal },
+      { id: "templates",       label: "Action Centers",                 icon: Library },
+      { id: "endoar",          label: "Grade Manager",                  icon: BookOpen },
     ],
     footer: [
       // 🌟 HIGHLIGHTED CHANGE: Rerouted profile item ID targeting for superadmin to trigger AdminProfile
@@ -128,11 +129,11 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
 };
 
 const SCOPE_LABELS: Record<string, string> = {
-  leader:          "Music · Writing · Video · Photo · DGA",
-  "ge-monitor":    "GE 101 — Section A",
-  "panata-monitor":"CICS2 — Panata Group",
-  admin:           "GE 101 — Section A",
-  superadmin:      "Full Organization · All STF-NEU",
+  leader:           "Music · Writing · Video · Photo · DGA",
+  "ge-monitor":     "GE 101 — Section A",
+  "panata-monitor": "CICS2 — Panata Group",
+  admin:            "GE 101 — Section A",
+  superadmin:       "Full Organization · All STF-NEU",
 };
 
 function NavItem({ item, active, onClick }: { item: Item; active: boolean; onClick: () => void }) {
@@ -159,77 +160,97 @@ export function Sidebar() {
 
   return (
     <aside
-      className="stf-sidebar w-60 shrink-0 min-h-[calc(100vh-6rem)] flex flex-col"
-      style={{ background: "var(--sidebar-bg)" }}
+      className="stf-sidebar shrink-0 flex flex-col relative overflow-hidden"
+      style={{
+        width: "240px",
+        height: role === "leader" ? "1180px" 
+              : (role === "ge-monitor" || role === "panata-monitor") ? "1050px" 
+              : role === "admin" ? "1120px" 
+              : role === "superadmin" ? "1120px" 
+              : "900px",      
+        backgroundImage: `url(${sidebarBg})`,
+        backgroundSize: "240px 900px",
+        backgroundPosition: role === "student" ? "center top" : "center bottom",        backgroundRepeat: "no-repeat",
+        backgroundColor: "#11374a",
+      }}
     >
-      {/* Scope badge */}
-      {role !== "student" && (
-        <div className="mx-3 mt-3 mb-2 px-3 py-2.5 scope-badge">
-          <div className="scope-label text-[9px] font-bold uppercase tracking-[0.16em] mb-0.5">Scope</div>
-          <div className="text-xs font-semibold leading-snug">{SCOPE_LABELS[role] ?? ""}</div>
-        </div>
-      )}
+      {/* Dark overlay so buttons stay readable on top of the image */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{ background: "rgba(10,28,46,0.62)" }}
+      />
 
-      {/* Role badge pill */}
-      <div className="mx-3 mb-3 mt-1 flex items-center gap-2">
-        <span
-          className="text-[9px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-full"
-          style={{ background: "rgba(245,197,24,0.18)", color: "var(--gold)" }}
-        >
-          {role === "student"         ? "Student" :
-           role === "leader"          ? "Team Leader" :
-           role === "ge-monitor"      ? "GE Monitor" :
-           role === "panata-monitor"  ? "Panata Monitor" :
-           role === "admin"           ? "Admin" :
-                                        "Super Admin"}
-        </span>
-      </div>
+      {/* All sidebar content sits above the overlay */}
+      <div className="relative z-10 flex flex-col flex-1">
 
-      {/* Nav */}
-      <nav className="flex flex-col gap-0.5 px-2.5 flex-1">
-        {/* Shared items */}
-        {shared.map(item => {
-          // Ensure "dashboard" isn't accidentally highlighted when admin-profile is live
-          const isItemActive = view === item.id;
-          return (
-            <NavItem 
-              key={item.id} 
-              item={item} 
-              active={isItemActive} 
-              onClick={() => setView(item.id)} 
-            />
-          );
-        })}
-        {/* Role-specific divider + tools */}
-        {hasRoleTools && (<>
-          <div className="flex items-center gap-2 px-1 pt-3 pb-1">
-            <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.10)" }} />
-            <span
-              className="text-[9px] font-bold uppercase tracking-[0.18em] shrink-0"
-              style={{ color: "rgba(255,255,255,0.35)" }}
-            >
-              {roleLabel}
-            </span>
-            <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.10)" }} />
+        {/* Scope badge */}
+        {role !== "student" && (
+          <div className="mx-3 mt-3 mb-2 px-3 py-2.5 scope-badge">
+            <div className="scope-label text-[9px] font-bold uppercase tracking-[0.16em] mb-0.5">Scope</div>
+            <div className="text-xs font-semibold leading-snug">{SCOPE_LABELS[role] ?? ""}</div>
           </div>
-          {roleTools.map(item => (
+        )}
+
+        {/* Role badge pill */}
+        <div className="mx-3 mb-3 mt-1 flex items-center gap-2">
+          <span
+            className="text-[9px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-full"
+            style={{ background: "rgba(245,197,24,0.18)", color: "var(--gold)" }}
+          >
+            {role === "student"        ? "Student" :
+             role === "leader"         ? "Team Leader" :
+             role === "ge-monitor"     ? "GE Monitor" :
+             role === "panata-monitor" ? "Panata Monitor" :
+             role === "admin"          ? "Admin" :
+                                         "Super Admin"}
+          </span>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex flex-col gap-0.5 px-2.5 flex-1">
+          {/* Shared items */}
+          {shared.map(item => (
+            <NavItem
+              key={item.id}
+              item={item}
+              active={view === item.id}
+              onClick={() => setView(item.id)}
+            />
+          ))}
+
+          {/* Role-specific divider + tools */}
+          {hasRoleTools && (
+            <>
+              <div className="flex items-center gap-2 px-1 pt-3 pb-1">
+                <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.10)" }} />
+                <span
+                  className="text-[9px] font-bold uppercase tracking-[0.18em] shrink-0"
+                  style={{ color: "rgba(255,255,255,0.35)" }}
+                >
+                  {roleLabel}
+                </span>
+                <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.10)" }} />
+              </div>
+              {roleTools.map(item => (
+                <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
+              ))}
+            </>
+          )}
+
+          {/* Footer items (Profile / Settings) */}
+          <div className="flex-1" />
+          {footer.map(item => (
             <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
           ))}
-        </>)}
+        </nav>
 
-        {/* Footer items (Settings / Profile) */}
-        <div className="flex-1" />
-        <div className="h-px mx-1 mb-1" style={{ background: "rgba(255,255,255,0.08)" }} />
-        {footer.map(item => (
-          <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
-        ))}
-      </nav>
-
-      {/* Version tag */}
-      <div className="px-4 py-3 mt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <div className="text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(255,255,255,0.25)" }}>
-          STF-NEU AEVM · v2.1 · Prototype
+        {/* Version tag */}
+        <div className="px-4 py-3 mt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div className="text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(255,255,255,0.25)" }}>
+            STF-NEU AEVM · v2.1 · Prototype
+          </div>
         </div>
+
       </div>
     </aside>
   );

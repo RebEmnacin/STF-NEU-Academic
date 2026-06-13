@@ -1,6 +1,8 @@
 import { usePortal, type Role } from "./PortalContext";
-import { Mail, Search, Sun } from "lucide-react";
+import { Mail, Search } from "lucide-react";
+import AEVMlogo from "../../assets/AEVMlogo.png";
 import { NotificationBell } from "./NotificationBell";
+import topnavBg from "../../assets/topnav-bg.png";
 
 const roles: { id: Role; label: string }[] = [
   { id: "guest",           label: "Guest" },
@@ -15,47 +17,52 @@ const roles: { id: Role; label: string }[] = [
 export function TopNav() {
   const { role, setRole, setView } = usePortal();
 
-const searchPlaceholder =
-  role === "student"        ? "Search schedule, tasks, announcements…" :
-  role === "leader"         ? "Search team members, sessions, tasks…" :
-  role === "ge-monitor"     ? "Search GE section students, tasks, grades…" :
-  role === "panata-monitor" ? "Search Panata members, sessions, duties…" :
-  role === "admin"          ? "Search section students, tasks, grades…" :
-  role === "superadmin"     ? "Search all students, events, sessions…" :
-  "Search…";
+  const searchPlaceholder =
+    role === "student"        ? "Search schedule, tasks, announcements…" :
+    role === "leader"         ? "Search team members, sessions, tasks…" :
+    role === "ge-monitor"     ? "Search GE section students, tasks, grades…" :
+    role === "panata-monitor" ? "Search Panata members, sessions, duties…" :
+    role === "admin"          ? "Search section students, tasks, grades…" :
+    role === "superadmin"     ? "Search all students, events, sessions…" :
+    "Search…";
 
   return (
-    <header className="stf-topnav sticky top-0 z-40 shadow-lg" style={{ background: "var(--nav-bg)" }}>
-      {/* ── Main Navbar: Increased height to h-16 and adjusted padding ── */}
+    <header
+      className="stf-topnav sticky top-0 z-40 shadow-lg"
+      style={{
+        backgroundImage: `url(${topnavBg})`,
+        backgroundSize: "100% 64px",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center top",
+      }}
+    >
+      {/* ── Main Navbar ── */}
       <div className="h-16 flex items-center justify-between px-6 gap-4">
 
-        {/* Left Side: Logo + Wordmark (Fixed width to align with sidebar) */}
+        {/* Left Side: Logo + Wordmark */}
         <div className="flex items-center gap-3 shrink-0 w-[280px]">
-          <div
-            className="relative w-10 h-10 rounded-xl grid place-items-center shadow-lg shrink-0"
-            style={{ background: "linear-gradient(135deg, var(--teal-light), var(--teal-dark))" }}
-          >
-            <Sun className="w-6 h-6" style={{ color: "var(--gold)" }} strokeWidth={2.5} />
-          </div>
+          <img
+  src={AEVMlogo}
+  alt="AEVM Logo"
+  className="h-10 w-auto shrink-0 object-contain"
+/>
           <div className="leading-tight flex-1">
-            <div className="nav-title font-display font-bold text-base tracking-tight truncate" style={{ color: "var(--gold)", fontFamily: "var(--font-display-val)" }}>
-              STF-NEU AEVM
+            <div
+              className="nav-title font-display font-bold text-base tracking-tight truncate"
+              style={{ color: "var(--gold)", fontFamily: "var(--font-display-val)" }}
+            >
+              STF-NEU ASTRA
             </div>
-            <div className="nav-subtitle text-[10px] tracking-[0.12em] uppercase font-semibold truncate" style={{ color: "rgba(255,255,255,0.40)" }}>
+            <div
+              className="nav-subtitle text-[10px] tracking-[0.12em] uppercase font-semibold truncate"
+              style={{ color: "rgba(255,255,255,0.40)" }}
+            >
               Special Task Force · New Era
             </div>
           </div>
-          {/* NEU seal */}
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[7px] font-bold border shrink-0"
-            style={{ borderColor: "rgba(245,197,24,0.4)", color: "var(--gold)", background: "rgba(245,197,24,0.08)" }}
-            title="NEU Seal"
-          >
-            NEU
-          </div>
         </div>
 
-        {/* Center: Search (Fluid width, maxed out, forced center) */}
+        {/* Center: Search */}
         <div className="flex-1 flex justify-center max-w-3xl">
           {role !== "guest" ? (
             <div className="w-full relative">
@@ -76,7 +83,7 @@ const searchPlaceholder =
           )}
         </div>
 
-        {/* Right Side: Profile/Actions (Fixed width matching left side for perfect centering) */}
+        {/* Right Side: Profile/Actions */}
         <div className="flex items-center justify-end gap-3 shrink-0 w-[280px]">
           {role === "guest" ? (
             <div className="flex items-center gap-3">
@@ -121,9 +128,15 @@ const searchPlaceholder =
 
       </div>
 
-      {/* ── Role switcher bar: Increased padding to align with header ── */}
-      <div className="px-6 py-2 flex items-center gap-3" style={{ background: "rgba(0,0,0,0.18)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <span className="text-[10px] font-bold tracking-[0.20em] uppercase" style={{ color: "rgba(255,255,255,0.30)" }}>
+      {/* ── Role switcher bar sits below the image naturally ── */}
+      <div
+        className="px-6 py-2 flex items-center gap-3"
+        style={{ background: "rgba(0,0,0,0.18)", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <span
+          className="text-[10px] font-bold tracking-[0.20em] uppercase"
+          style={{ color: "rgba(255,255,255,0.30)" }}
+        >
           PROTOTYPE VIEW:
         </span>
         <div className="inline-flex rounded-lg p-1 gap-1" style={{ background: "rgba(0,0,0,0.25)" }}>
