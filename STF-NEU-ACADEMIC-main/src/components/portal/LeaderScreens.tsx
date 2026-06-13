@@ -8,6 +8,7 @@ import {
   Upload, FileText, Megaphone, CheckSquare, BarChart2, CalendarCheck,
   BookOpen, CalendarDays, CalendarPlus,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 
 // ─── Shared animation primitives ──────────────────────────────────────────────
 function useFadeUp(delay = 0) {
@@ -115,13 +116,20 @@ function AvatarSVG({ initials, size = 48, isOnLeave = false, className = "" }: {
 
 function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose: () => void; onMessage: () => void }) {
   const [visible, setVisible] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setVisible(true), 20); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+  }, []);
   const isActive = member.status === "Active";
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6"
-      style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+      style={{
+        background: "rgba(0,0,0,0.45)",
+        backdropFilter: "blur(2px)",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.25s cubic-bezier(0.16,1,0.3,1)",
+      }}
       onClick={onClose}
     >
       <div
@@ -130,8 +138,8 @@ function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose:
         style={{
           boxShadow: "0 16px 60px rgba(0,0,0,0.25)",
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0) scale(1)" : "translateY(24px) scale(0.97)",
-          transition: "opacity 0.3s ease, transform 0.3s ease",
+          transform: visible ? "translateY(0) scale(1)" : "translateY(32px) scale(0.97)",
+          transition: "opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)",
         }}
       >
         <div className="px-6 pt-6 pb-10 relative"
@@ -211,7 +219,7 @@ function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose:
         </div>
       </div>
     </div>
-  );
+    , document.body);
 }
 
 function MessageModal({ member, onClose }: { member: Member; onClose: () => void }) {
@@ -223,7 +231,9 @@ function MessageModal({ member, onClose }: { member: Member; onClose: () => void
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setVisible(true), 20); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+  }, []);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   function send() {
@@ -235,16 +245,17 @@ function MessageModal({ member, onClose }: { member: Member; onClose: () => void
     }, 1200);
   }
 
-  return (
-    <div className="fixed bottom-5 right-5 z-50" style={{ width: 380 }}>
+  return createPortal(
+    <div className="fixed bottom-5 right-5 z-[100]" style={{ width: 380 }}>
       <div
         className="bg-background border border-border rounded-2xl flex flex-col overflow-hidden"
         style={{
           height: 520,
           boxShadow: "0 16px 60px rgba(0,0,0,0.25)",
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0) scale(1)" : "translateY(24px) scale(0.97)",
-          transition: "opacity 0.3s ease, transform 0.3s ease",
+          transform: visible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.96)",
+          transition: "opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+          willChange: "transform",
         }}
       >
         <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-card">
@@ -288,7 +299,7 @@ function MessageModal({ member, onClose }: { member: Member; onClose: () => void
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 // ─── COMPACT MemberCard — horizontal layout, avatar on left side ───────────────
@@ -418,12 +429,33 @@ const FILE_CONFIG = {
 
 function FilePreviewModal({ file, onClose }: { file: FileAttachment; onClose: () => void }) {
   const [visible, setVisible] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setVisible(true), 20); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+  }, []);
   const cfg = FILE_CONFIG[file.type];
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6" style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} className="bg-background border border-border rounded-2xl w-full max-w-xl flex flex-col overflow-hidden"
-        style={{ maxHeight: "80vh", boxShadow: "0 20px 70px rgba(0,0,0,0.3)", opacity: visible ? 1 : 0, transform: visible ? "translateY(0) scale(1)" : "translateY(20px) scale(0.97)", transition: "opacity 0.25s ease, transform 0.25s ease" }}>
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+      style={{
+        background: "rgba(0,0,0,0.55)",
+        backdropFilter: "blur(3px)",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.25s cubic-bezier(0.16,1,0.3,1)",
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="bg-background border border-border rounded-2xl w-full max-w-xl flex flex-col overflow-hidden"
+        style={{
+          maxHeight: "80vh",
+          boxShadow: "0 20px 70px rgba(0,0,0,0.3)",
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0) scale(1)" : "translateY(32px) scale(0.97)",
+          transition: "opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+          willChange: "transform",
+        }}
+      >
         <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-card">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>{cfg.icon}</div>
           <div className="flex-1 min-w-0">
@@ -443,19 +475,40 @@ function FilePreviewModal({ file, onClose }: { file: FileAttachment; onClose: ()
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 function SubmissionsModal({ member, onClose }: { member: Member; onClose: () => void }) {
   const [visible, setVisible] = useState(false);
   const [previewFile, setPreviewFile] = useState<FileAttachment | null>(null);
-  useEffect(() => { const t = setTimeout(() => setVisible(true), 20); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+  }, []);
   const pct = Math.round((member.tasksDone / member.tasksTotal) * 100);
-  return (
+  return createPortal(
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }} onClick={onClose}>
-        <div onClick={e => e.stopPropagation()} className="bg-background border border-border rounded-2xl w-full max-w-lg overflow-hidden flex flex-col"
-          style={{ maxHeight: "88vh", boxShadow: "0 16px 60px rgba(0,0,0,0.25)", opacity: visible ? 1 : 0, transform: visible ? "translateY(0) scale(1)" : "translateY(24px) scale(0.97)", transition: "opacity 0.3s ease, transform 0.3s ease" }}>
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+        style={{
+          background: "rgba(0,0,0,0.45)",
+          backdropFilter: "blur(2px)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.25s cubic-bezier(0.16,1,0.3,1)",
+        }}
+        onClick={onClose}
+      >
+        <div
+          onClick={e => e.stopPropagation()}
+          className="bg-background border border-border rounded-2xl w-full max-w-lg overflow-hidden flex flex-col"
+          style={{
+            maxHeight: "88vh",
+            boxShadow: "0 16px 60px rgba(0,0,0,0.25)",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0) scale(1)" : "translateY(32px) scale(0.97)",
+            transition: "opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+            willChange: "transform",
+          }}
+        >
           <div className="bg-teal-dark px-6 py-5 flex items-center gap-4">
             <AvatarSVG initials={member.initials} size={44} isOnLeave={member.status !== "Active"} className="rounded-xl shadow" />
             <div className="flex-1 text-white">
@@ -521,7 +574,7 @@ function SubmissionsModal({ member, onClose }: { member: Member; onClose: () => 
       </div>
       {previewFile && <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />}
     </>
-  );
+  , document.body);
 }
 
 // ─── Roster ───────────────────────────────────────────────────────────────────
@@ -1074,8 +1127,8 @@ function SessionAttendanceModal({ session, onClose }: { session: any[]; onClose:
   const statCounts = { Present: 0, Late: 0, Excused: 0, Absent: 0 };
   allMembers.forEach(m => { if (m.status in statCounts) statCounts[m.status as keyof typeof statCounts]++; });
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6"
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6"
       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)" }}
       onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
@@ -1166,7 +1219,7 @@ function SessionAttendanceModal({ session, onClose }: { session: any[]; onClose:
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 // ─── Team Attendance ───────────────────────────────────────────────────────────
@@ -1575,6 +1628,16 @@ export function ActionCenter({ global = false }: { global?: boolean }) {
   const [activeTab, setActiveTab] = useState<ActionTab>("announcement");
   const [saved, setSaved] = useState(false);
   const [sent, setSent] = useState(false);
+  const [groupChecked, setGroupChecked] = useState(true);
+const [allMembers, setAllMembers] = useState(true);
+const [leadsOnly, setLeadsOnly] = useState(false);
+const [monitorsOnly, setMonitorsOnly] = useState(false);
+const [specificPeople, setSpecificPeople] = useState<Record<string, boolean>>({
+  "Natalie Portman": false,
+  "Alex Ammin": false,
+  "Ben Affleck": false,
+  "Maria Santos": false,
+});
 
   // Announcement state
   const [annTitle, setAnnTitle] = useState("Reminder: Pulong Panata");
@@ -1704,38 +1767,53 @@ export function ActionCenter({ global = false }: { global?: boolean }) {
           </div>
 
           <div className="grid grid-cols-12 gap-5 p-5">
-            <div className="col-span-4 space-y-3">
-              <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Audience / Scope</div>
-              <div className="bg-secondary/50 border border-border rounded-xl p-3 text-sm space-y-2 max-h-80 overflow-y-auto">
-                <label className="flex items-center gap-2 font-semibold">
-                  <input type="checkbox" defaultChecked className="accent-teal"/> Video Team / CICS2 / GE Sec A
-                </label>
-                <div className="pl-5 space-y-1.5 text-xs">
-                  <label className="flex items-center gap-2"><input type="checkbox" defaultChecked className="accent-teal"/> All Members</label>
-                  <label className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> Leads Only</label>
-                  <label className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> Monitors Only</label>
-                  <div className="text-muted-text font-bold mt-2 pt-1 border-t border-border">Specific People</div>
-                  {["Natalie Portman", "Alex Ammin", "Ben Affleck", "Maria Santos"].map(n => (
-                    <label key={n} className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> {n}</label>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-teal-soft border border-teal/30 rounded-xl p-3 text-xs">
-                <strong>Reach preview:</strong> this will be sent to <strong>55</strong> members.
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Recurrence & Effectivity</div>
-                <select className={selectCls}>
-                  <option>Does not repeat</option><option>Daily</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option>
-                </select>
-                <div className="grid grid-cols-2 gap-2">
-                  <div><label className="text-[10px] text-muted-text">Start</label><input type="date" defaultValue="2026-06-08" className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/></div>
-                  <div><label className="text-[10px] text-muted-text">End</label><input type="date" defaultValue="2026-07-08" className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/></div>
-                </div>
-              </div>
-            </div>
-            <div className="col-span-8 space-y-5">
-
+  <div className="col-span-4 space-y-3">
+    <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Audience / Scope</div>
+    <div className="bg-secondary/50 border border-border rounded-xl p-3 text-sm space-y-2 max-h-80 overflow-y-auto">
+      <label className="flex items-center gap-2 font-semibold cursor-pointer select-none">
+        <AnimatedCheckbox checked={groupChecked} onChange={setGroupChecked} />
+        Video Team / CICS2 / GE Sec A
+      </label>
+      <div className="pl-5 space-y-1.5 text-xs">
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <AnimatedCheckbox checked={allMembers} onChange={setAllMembers} />
+          All Members
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <AnimatedCheckbox checked={leadsOnly} onChange={setLeadsOnly} />
+          Leads Only
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <AnimatedCheckbox checked={monitorsOnly} onChange={setMonitorsOnly} />
+          Monitors Only
+        </label>
+        <div className="text-muted-text font-bold mt-2 pt-1 border-t border-border">Specific People</div>
+        {["Natalie Portman", "Alex Ammin", "Ben Affleck", "Maria Santos"].map(n => (
+          <label key={n} className="flex items-center gap-2 cursor-pointer select-none">
+            <AnimatedCheckbox
+              checked={specificPeople[n] ?? false}
+              onChange={v => setSpecificPeople(prev => ({ ...prev, [n]: v }))}
+            />
+            {n}
+          </label>
+        ))}
+      </div>
+    </div>
+    <div className="bg-teal-soft border border-teal/30 rounded-xl p-3 text-xs">
+      <strong>Reach preview:</strong> this will be sent to <strong>55</strong> members.
+    </div>
+    <div className="space-y-2">
+      <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Recurrence & Effectivity</div>
+      <select className={selectCls}>
+        <option>Does not repeat</option><option>Daily</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option>
+      </select>
+      <div className="grid grid-cols-2 gap-2">
+        <div><label className="text-[10px] text-muted-text">Start</label><input type="date" defaultValue="2026-06-08" className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/></div>
+        <div><label className="text-[10px] text-muted-text">End</label><input type="date" defaultValue="2026-07-08" className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/></div>
+      </div>
+    </div>
+  </div>
+  <div className="col-span-8 space-y-5">
             {/* ── ANNOUNCEMENT ── */}
             {activeTab === "announcement" && (
               <>
@@ -2170,7 +2248,7 @@ export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team 104" }
   const { modal, setModal } = usePortal();
   if (modal !== "dispatcher") return null;
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-6" onClick={() => setModal(null)}>
+    <div className="fixed inset-0 z-[100] bg-black/50 grid place-items-center p-6" onClick={() => setModal(null)}>
       <div onClick={e => e.stopPropagation()} className="bg-background w-full max-w-2xl rounded-2xl border border-border overflow-hidden"
         style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.22)" }}>
         <div className="px-6 py-4 border-b border-border bg-teal-dark text-white flex items-center justify-between">
@@ -2660,5 +2738,65 @@ export function ActionCenterLimited({ scope = "Group" }: { scope?: string }) {
         </div>
       </FadeUp>
     </div>
+  );
+}
+// ─── Animated Checkbox ────────────────────────────────────────────────────────
+function AnimatedCheckbox({
+  checked,
+  onChange,
+  className = "",
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative shrink-0 ${className}`}
+      style={{
+        width: 18,
+        height: 18,
+        borderRadius: 5,
+        border: `2px solid ${checked ? "var(--teal)" : "var(--border)"}`,
+        background: checked ? "var(--teal)" : "transparent",
+        transition: "background 0.18s cubic-bezier(0.16,1,0.3,1), border-color 0.18s cubic-bezier(0.16,1,0.3,1), transform 0.15s cubic-bezier(0.16,1,0.3,1), box-shadow 0.18s ease",
+        transform: checked ? "scale(1.08)" : "scale(1)",
+        boxShadow: checked ? "0 0 0 3px rgba(27,107,143,0.15)" : "none",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        outline: "none",
+      }}
+    >
+      <svg
+        viewBox="0 0 12 10"
+        fill="none"
+        style={{
+          width: 10,
+          height: 10,
+          opacity: checked ? 1 : 0,
+          transform: checked ? "scale(1)" : "scale(0.5)",
+          transition: "opacity 0.18s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1)",
+        }}
+      >
+        <polyline
+          points="1.5,5.5 4.5,8.5 10.5,1.5"
+          stroke="white"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            strokeDasharray: 14,
+            strokeDashoffset: checked ? 0 : 14,
+            transition: "stroke-dashoffset 0.22s cubic-bezier(0.16,1,0.3,1)",
+          }}
+        />
+      </svg>
+    </button>
   );
 }

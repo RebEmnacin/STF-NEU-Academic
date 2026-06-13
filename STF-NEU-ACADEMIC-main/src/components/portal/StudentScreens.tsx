@@ -20,6 +20,7 @@ export const scheduleDeepLink: {
 } = {};
 
 // ─── Fade-up animation hook ───────────────────────────────────────────────────
+// ─── Fade-up animation hook ───────────────────────────────────────────────────
 function useFadeUp(delay = 0) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -29,14 +30,26 @@ function useFadeUp(delay = 0) {
   return visible;
 }
 
-function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+function FadeUp({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
   const visible = useFadeUp(delay);
   return (
-    <div className={className} style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(18px)",
-      transition: "opacity 0.45s ease, transform 0.45s ease",
-    }}>
+    <div
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(18px)",
+        transition: `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
+        willChange: "opacity, transform",
+      }}
+    >
       {children}
     </div>
   );
@@ -296,25 +309,66 @@ const DOW_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","
 
 export function DayDrawer() {
   const { drawerDay, setDrawerDay, setView } = usePortal();
-  if (!drawerDay) return null;
-  const parsed = new Date(drawerDay);
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (drawerDay) {
+      setMounted(true);
+      // tiny frame gap so the browser registers the initial transform before animating
+      requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+    } else {
+      setVisible(false);
+      const t = setTimeout(() => setMounted(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [drawerDay]);
+
+  if (!mounted) return null;
+
+  const parsed = new Date(drawerDay!);
   const dowName = DOW_NAMES[parsed.getDay()];
   const blocks = dayScheduleMap[dowName] ?? [];
+
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex justify-end" onClick={() => setDrawerDay(null)}>
-      <div className="absolute inset-0 bg-black/30" />
-      <div onClick={e => e.stopPropagation()}
-        className="relative bg-background w-[55%] max-w-4xl h-full overflow-y-auto shadow-2xl border-l border-border animate-in slide-in-from-right">
+    <div className="fixed inset-0 z-[100] flex justify-end">
+      {/* Backdrop */}
+      <div
+        onClick={() => setDrawerDay(null)}
+        style={{
+          position: "absolute", inset: 0,
+          background: "rgba(0,0,0,0.3)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      />
+
+      {/* Drawer panel */}
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: "relative",
+          width: "55%", maxWidth: "56rem", height: "100%",
+          transform: visible ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+          willChange: "transform",
+        }}
+        className="bg-background overflow-y-auto shadow-2xl border-l border-border"
+      >
         <div className="grid grid-cols-12 h-full">
           <div className="col-span-8 border-r border-border p-6">
-            <h3 className="font-serif font-bold text-teal-dark mb-4 text-lg">Hourly Timeline · {drawerDay}</h3>
+            <h3 className="font-serif font-bold text-teal-dark mb-4 text-lg">
+              Hourly Timeline · {drawerDay}
+            </h3>
             <div className="space-y-1">
               {Array.from({ length: 17 }).map((_, i) => {
                 const hour = 6 + i;
                 const block = blocks.find(b => b.start === hour);
                 return (
                   <div key={i} className="flex gap-3 min-h-[48px] border-t border-border/40 pt-1.5">
-                    <div className="w-16 text-xs text-muted-text font-mono shrink-0 pt-0.5">{String(hour).padStart(2,"0")}:00</div>
+                    <div className="w-16 text-xs text-muted-text font-mono shrink-0 pt-0.5">
+                      {String(hour).padStart(2, "0")}:00
+                    </div>
                     {block && (
                       <div className={`flex-1 rounded-lg p-2.5 text-sm ${block.locked ? "bg-teal/10 border border-teal/30" : "bg-gold/10 border border-gold/50"}`}>
                         <div className="font-semibold flex items-center justify-between gap-2">
@@ -322,8 +376,10 @@ export function DayDrawer() {
                             {block.label}
                             {block.locked && <Lock className="w-3.5 h-3.5 text-teal" />}
                           </span>
-                          <button onClick={() => { setDrawerDay(null); setView("schedule"); }}
-                            className="flex items-center gap-1 text-xs text-teal font-semibold hover:underline shrink-0">
+                          <button
+                            onClick={() => { setDrawerDay(null); setView("schedule"); }}
+                            className="flex items-center gap-1 text-xs text-teal font-semibold hover:underline shrink-0"
+                          >
                             <ExternalLink className="w-3 h-3" /> View
                           </button>
                         </div>
@@ -337,6 +393,7 @@ export function DayDrawer() {
               })}
             </div>
           </div>
+
           <div className="col-span-4 p-6 bg-card">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -364,8 +421,10 @@ export function DayDrawer() {
                       <span className={`chip text-xs ${b.locked ? "bg-teal text-white" : "bg-gold text-teal-dark"}`}>
                         {b.locked ? "System" : "Manual"}
                       </span>
-                      <button onClick={() => { setDrawerDay(null); setView("schedule"); }}
-                        className="text-xs text-teal font-semibold hover:underline flex items-center gap-1">
+                      <button
+                        onClick={() => { setDrawerDay(null); setView("schedule"); }}
+                        className="text-xs text-teal font-semibold hover:underline flex items-center gap-1"
+                      >
                         <ExternalLink className="w-3 h-3" /> Comprehensive
                       </button>
                     </div>
@@ -379,7 +438,6 @@ export function DayDrawer() {
     </div>
   , document.body);
 }
-
 // ─── Schedule Management ──────────────────────────────────────────────────────
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 6);
 const BLOCK_TYPE_COLORS: Record<string, string> = {
@@ -2623,21 +2681,50 @@ function Toggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; la
       aria-checked={on}
       aria-label={label}
       style={{
-        width: 48, height: 26, borderRadius: 13,
+        width: 44,
+        height: 24,
+        borderRadius: 12,
         background: on ? "var(--teal)" : "oklch(0.80 0.006 240)",
-        border: "none", cursor: "pointer",
-        position: "relative", flexShrink: 0,
-        transition: "background 0.25s ease",
+        border: "none",
+        cursor: "pointer",
+        position: "relative",
+        flexShrink: 0,
+        padding: 0,
+        transition: "background 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s cubic-bezier(0.16,1,0.3,1)",
+        boxShadow: on ? "0 0 0 3px rgba(27,107,143,0.18)" : "none",
+        outline: "none",
       }}
     >
+      {/* Thumb */}
       <span style={{
-        position: "absolute", top: 4, left: 4,
-        width: 18, height: 18, borderRadius: "50%",
-        background: "white", boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-        transition: "transform 0.25s ease",
-        transform: on ? "translateX(22px)" : "translateX(0)",
-        display: "block",
-      }}/>
+        position: "absolute",
+        top: 3,
+        left: 3,
+        width: 18,
+        height: 18,
+        borderRadius: "50%",
+        background: "white",
+        boxShadow: on
+          ? "0 2px 6px rgba(0,0,0,0.22)"
+          : "0 1px 4px rgba(0,0,0,0.20)",
+        transform: on ? "translateX(20px)" : "translateX(0px)",
+        transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease",
+        willChange: "transform",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        {/* Inner dot */}
+        <span style={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: "var(--teal)",
+          opacity: on ? 1 : 0,
+          transform: on ? "scale(1)" : "scale(0)",
+          transition: "opacity 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1)",
+        }} />
+      </span>
     </button>
   );
 }
@@ -2740,64 +2827,6 @@ export function SettingsView() {
           </div>
         </FadeUp>
 
-        {/* Appearance */}
-        <FadeUp delay={80}>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
-            <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border bg-secondary/30">
-              <div className="w-7 h-7 rounded-lg bg-teal-soft flex items-center justify-center text-teal">
-                <Sun className="w-4 h-4"/>
-              </div>
-              <h2 className="font-semibold text-sm text-foreground">Appearance</h2>
-            </div>
-            <div className="px-6 py-2">
-              <SettingRow label="Theme" sub="Light, dark or follow your system">
-                <div className="flex gap-1.5">
-                  {([
-                    { id:"light" as const,  Icon: Sun,     label:"Light" },
-                    { id:"dark"  as const,  Icon: Moon,    label:"Dark" },
-                    { id:"system"as const,  Icon: Monitor, label:"System" },
-                  ]).map(({ id, Icon, label }) => (
-                    <button
-                      key={id}
-                      onClick={() => applyTheme(id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all"
-                      style={theme === id
-                        ? { background:"var(--teal)", color:"#fff", border:"1px solid var(--teal)" }
-                        : { background:"transparent", borderColor:"var(--border)", color:"var(--muted-text)" }
-                      }
-                    >
-                      <Icon className="w-3 h-3"/> {label}
-                    </button>
-                  ))}
-                </div>
-              </SettingRow>
-              <SettingRow label="Font Size" sub={`Currently ${fontSize}px — affects body text`}>
-                <div className="flex items-center gap-2 w-44">
-                  <span className="text-xs text-muted-text font-bold">A</span>
-                  <input type="range" min={12} max={18} value={fontSize}
-                    onChange={e => setFontSize(Number(e.target.value))}
-                    className="flex-1" style={{accentColor:"var(--teal)"}}/>
-                  <span className="text-base text-muted-text font-bold">A</span>
-                </div>
-              </SettingRow>
-              <SettingRow label="Accent Color" sub="Portal highlight and button color">
-                <div className="flex gap-2">
-                  {ACCENTS.map(c => (
-                    <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.label}
-                      className="w-6 h-6 rounded-full transition-transform hover:scale-110"
-                      style={{ background:c.value, outline:accentColor===c.value?`3px solid ${c.value}`:"none", outlineOffset:2 }}/>
-                  ))}
-                </div>
-              </SettingRow>
-              <SettingRow label="Language">
-                <select value={language} onChange={e => setLanguage(e.target.value)}
-                  className="text-xs border border-border rounded-lg px-3 py-1.5 bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
-                  {["English","Filipino","Tagalog"].map(l=><option key={l}>{l}</option>)}
-                </select>
-              </SettingRow>
-            </div>
-          </div>
-        </FadeUp>
 
         {/* Notifications */}
         <FadeUp delay={100}>
@@ -2892,39 +2921,6 @@ export function SettingsView() {
                   </button>
                 </div>
               </SettingRow>
-            </div>
-          </div>
-        </FadeUp>
-
-        {/* Danger Zone */}
-        <FadeUp delay={220}>
-          <div className="bg-card rounded-2xl overflow-hidden" style={{border:"1px solid var(--red-status)", boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
-            <div className="flex items-center gap-3 px-5 py-3.5 border-b" style={{borderColor:"var(--red-status)", background:"oklch(0.98 0.010 25)"}}>
-              <div className="w-7 h-7 rounded-lg bg-red-status/10 flex items-center justify-center text-red-status">
-                <Shield className="w-4 h-4"/>
-              </div>
-              <h2 className="font-semibold text-sm" style={{color:"var(--red-status)"}}>Danger Zone</h2>
-            </div>
-            <div className="p-5 space-y-0.5">
-              <div className="flex items-center justify-between py-3 border-b border-border/60 gap-4">
-                <div>
-                  <div className="text-sm font-medium">Export my data</div>
-                  <div className="text-xs text-muted-text mt-0.5">Download all your portal data as JSON</div>
-                </div>
-                <button className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-border text-muted-text hover:bg-secondary transition">
-                  Export
-                </button>
-              </div>
-              <div className="flex items-center justify-between py-3 gap-4">
-                <div>
-                  <div className="text-sm font-medium">Deactivate account</div>
-                  <div className="text-xs text-muted-text mt-0.5">Temporarily disable your portal access</div>
-                </div>
-                <button className="px-3 py-1.5 rounded-lg text-xs font-bold text-white transition hover:brightness-110"
-                  style={{background:"var(--red-status)"}}>
-                  Deactivate
-                </button>
-              </div>
             </div>
           </div>
         </FadeUp>
