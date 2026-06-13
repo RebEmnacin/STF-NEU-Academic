@@ -1109,8 +1109,8 @@ function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
 
   const currentSchedules = ["Sosyedad at Literatura — IS233B", "Ethics — PHI101A"];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="bg-card rounded-2xl border border-border w-full max-w-lg shadow-2xl overflow-hidden" onClick={e=>e.stopPropagation()}>
         <div className="bg-teal-dark text-white px-6 py-4">
           <h2 className="font-serif font-bold text-xl">Request Schedule Change</h2>
@@ -1173,7 +1173,7 @@ function RequestScheduleChangeModal({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 // ─── Add Schedule Modal ──────────────────────────────────────────────────────
