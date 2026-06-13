@@ -6,6 +6,51 @@ import {
   Calendar, ChevronLeft, ChevronRight, Tv2, Info
 } from "lucide-react";
 
+/*
+CHANGES
+1. Added calendar in SectionDashboard() (Regular admin) and AdminDashboard() (Super admin)
+2. Added AdminProfile() - just needs linking to view the look of it (right now it just links into admin dashboard)
+
+TO BE CHANGED/ TO DO:
+1. Sensible Consistent data based on dashboard
+  - Scrape all the both dashboard data and compare it to other data 
+  - use AI to make it consistent with each other
+
+2. Deprecate the old regular admin design (MyStudents()) and old super admin design (StudentManagement())
+  - MyStudents() for regular admin
+    - add more subjects responsibility for showcasing a ge group monitor handling 2 or more GE subject groups (multiple rosters)
+  - StudentManagement() [masterlist of all students (for super admin)] (with search bar function and sorting)
+    - View all students, all existing GE subject groups, team ,panata groups
+    - subtabs for filtering by GE subjects groups, team, panata groups
+3. Add AdminSettings (for both regular and super admin)
+4. Remove attendancelogs() in regular admin
+5. Changes in OperationControl() superadmin
+  - StudentAssigner (apply subtabs (for ge subject group, team, panata group, event(additional)))
+    - GE Subject 
+      - show GE subject as a card (shows how many enrolled there, with view button that shows the list of students))
+      - the target assignment dropdown depends on subject card selected and existing groups in that ge subject (for future feature: add an indicator if the existing groups isnt enough to cater all enrolled students)
+    - Team
+      - show team as a card (shows how many members there, with view button that shows the list of students))
+    - Panata Group
+      - show students' departments as a card (shows how many students were in that department to determine which panata group department they belong)
+      - the target assignment dropdown depends on the department card selected and existing panata groups in that department (for future feature: add an indicator if the existing panata groups in that department isnt enough to cater all students from that department)
+    - Event Manager (additional)
+      - show events (special events) as a card (show how many students that are going to be attendees)
+      - show targets (individual, team, by year level)
+  - PendingRequests (remove small tabs of request type in requests and just make it a list of cards with some details remained)
+  - NewGroupCreation (separate tabs for creating new ge subject group, team, panata group)
+    - Dropdown input for GE subject selection (available GE subject within the current semester) and Teacher (available admin teachers)
+  - Algorithms (merge with new group creation and assigner tabs)
+    - new group creation (with algorithm suggestions for optimal student distribution) and 
+    - assigner (with algorithm suggestions for optimal student-group assignment based on heatmap data/ student availability) 
+  - ADD [FUTURE implementation] Event Manager tab (additional)
+     - determine the roles (generic, unique) needed for such event
+  - View all existing GE Subject groups (view performance, attendance rate), panata groups (attendance rate), teams (attendance rate)
+    - 
+
+*/
+
+
 // ============ Section Admin (Professor) Screens ============
 
 // ─── Shared Constants & Helper Tools ──────────────────────────────────────────
@@ -117,7 +162,7 @@ export function SectionDashboard() {
     </div>
   );
 }
-
+// TO CHANGE
 // AD2: My Students (section)
 export function MyStudents() {
   return (
@@ -215,6 +260,7 @@ export function TaskGrader() {
   );
 }
 
+// TO CHANGE
 // AD4: Section Attendance Tracker (reuse Super Admin session list scoped)
 export function SectionAttendance() {
   return (

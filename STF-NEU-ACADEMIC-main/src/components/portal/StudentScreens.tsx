@@ -11,6 +11,18 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
+/*
+CHANGES
+1. StudentDashboard - more sensible sample data
+2. Notification modal with "follow up" functionality
+
+
+TO BE CHANGED/ TO DO :
+1. Sensible consistent sample data across calendar, summary cards, and day drawer to reflect realistic student schedule and commitments
+2. Each Students should have their own QR code in their profile (For future QR system implementation)
+*/
+
+
 // ─── Deep-link signal for dashboard → schedule navigation ─────────────────────
 export const scheduleDeepLink: {
   scheduleTab?: "manage" | "comprehensive";

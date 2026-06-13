@@ -9,6 +9,22 @@ import {
   BookOpen, CalendarDays, CalendarPlus,
 } from "lucide-react";
 
+/*
+CHANGES
+1. [Attendance()] Attendance logger added in GE and Panata group monitor
+
+TO BE CHANGED/TO DO:
+1. [Roster() ] add more subjects responsibility for showcasing a ge group monitor handling 2 or more GE subject groups (multiple rosters)
+  - add more sample students, change table formatting: student name, yr level, attendance rate, actions
+  - change view as list of long cards per handled monitored groups with stats (no. of students, avg. attendance rate. etc.) and view masterlist button to proceed to the students table
+2. [ActionCenterLimited] - Make the audience scope layout more enhanced (like same as the ActionCenter)
+3. [AttendanceList and List of Students (roster data)] Make data more sensible and consistent to one another
+4. Enhanced heatmap view coloring (either: shades of blue (brightness) or standard shades of yellow green red)
+5. Add QRGenerator in GE Monitor role
+*/
+
+
+
 // ─── Shared animation primitives ──────────────────────────────────────────────
 function useFadeUp(delay = 0) {
   const [visible, setVisible] = useState(false);

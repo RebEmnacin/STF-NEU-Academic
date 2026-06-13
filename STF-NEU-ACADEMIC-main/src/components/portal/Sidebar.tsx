@@ -7,6 +7,18 @@ import {
   UserCircle // 🌟 HIGHLIGHTED CHANGE: Added UserCircle icon for AdminProfile link
 } from "lucide-react";
 
+/*
+CHANGES
+1. menuDefs - re arrange sidebar items, added admin profile
+  - Added amin profile
+  - Removed dispatches (useless, its all in action center now)
+
+TO BE CHANGED/ TO DO:
+1. to apply admin profile linking in sidebar, need to update setView logic in PortalContext to recognize "admin-profile" and route to AdminProfile screen
+2. Put numbering in the announcement sidebar tab depending how many unread announcements there are (can be done by adding a new state in PortalContext to track unread announcements, and then displaying that count as a badge on the "Announcements" nav item in the sidebar)
+*/
+
+
 interface Item { id: string; label: string; icon: any; }
 interface MenuDef { shared: Item[]; roleLabel: string; roleTools: Item[]; footer: Item[]; }
 
