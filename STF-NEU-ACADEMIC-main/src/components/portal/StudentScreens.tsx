@@ -10,6 +10,8 @@ import {
   UserCircle, Building2, Activity
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
 
 // ─── Deep-link signal for dashboard → schedule navigation ─────────────────────
 export const scheduleDeepLink: {
@@ -298,8 +300,8 @@ export function DayDrawer() {
   const parsed = new Date(drawerDay);
   const dowName = DOW_NAMES[parsed.getDay()];
   const blocks = dayScheduleMap[dowName] ?? [];
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setDrawerDay(null)}>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex justify-end" onClick={() => setDrawerDay(null)}>
       <div className="absolute inset-0 bg-black/30" />
       <div onClick={e => e.stopPropagation()}
         className="relative bg-background w-[55%] max-w-4xl h-full overflow-y-auto shadow-2xl border-l border-border animate-in slide-in-from-right">
@@ -375,7 +377,7 @@ export function DayDrawer() {
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 // ─── Schedule Management ──────────────────────────────────────────────────────
@@ -683,8 +685,8 @@ export function ScheduleModal({ isOpen, onClose, entry, onSave }: {
 
   if (!isOpen || !entry) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in" onClick={onClose}>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 animate-fade-in" onClick={onClose}>
       <div className="bg-card rounded-2xl border border-border p-7 w-[480px] shadow-2xl scale-in" onClick={e=>e.stopPropagation()}>
         <div className="flex justify-between items-center mb-5">
           <h2 className="font-serif font-bold text-teal-dark text-xl">Edit Schedule Entry</h2>
@@ -722,7 +724,7 @@ export function ScheduleModal({ isOpen, onClose, entry, onSave }: {
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 // ─── Comprehensive Schedule View Data Definitions ──────────────────────────────
@@ -1913,8 +1915,8 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
         </div>
       </div>
 
-      {openAnn !== null && pageAnns[openAnn] && (
-        <div onClick={() => setOpenAnn(null)} className="fixed inset-0 bg-black/50 z-50 grid place-items-center p-4">
+      {openAnn !== null && pageAnns[openAnn] && createPortal(
+         <div onClick={() => setOpenAnn(null)} className="fixed inset-0 bg-black/50 z-[100] grid place-items-center p-4">
           <div onClick={e => e.stopPropagation()} className="bg-card rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div className={`px-6 py-4 shrink-0 ${pageAnns[openAnn].urgency === "URGENT" ? "bg-red-status text-white" : pageAnns[openAnn].urgency === "HIGH" ? "bg-amber-status text-white" : "bg-teal-dark text-white"}`}>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1963,7 +1965,7 @@ export function AnnouncementsView({ canCreate = false }: { canCreate?: boolean }
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 }
