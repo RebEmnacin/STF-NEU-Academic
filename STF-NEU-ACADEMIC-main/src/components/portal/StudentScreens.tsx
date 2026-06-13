@@ -18,6 +18,7 @@ CHANGES
 
 
 TO BE CHANGED/ TO DO :
+1. Add more colors in piechart in tasks view (Pending, Submitted, Graded, Missing, Overdue)
 1. Sensible consistent sample data across calendar, summary cards, and day drawer to reflect realistic student schedule and commitments
 2. Each Students should have their own QR code in their profile (For future QR system implementation)
 */

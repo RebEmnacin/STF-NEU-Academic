@@ -69,6 +69,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "GE Monitor Tools",
     roleTools: [
+      { id: "roster",        label: "Course Rosters",       icon: Users },
       { id: "ge-attendance", label: "Course Attendance",    icon: ClipboardList },
       { id: "templates",     label: "Action Center",        icon: Library },
     ],
@@ -87,6 +88,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "Panata Monitor Tools",
     roleTools: [
+      { id: "roster",            label: "Panata Rosters",    icon: Users },
       { id: "panata-attendance", label: "Panata Attendance", icon: ClipboardList },
       { id: "templates",         label: "Action Center",     icon: Library },
     ],
@@ -100,7 +102,6 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
       { id: "dashboard",     label: "Dashboard",           icon: LayoutDashboard },
       { id: "schedule",      label: "Schedule Management", icon: Calendar },
       { id: "announcements", label: "Announcements",       icon: Megaphone },
-      { id: "attendance-logs", label: "Attendance Logs",   icon: ClipboardList },
     ],
     roleLabel: "Monitor Tools",
     roleTools: [

@@ -5,7 +5,15 @@ import {
   Users, SlidersHorizontal, AlertCircle, Clock, BookOpen, BookMarked, 
   Calendar, ChevronLeft, ChevronRight, Tv2, Info
 } from "lucide-react";
+import {
+  Download, Search, 
+ClipboardList,
+  Send, CalendarCheck, X
+} from "lucide-react";
 
+import { roster, SectionCard, AvatarSVG, MiniBar, ProfileModal, MessageModal, SubmissionsModal,
+        StatCard, geSessions, AttendanceLogger, SessionAttendanceModal
+} from './LeaderScreens';
 /*
 CHANGES
 1. Added calendar in SectionDashboard() (Regular admin) and AdminDashboard() (Super admin)
@@ -22,8 +30,11 @@ TO BE CHANGED/ TO DO:
   - StudentManagement() [masterlist of all students (for super admin)] (with search bar function and sorting)
     - View all students, all existing GE subject groups, team ,panata groups
     - subtabs for filtering by GE subjects groups, team, panata groups
+
 3. Add AdminSettings (for both regular and super admin)
+
 4. Remove attendancelogs() in regular admin
+
 5. Changes in OperationControl() superadmin
   - StudentAssigner (apply subtabs (for ge subject group, team, panata group, event(additional)))
     - GE Subject 
@@ -45,6 +56,8 @@ TO BE CHANGED/ TO DO:
     - assigner (with algorithm suggestions for optimal student-group assignment based on heatmap data/ student availability) 
   - ADD [FUTURE implementation] Event Manager tab (additional)
      - determine the roles (generic, unique) needed for such event
+
+  6. Changes in Grading System
   - View all existing GE Subject groups (view performance, attendance rate), panata groups (attendance rate), teams (attendance rate)
     - 
 
@@ -164,55 +177,143 @@ export function SectionDashboard() {
 }
 // TO CHANGE
 // AD2: My Students (section)
+
 export function MyStudents() {
-  return (
-    <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-1">My Students — GE 101, Sec A</h1>
-      <div className="flex gap-3 mt-4 mb-4">
-        {[["Students","30"],["Active","28"],["On Leave","2"],["Avg Task Completion","78%"]].map(([k,v]) => (
-          <div key={k} className="bg-card border border-border rounded-lg p-3 flex-1 card-soft">
-            <div className="text-xs text-muted-text">{k}</div>
-            <div className="font-serif text-xl font-bold text-teal-dark">{v}</div>
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  
+  const [viewMember, setViewMember] = useState<any | null>(null);
+  const [msgMember, setMsgMember] = useState<any | null>(null);
+  const [subsMember, setSubsMember] = useState<any | null>(null);
+
+  // Admin handling multiple GE Subjects
+  const myGroups = ["GE 101 - Sec A", "GE 102 - Sec B"];
+
+  if (!activeGroup) {
+    return (
+      <div className="p-7">
+        <FadeUp>
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <h1 className="font-serif text-3xl font-bold text-teal-dark">My Students</h1>
+              <p className="text-sm text-muted-text mt-1">Select a GE Subject Group to view its roster</p>
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">
+              Admin View
+            </span>
           </div>
-        ))}
+        </FadeUp>
+
+        <div className="space-y-4">
+          {myGroups.map((group, i) => {
+            const groupMembers = roster.filter(r => r.ge === group);
+            const total = groupMembers.length;
+            const avgAtt = total > 0 ? Math.round(groupMembers.reduce((acc, curr) => acc + curr.attendancePct, 0) / total) : 0;
+
+            return (
+              <FadeUp key={group} delay={i * 60}>
+                <div className="bg-card border border-border rounded-xl p-5 flex items-center justify-between hover:border-teal/50 transition-all shadow-sm group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-teal-soft flex items-center justify-center text-teal-dark shrink-0">
+                      <BookOpen className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">{group}</h3>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-text font-medium">
+                        <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-teal" /> {total} Students</span>
+                        <span className="flex items-center gap-1.5"><CalendarCheck className="w-4 h-4 text-teal" /> {avgAtt}% Avg. Attendance</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => setActiveGroup(group)} className="bg-teal text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-teal-dark transition flex items-center gap-2">
+                    View Masterlist <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </FadeUp>
+            );
+          })}
+        </div>
       </div>
-      <div className="flex gap-2 mb-3">
-        <input placeholder="Search students…" className="flex-1 px-3 py-2 border border-border rounded text-sm bg-card"/>
-        <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>All Departments</option><option>Computer Studies</option><option>Nursing</option><option>Engineering and Architecture</option></select>
-        <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>All Years</option><option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option></select>
-      </div>
-      <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-        <table className="w-full text-sm">
-          <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["","Name","Student ID","Course","Year","Attendance","Task Completion","Status","Actions"].map(h => <th key={h} className="px-2 py-2 text-left">{h}</th>)}</tr></thead>
-          <tbody>
-            {[
-              ["AJ","Alex Johnson","STF-2021-0042","BS IT","Sophomore","87%","72%","Active"],
-              ["NP","Natalie Portman","STF-2022-0101","BS Nursing","Junior","95%","88%","Active"],
-              ["BA","Ben Affleck","STF-2021-0088","BS Civil Eng","Senior","91%","95%","Active"],
-              ["MS","Maria Santos","STF-2023-0103","BA Communication","Freshman","76%","60%","Active"],
-              ["JR","Jose Reyes","STF-2023-0104","BS Psychology","Freshman","82%","55%","Active"],
-              ["AC","Ana Cruz","STF-2022-0105","BS Accountancy","Junior","65%","40%","On Leave"],
-              ["DL","Diego Luna","STF-2022-0106","BS Criminology","Sophomore","88%","79%","Active"],
-              ["RG","Rosa Gomez","STF-2023-0107","BS Midwifery","Freshman","92%","83%","Active"],
-            ].map((r,i) => (
-              <tr key={i} className="row-alt border-b border-border">
-                <td className="px-2 py-2"><div className="w-8 h-8 rounded-full bg-gold grid place-items-center text-xs font-bold text-teal-dark">{r[0]}</div></td>
-                <td className="px-2 py-2 font-semibold">{r[1]}</td>
-                <td className="px-2 py-2 font-mono text-xs">{r[2]}</td>
-                <td className="px-2 py-2">{r[3]}</td>
-                <td className="px-2 py-2">{r[4]}</td>
-                <td className="px-2 py-2">{r[5]}</td>
-                <td className="px-2 py-2">{r[6]}</td>
-                <td className="px-2 py-2"><span className={`chip ${r[7]==="Active"?"bg-green-status text-white":"bg-amber-status text-white"}`}>{r[7]}</span></td>
-                <td className="px-2 py-2"><div className="flex gap-1"><button className="chip border border-teal text-teal">View</button><button className="chip border border-border">Message</button></div></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    );
+  }
+
+  const groupRoster = roster.filter(r => r.ge === activeGroup);
+  const filtered = groupRoster.filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.id.includes(search));
+
+  return (
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-center gap-4 mb-6">
+          <button onClick={() => { setActiveGroup(null); setSearch(""); }} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-sm font-semibold hover:bg-secondary transition">
+            <ChevronLeft className="w-4 h-4" /> Groups
+          </button>
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">{activeGroup}</h1>
+            <p className="text-sm text-muted-text mt-0.5">Masterlist · {groupRoster.length} enrolled students</p>
+          </div>
+        </div>
+      </FadeUp>
+      
+      <FadeUp delay={60}>
+        <SectionCard
+          icon={Users}
+          title="Student Roster"
+          action={
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-text" />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search students…" className="pl-9 pr-3 py-2 text-sm border border-border rounded-xl bg-card w-52 focus:outline-none focus:ring-2 focus:ring-teal/30" />
+              </div>
+              <button className="flex items-center gap-1.5 px-3 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white transition">
+                <Download className="w-3.5 h-3.5" /> Export
+              </button>
+            </div>
+          }
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
+                  {["", "Student Name", "Yr Level", "Attendance Rate", "Actions"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r, i) => (
+                  <tr key={r.id} className={`border-b border-border last:border-0 transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20`}>
+                    <td className="px-4 py-3 w-12"><AvatarSVG initials={r.initials} size={32} isOnLeave={r.status !== "Active"} className="rounded-full" /></td>
+                    <td className="px-4 py-3">
+                      <div className="font-semibold text-foreground">{r.name}</div>
+                      <div className="text-[11px] font-mono text-muted-text mt-0.5">{r.id} · {r.course}</div>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium">{r.year}</td>
+                    <td className="px-4 py-3 w-48">
+                      <span className={`text-sm font-bold ${r.attendancePct >= 80 ? "text-green-700" : "text-red-status"}`}>{r.attendance}</span>
+                      <MiniBar pct={r.attendancePct} color={r.attendancePct >= 80 ? "var(--green-status)" : "var(--red-status)"} />
+                    </td>
+                    <td className="px-4 py-3 w-56">
+                      <div className="flex gap-1.5">
+                        <button onClick={() => setViewMember(r)} className="px-2.5 py-1.5 rounded-lg border border-teal text-teal text-xs font-semibold hover:bg-teal hover:text-white transition">View</button>
+                        <button onClick={() => setMsgMember(r)} className="px-2.5 py-1.5 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1"><Send className="w-3 h-3" />Msg</button>
+                        <button onClick={() => setSubsMember(r)} className="px-2.5 py-1.5 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1"><ClipboardList className="w-3 h-3" />Tasks</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && <tr><td colSpan={5} className="text-center text-muted-text py-12 text-sm">No students found.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      </FadeUp>
+
+      {viewMember && <ProfileModal member={viewMember} onClose={() => setViewMember(null)} onMessage={() => { setViewMember(null); setMsgMember(viewMember); }} />}
+      {msgMember && <MessageModal member={msgMember} onClose={() => setMsgMember(null)} />}
+      {subsMember && <SubmissionsModal member={subsMember} onClose={() => setSubsMember(null)} />}
     </div>
   );
 }
+
 
 // AD3: Task Evaluator & Grader
 export function TaskGrader() {
@@ -263,34 +364,98 @@ export function TaskGrader() {
 // TO CHANGE
 // AD4: Section Attendance Tracker (reuse Super Admin session list scoped)
 export function SectionAttendance() {
+  const [mainTab, setMainTab] = useState<"records" | "logger">("records");
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  
+  const pct = 84;
+  const r = 36; const circ = 2 * Math.PI * r;
+  const [go, setGo] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
+
   return (
-    <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-4">Section Attendance Tracker — GE 101 Sec A</h1>
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-teal text-white rounded-lg p-4 card-soft"><div className="text-xs opacity-80">Total Sessions</div><div className="font-serif text-3xl font-bold mt-1">24</div></div>
-        <div className="bg-card border border-border rounded-lg p-4 card-soft"><div className="text-xs text-muted-text">Section Avg Attendance</div><div className="font-serif text-3xl font-bold text-teal-dark">84%</div></div>
-        <div className="bg-card border border-border rounded-lg p-4 card-soft"><div className="text-xs text-muted-text">Students Needing Attention</div><div className="font-serif text-3xl font-bold text-red-status">3</div></div>
-      </div>
-      <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-        <table className="w-full text-xs">
-          <thead className="bg-teal-dark text-white uppercase"><tr>{["Session","Date","Time","Present","Absent","Late","Excused","Rate %"].map(h => <th key={h} className="px-2 py-2 text-left">{h}</th>)}</tr></thead>
-          <tbody>
-            {[
-              ["GE 101 Lecture - Sec A","Nov 1, 2023","8–9:30 AM",28,1,1,0,93],
-              ["GE 101 Lecture - Sec A","Nov 3, 2023","8–9:30 AM",26,2,2,0,87],
-              ["GE 101 Lecture - Sec A","Nov 6, 2023","8–9:30 AM",27,2,1,0,90],
-              ["Choir Orientation Batch 1","Nov 2, 2023","1–3 PM",24,4,2,0,80],
-              ["Section Workshop","Nov 8, 2023","1–3 PM",28,1,0,1,93],
-            ].map((r,i) => (
-              <tr key={i} className="row-alt border-b border-border">{r.map((c,j) => <td key={j} className="px-2 py-2">{j===7?`${c}%`:c}</td>)}</tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Attendance</h1>
+            <p className="text-sm text-muted-text mt-1">GE 101 Sec A — Session Records</p>
+          </div>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Admin View</span>
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={40}>
+        <div className="flex gap-0 border-b border-border mb-6">
+          {([["records","Session Records"],["logger","Attendance Logger"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setMainTab(key)}
+              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {mainTab === "records" && (<>
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <FadeUp delay={60}>
+            <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+              <div className="relative w-20 h-20 shrink-0">
+                <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
+                  <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
+                  <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
+                    style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
+                </svg>
+                <div className="absolute inset-0 grid place-items-center">
+                  <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-text">Section Avg Attendance</div>
+                <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
+                <div className="text-xs text-muted-text mt-0.5">24 sessions</div>
+              </div>
+            </div>
+          </FadeUp>
+          <FadeUp delay={100}><StatCard label="Total Sessions" value="24" sub="This semester" /></FadeUp>
+          <FadeUp delay={140}><StatCard label="Students Needing Attention" value="3 ⚠" accent sub="Below 75% threshold" /></FadeUp>
+        </div>
+
+        <FadeUp delay={220}>
+          <SectionCard icon={ClipboardList} title="Session Log">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {geSessions.map((s, i) => (
+                    <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
+                      {s.map((c, j) => (
+                        <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
+                          {j===1 ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span> : j===8 ? `${c}%` : c}
+                        </td>
+                      ))}
+                      <td className="px-4 py-3.5">
+                        <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                          <ClipboardList className="w-3 h-3" /> View Sheet
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        </FadeUp>
+      </>)}
+
+      {mainTab === "logger" && <AttendanceLogger />}
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>
   );
 }
-
 // ============ Super Admin Screens ============
 
 // 🟢 ADDED: Master Overseer Institutional data model representing specialized Panata, Team, and Event modules
@@ -496,77 +661,96 @@ const adminSessions = [
 ];
 
 export function SessionLogs() {
-  const [selected, setSelected] = useState(4);
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  
   return (
-    <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-4">Session & Attendance Logs Tracker</h1>
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-teal text-white rounded-lg p-4 card-soft"><div className="text-xs opacity-85">Total Sessions</div><div className="font-serif text-4xl font-bold mt-1">185</div></div>
-        <div className="bg-card border border-border rounded-lg p-4 flex items-center gap-4 card-soft">
-          <div className="relative w-20 h-20"><svg viewBox="0 0 100 100" className="-rotate-90"><circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none"/><circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="196 251"/></svg><div className="absolute inset-0 grid place-items-center font-bold">78%</div></div>
-          <div><div className="text-xs text-muted-text">Global Attendance</div><div className="text-xs">Registered: 4,500</div><div className="text-xs">Present: 3,510</div></div>
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">System Session Logs</h1>
+            <p className="text-sm text-muted-text mt-1">Global attendance oversight and log auditing</p>
+          </div>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
         </div>
-        <div className="bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs text-muted-text mb-2">Sessions by Context</div>
-          {[["GE Subjects",35,"bg-teal"],["Team Practices",24,"bg-gold"],["Panata Groups",21,"bg-slate-blue"],["Tasks/Anns",20,"bg-amber-status"]].map(([k,v,c]) => (
-            <div key={k as string} className="text-xs flex items-center gap-2 mb-1"><span className={`w-3 h-3 rounded ${c}`}/> {k} <strong className="ml-auto">{v}%</strong></div>
-          ))}
-        </div>
+      </FadeUp>
+
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <FadeUp delay={40}>
+          <div className="bg-teal text-white rounded-xl p-5 card-soft" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div className="text-sm opacity-85">Total Tracked Sessions</div>
+            <div className="font-serif text-4xl font-bold mt-2">185</div>
+          </div>
+        </FadeUp>
+        <FadeUp delay={80}>
+          <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4 card-soft">
+            <div className="relative w-20 h-20">
+              <svg viewBox="0 0 100 100" className="-rotate-90">
+                <circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none" />
+                <circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="196 251" strokeLinecap="round" />
+              </svg>
+              <div className="absolute inset-0 grid place-items-center font-bold text-teal-dark">78%</div>
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-teal-dark">Global Attendance</div>
+              <div className="text-xs text-muted-text mt-1">Registered: 4,500</div>
+              <div className="text-xs text-muted-text">Present: 3,510</div>
+            </div>
+          </div>
+        </FadeUp>
+        <FadeUp delay={120}>
+          <div className="bg-card border border-border rounded-xl p-5 card-soft">
+            <div className="text-xs font-semibold text-muted-text uppercase tracking-wider mb-3">Sessions by Context</div>
+            {[["GE Subjects",35,"bg-teal"],["Team Practices",24,"bg-gold"],["Panata Groups",21,"bg-slate-blue"],["Tasks/Anns",20,"bg-amber-status"]].map(([k,v,c]) => (
+              <div key={k as string} className="text-xs flex items-center gap-2 mb-2">
+                <span className={`w-3 h-3 rounded ${c}`} /> 
+                <span className="font-medium text-foreground">{k}</span>
+                <strong className="ml-auto text-teal-dark">{v}%</strong>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-8 bg-card border border-border rounded-lg overflow-hidden card-soft">
-          <div className="p-3 flex gap-2 border-b border-border">
-            <input placeholder="Search sessions..." className="flex-1 px-3 py-1.5 border border-border rounded text-sm"/>
-            <select className="px-2 py-1.5 border border-border rounded text-sm"><option>All Contexts</option><option>Class</option><option>Team</option><option>Panata</option><option>Task</option></select>
-            <select className="px-2 py-1.5 border border-border rounded text-sm"><option>All Dates</option></select>
+      <FadeUp delay={160}>
+        <SectionCard icon={Library} title="Complete Audit Log" action={
+          <div className="flex gap-2">
+            <select className="px-3 py-1.5 border border-border rounded-lg text-xs bg-card"><option>All Contexts</option><option>Class</option><option>Team</option><option>Panata</option></select>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-secondary transition"><Download className="w-3.5 h-3.5" /> Export DB</button>
           </div>
-          <table className="w-full text-xs">
-            <thead className="bg-teal-dark text-white uppercase"><tr>{["Session","Type","Date","Time","Location","Reg","Present","Rate %"].map(h => <th key={h} className="px-2 py-2 text-left">{h}</th>)}</tr></thead>
-            <tbody>
-              {adminSessions.map((s,i) => (
-                <tr key={i} onClick={() => setSelected(i)}
-                  className={`row-alt border-b border-border cursor-pointer ${selected===i?"!bg-green-status/15 border-l-4 border-l-green-status":""} ${(s[7] as number)<50?"border-l-4 border-l-red-status":""}`}>
-                  <td className="px-2 py-2 font-semibold">{s[0]}</td>
-                  <td className="px-2 py-2"><span className={`chip ${s[1]==="Panata"?"bg-gold text-teal-dark":s[1]==="Task"?"bg-amber-status text-white":"bg-teal text-white"}`}>{s[1]}</span></td>
-                  <td className="px-2 py-2">{s[2]}</td>
-                  <td className="px-2 py-2">{s[3]}</td>
-                  <td className="px-2 py-2 text-muted-text">{s[4]}</td>
-                  <td className="px-2 py-2">{s[5]}</td>
-                  <td className="px-2 py-2">{s[6]}</td>
-                  <td className="px-2 py-2 font-bold">{s[7]}%</td>
+        }>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                  {["Session Name","Type","Date","Time","Location","Reg","Present","Rate %","Action"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="col-span-4 bg-card border border-border rounded-lg p-4 card-soft">
-          <h3 className="font-serif font-bold text-teal-dark text-sm mb-2">{adminSessions[selected][0]}</h3>
-          <div className="text-xs text-muted-text mb-3">{adminSessions[selected][2]} · {adminSessions[selected][3]} · Present: {adminSessions[selected][6]}/{adminSessions[selected][5]} ({adminSessions[selected][7]}%)</div>
-          {(adminSessions[selected][7] as number) < 50 && <div className="chip bg-amber-status text-white mb-3">⚠ Requires Attention</div>}
-          <div className="flex gap-1 mb-3 text-xs">
-            {["Present","Absent","Late","Excused"].map((t,i) => <button key={t} className={`px-2 py-1 rounded ${i===0?"bg-teal text-white":"bg-secondary"}`}>{t}</button>)}
+              </thead>
+              <tbody>
+                {adminSessions.map((s,i) => (
+                  <tr key={i} className={`border-b border-border transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20 ${(s[7] as number)<50?"border-l-4 border-l-red-status":""}`}>
+                    <td className="px-4 py-3.5 font-semibold text-foreground">{s[0]}</td>
+                    <td className="px-4 py-3.5"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${s[1]==="Panata"?"bg-gold/20 text-yellow-800 border-gold/40":s[1]==="Task"?"bg-amber-status/20 text-amber-700 border-amber-status/40":"bg-teal-soft text-teal-dark border-teal/20"}`}>{s[1]}</span></td>
+                    <td className="px-4 py-3.5 text-muted-text">{s[2]}</td>
+                    <td className="px-4 py-3.5 font-mono">{s[3]}</td>
+                    <td className="px-4 py-3.5 text-muted-text">{s[4]}</td>
+                    <td className="px-4 py-3.5">{s[5]}</td>
+                    <td className="px-4 py-3.5">{s[6]}</td>
+                    <td className="px-4 py-3.5 font-bold">{s[7]}%</td>
+                    <td className="px-4 py-3.5">
+                      <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                        <ClipboardList className="w-3 h-3" /> Audit Sheet
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <table className="w-full text-xs">
-            <thead><tr className="border-b border-border"><th className="text-left py-1">Name</th><th className="text-left">Group</th><th className="text-center">Status</th></tr></thead>
-            <tbody>
-              {[
-                ["Natalie Portman","Video Team","✓"],
-                ["Alex Ammin","Video Team","✓"],
-                ["Ben Affleck","Design Team","✓"],
-                ["Maria Santos","Video Team","✕"],
-                ["Jose Reyes","Video Team","🅴"],
-                ["Ana Cruz","Music Team","✕"],
-                ["Diego Luna","Writers","✓"],
-                ["Rosa Gomez","DGA","✓"],
-              ].map((r,i) => (
-                <tr key={i} className="border-b border-border"><td className="py-1">{r[0]}</td><td className="text-muted-text">{r[1]}</td><td className="text-center font-bold">{r[2]}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        </SectionCard>
+      </FadeUp>
+
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>
   );
 }
@@ -934,105 +1118,142 @@ export function Endoar() {
 
 // SA-Student Management (org-wide)
 export function StudentGroups() {
+  const [mainTab, setMainTab] = useState<"all" | "ge" | "team" | "panata">("all");
   const [openCard, setOpenCard] = useState<string | null>(null);
-  const respCards = [
-    { id: "ge", scope: "GE", title: "GE Subject Groups", count: 87, attendance: 84 },
-    { id: "team", scope: "Team", title: "STF Teams", count: 6, attendance: 89 },
-    { id: "panata", scope: "Panata", title: "Panata Groups", count: 25, attendance: 91 },
-  ];
+  const [search, setSearch] = useState("");
+
+  const groupsData = {
+    ge: [
+      { id: "GE 101-A", title: "GE 101 - Sec A", count: 30, attendance: 93 }, 
+      { id: "GE 102-B", title: "GE 102 - Sec B", count: 28, attendance: 87 }
+    ],
+    team: [
+      { id: "VT-104", title: "Video Team 104", count: 55, attendance: 89 }, 
+      { id: "MT-101", title: "Music Team", count: 42, attendance: 92 }
+    ],
+    panata: [
+      { id: "CICS2", title: "CICS2 Panata Group", count: 18, attendance: 96 }, 
+      { id: "CAS1", title: "CAS1 Panata Group", count: 15, attendance: 88 }
+    ]
+  };
+
+  const filteredStudents = roster.filter(r => 
+    r.name.toLowerCase().includes(search.toLowerCase()) || 
+    r.id.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-1">Student Management — Masterlist</h1>
-      <p className="text-sm text-muted-text mb-4">Responsibility sub-cards with searchable masterlists across the organization.</p>
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Student Management</h1>
+            <p className="text-sm text-muted-text mt-1">Masterlist & Organizational Groups Overview</p>
+          </div>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
+        </div>
+      </FadeUp>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {respCards.map(c => (
-          <button key={c.id} onClick={() => setOpenCard(c.id)} className="text-left bg-card border border-border rounded-xl p-4 card-soft hover:border-teal/40 transition">
-            <span className="chip bg-teal-soft text-teal text-[10px]">{c.scope}</span>
-            <div className="font-serif font-bold text-teal-dark mt-2">{c.title}</div>
-            <div className="text-xs text-muted-text mt-1">{c.count} active · {c.attendance}% avg attendance</div>
-            <div className="text-xs text-teal font-semibold mt-2">View Masterlist →</div>
-          </button>
-        ))}
-      </div>
+      <FadeUp delay={40}>
+        <div className="flex gap-0 border-b border-border mb-6">
+          {([["all", "All Students"], ["ge", "GE Subjects"], ["team", "STF Teams"], ["panata", "Panata Groups"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setMainTab(key)}
+              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
 
-      {openCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenCard(null)}>
-          <div className="bg-card rounded-xl max-w-3xl w-full max-h-[80vh] overflow-hidden shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="px-5 py-4 bg-teal-dark text-white">
-              <h3 className="font-serif font-bold">{respCards.find(c => c.id === openCard)?.title} · Masterlist</h3>
+      {mainTab === "all" ? (
+        <FadeUp delay={60}>
+          <div className="grid grid-cols-4 gap-3 mb-5">
+            {[
+              ["Total Students","4,500","bg-teal text-white"], 
+              ["Active Teams","6","bg-gold text-teal-dark"], 
+              ["Panata Groups","25","bg-slate-blue text-white"], 
+              ["18 Departments","18","bg-teal-light text-white"]
+            ].map(([k,v,c]) => (
+              <div key={k} className={`${c} rounded-lg p-4 card-soft`}>
+                <div className="text-xs opacity-85">{k}</div>
+                <div className="font-serif text-3xl font-bold mt-1">{v}</div>
+              </div>
+            ))}
+          </div>
+          
+          <SectionCard icon={Users} title="Global Masterlist" action={
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-text" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search any student…" className="pl-9 pr-3 py-2 text-sm border border-border rounded-xl bg-card w-64 focus:outline-none focus:ring-2 focus:ring-teal/30" />
             </div>
-            <div className="p-4 border-b flex gap-2">
-              <input placeholder="Search students…" className="flex-1 px-3 py-2 border border-border rounded text-sm"/>
-              <select className="px-3 py-2 border border-border rounded text-sm"><option>Sort: Name</option><option>Sort: Attendance</option><option>Sort: Year</option></select>
-            </div>
-            <div className="overflow-y-auto flex-1 p-4">
+          }>
+            <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="text-xs uppercase text-muted-text border-b"><tr>{["Name", "Student ID", "Department", "Team", "Panata", "Status"].map(h => <th key={h} className="py-2 text-left">{h}</th>)}</tr></thead>
+                <thead className="bg-teal-dark text-white text-xs uppercase">
+                  <tr>{["Name","Student ID","Department","Team","Panata","GE Subject Group","Status"].map(h => <th key={h} className="px-4 py-3 text-left">{h}</th>)}</tr>
+                </thead>
                 <tbody>
-                  {[
-                    ["Alex Johnson", "STF-2021-0042", "Computer Studies", "Video Team 104", "CICS2", "Active"],
-                    ["Natalie Portman", "STF-2022-0101", "Nursing", "Video Team 104", "CON-CRT", "Active"],
-                    ["David Lee", "STF-2024-0701", "Criminology", "—", "—", "Unassigned"],
-                  ].map((r, i) => (
-                    <tr key={i} className="border-b border-border"><td className="py-2 font-semibold">{r[0]}</td>{r.slice(1).map((c, j) => <td key={j} className="py-2 text-xs">{c}</td>)}</tr>
+                  {filteredStudents.map((r, i) => (
+                    <tr key={i} className={`border-b border-border transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20`}>
+                      <td className="px-4 py-3 font-semibold">{r.name}</td>
+                      <td className="px-4 py-3 font-mono text-xs">{r.id}</td>
+                      <td className="px-4 py-3">{r.dept}</td>
+                      <td className="px-4 py-3"><span className="chip bg-secondary">{r.team}</span></td>
+                      <td className="px-4 py-3"><span className="chip bg-secondary">{r.panata}</span></td>
+                      <td className="px-4 py-3"><span className="chip bg-secondary">{r.ge}</span></td>
+                      <td className="px-4 py-3"><span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${r.status === "Active" ? "bg-green-500/10 text-green-700 border-green-300" : "bg-amber-400/10 text-amber-600 border-amber-300"}`}>{r.status}</span></td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="p-4 border-t flex justify-end gap-2">
-              <button className="px-4 py-2 text-sm border border-teal text-teal rounded font-semibold">Export CSV</button>
-              <button onClick={() => setOpenCard(null)} className="px-4 py-2 text-sm bg-teal text-white rounded font-semibold">Close</button>
+          </SectionCard>
+        </FadeUp>
+      ) : (
+        <FadeUp delay={60}>
+          <div className="grid grid-cols-3 gap-4">
+            {groupsData[mainTab].map(c => (
+              <button key={c.id} onClick={() => setOpenCard(c.id)} className="text-left bg-card border border-border rounded-xl p-5 card-soft hover:border-teal/40 transition">
+                <span className="chip bg-teal-soft text-teal text-[10px] uppercase tracking-wider">{mainTab}</span>
+                <div className="font-serif text-xl font-bold text-teal-dark mt-2">{c.title}</div>
+                <div className="text-sm text-muted-text mt-1">{c.count} active members · {c.attendance}% avg attendance</div>
+                <div className="text-xs text-teal font-semibold mt-4 flex items-center gap-1">View Masterlist <ChevronRight className="w-3.5 h-3.5" /></div>
+              </button>
+            ))}
+          </div>
+        </FadeUp>
+      )}
+
+      {openCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenCard(null)}>
+          <div className="bg-card rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-5 bg-teal-dark text-white flex justify-between items-center">
+              <h3 className="font-serif text-xl font-bold">{openCard} · Associated Masterlist</h3>
+              <button onClick={() => setOpenCard(null)} className="hover:bg-white/10 rounded-lg p-1.5 transition"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-0">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary text-xs uppercase text-muted-text border-b border-border sticky top-0">
+                  <tr>{["Name", "Student ID", "Department", "Status"].map(h => <th key={h} className="px-6 py-3 text-left font-semibold">{h}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {roster.slice(0, 5).map((r, i) => (
+                    <tr key={i} className="border-b border-border hover:bg-teal-soft/10">
+                      <td className="px-6 py-3 font-semibold">{r.name}</td>
+                      <td className="px-6 py-3 font-mono text-xs">{r.id}</td>
+                      <td className="px-6 py-3">{r.dept}</td>
+                      <td className="px-6 py-3"><span className="text-[11px] font-semibold px-2.5 py-1 rounded-full border bg-green-500/10 text-green-700 border-green-300">Active</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-6 py-4 border-t border-border flex justify-end gap-2">
+              <button className="px-5 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white transition">Export Data</button>
             </div>
           </div>
         </div>
       )}
-
-      <div className="grid grid-cols-4 gap-3 mb-5">
-        {[
-          ["Total Students","4,500","bg-teal text-white"],
-          ["Active Teams","6","bg-gold text-teal-dark"],
-          ["Panata Groups","25","bg-slate-blue text-white"],
-          ["18 Departments","18","bg-teal-light text-white"],
-        ].map(([k,v,c]) => (
-          <div key={k} className={`${c} rounded-lg p-4 card-soft`}><div className="text-xs opacity-85">{k}</div><div className="font-serif text-3xl font-bold mt-1">{v}</div></div>
-        ))}
-      </div>
-      <div className="flex gap-2 mb-3">
-        <input placeholder="Search students…" className="flex-1 px-3 py-2 border border-border rounded text-sm bg-card"/>
-        <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>All Departments</option><option>Computer Studies</option><option>Nursing</option><option>Engineering and Architecture</option><option>Communication</option></select>
-        <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>All Teams</option><option>Video Team</option><option>Music Team</option></select>
-      </div>
-      <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-        <table className="w-full text-sm">
-          <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Name","Student ID","Year","Department","Team","Panata","GE Subject Group","Status"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
-          <tbody>
-            {[
-              ["Alex Johnson","STF-2021-0042","Sophomore","Computer Studies","Video Team 104","CICS2","GE 101-A","Active","green"],
-              ["Natalie Portman","STF-2022-0101","Junior","Nursing","Video Team 104","CON-CRT-CPT-CMW","GE 101-A","Active","green"],
-              ["Ben Affleck","STF-2021-0088","Senior","Engineering and Architecture","Photography Team","CEA1","GE 102-B","Active","green"],
-              ["Maria Santos","STF-2023-0103","Freshman","Communication","Writers Team","CAS2","GE 101-A","Active","green"],
-              ["Ana Cruz","STF-2022-0105","Junior","Accountancy","Music Team","COA1","GE 102-A","On Leave","amber"],
-              ["Jose Reyes","STF-2023-0104","Freshman","Arts and Sciences","Writers Team","CAS3","GE 101-B","Active","green"],
-              ["David Lee","STF-2024-0701","Freshman","Criminology","—","—","—","Unassigned","red"],
-              ["Diego Luna","STF-2022-0106","Sophomore","Criminology","Livestream Team","COC1","GE 102-A","Active","green"],
-              ["Rosa Gomez","STF-2023-0107","Freshman","Midwifery","DGA Team","CMT1","GE 101-B","Active","green"],
-            ].map((r,i) => (
-              <tr key={i} className="row-alt border-b border-border">
-                <td className="px-3 py-2 font-semibold">{r[0]}</td>
-                <td className="px-3 py-2 font-mono text-xs">{r[1]}</td>
-                <td className="px-3 py-2">{r[2]}</td>
-                <td className="px-3 py-2">{r[3]}</td>
-                <td className="px-3 py-2">{r[4]}</td>
-                <td className="px-3 py-2">{r[5]}</td>
-                <td className="px-3 py-2">{r[6]}</td>
-                <td className="px-3 py-2"><span className={`chip ${r[8]==="green"?"bg-green-status text-white":r[8]==="amber"?"bg-amber-status text-white":"bg-red-status text-white"}`}>{r[7]}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
