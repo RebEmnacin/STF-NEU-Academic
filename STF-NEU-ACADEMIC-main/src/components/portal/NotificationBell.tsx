@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Bell, AlertTriangle, CalendarX, Clock, CheckCircle2 } from "lucide-react";
 
 export type Notif = {
@@ -40,79 +41,148 @@ const iconFor = (t: Notif["type"]) => {
     case "urgent": return <AlertTriangle className="w-4 h-4 text-red-status" />;
     case "cancellation": return <CalendarX className="w-4 h-4 text-red-status" />;
     case "postpone": return <Clock className="w-4 h-4 text-amber-status" />;
-    case "reminder": return <Clock className="w-4 h-4 text-teal" />;
+    case "reminder": return <Clock className="w-4 h-4" style={{ color: "var(--gold)" }} />;
     default: return <CheckCircle2 className="w-4 h-4 text-green-status" />;
   }
 };
 
 const ringFor = (t: Notif["type"]) =>
-  t === "urgent" || t === "cancellation" ? "border-l-4 border-l-red-status bg-red-status/5"
-  : t === "postpone" ? "border-l-4 border-l-amber-status bg-amber-status/5"
+  t === "urgent" || t === "cancellation" ? "border-l-4 border-l-red-status"
+  : t === "postpone" ? "border-l-4 border-l-amber-status"
   : "border-l-4 border-l-transparent";
+
+const rowTintFor = (t: Notif["type"]) =>
+  t === "urgent" || t === "cancellation" ? "rgba(239,68,68,0.08)"
+  : t === "postpone" ? "rgba(245,158,11,0.08)"
+  : "transparent";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({ top: 0, right: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
   const sorted = [...notifs].sort((a, b) => priorityScore(b) - priorityScore(a));
   const urgentCount = sorted.filter(n => n.type === "urgent" || n.type === "cancellation").length;
 
+  const toggleOpen = () => {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setCoords({ top: r.bottom + 8, right: window.innerWidth - r.right });
+    }
+    setOpen(o => !o);
+  };
+
   useEffect(() => {
+    if (!open) return;
+
     const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (
+        btnRef.current && !btnRef.current.contains(target) &&
+        panelRef.current && !panelRef.current.contains(target)
+      ) {
+        setOpen(false);
+      }
     };
-    if (open) document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    const onReposition = () => {
+      if (btnRef.current) {
+        const r = btnRef.current.getBoundingClientRect();
+        setCoords({ top: r.bottom + 8, right: window.innerWidth - r.right });
+      }
+    };
+
+    document.addEventListener("mousedown", onClick);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
   }, [open]);
 
   return (
-    <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(o => !o)} className="relative p-1.5 hover:bg-secondary rounded">
-        <Bell className="w-5 h-5 text-teal-dark" />
+    <div className="relative">
+      <button ref={btnRef} onClick={toggleOpen} className="relative p-2 rounded-lg hover:bg-white/10 transition-all">
+        <Bell className="w-5 h-5" style={{ color: "rgba(255,255,255,0.60)" }} />
         {sorted.length > 0 && (
-          <span className={`absolute -top-0.5 -right-0.5 ${urgentCount > 0 ? "bg-red-status animate-pulse" : "bg-teal"} text-white text-[9px] w-4 h-4 grid place-items-center rounded-full font-bold`}>
+          <span className={`absolute top-1 right-1 ${urgentCount > 0 ? "bg-red-status animate-pulse" : "bg-teal"} text-white text-[9px] w-4 h-4 grid place-items-center rounded-full font-bold border border-white/20`}>
             {sorted.length}
           </span>
         )}
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-full mt-2 w-96 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden">
-          <div className="bg-teal-dark text-white px-4 py-3 flex items-center justify-between">
+      {open && createPortal(
+        <div
+          ref={panelRef}
+          className="fixed w-96 rounded-lg overflow-hidden"
+          style={{
+            top: coords.top,
+            right: coords.right,
+            background: "var(--teal-dark, #0d4a6b)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            boxShadow: "0 20px 48px rgba(0,0,0,0.35)",
+            zIndex: 9999,
+          }}
+        >
+          {/* Header */}
+          <div
+            className="px-4 py-3 flex items-center justify-between"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}
+          >
             <div>
-              <div className="font-serif font-bold text-sm">Notifications</div>
-              <div className="text-[10px] text-white/70">Sorted by urgency · recency · event proximity</div>
+              <div className="font-serif font-bold text-sm text-white">Notifications</div>
+              <div className="text-[10px] text-white/60">Sorted by urgency · recency · event proximity</div>
             </div>
             {urgentCount > 0 && (
-              <span className="bg-red-status text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{urgentCount} URGENT</span>
+              <span className="bg-red-status text-white text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">{urgentCount} URGENT</span>
             )}
           </div>
+
+          {/* List */}
           <div className="max-h-[420px] overflow-y-auto">
             {sorted.map(n => (
-              <div key={n.id} className={`px-4 py-3 border-b border-border last:border-0 hover:bg-secondary cursor-pointer ${ringFor(n.type)}`}>
+              <div
+                key={n.id}
+                className={`px-4 py-3 last:border-0 cursor-pointer transition-colors hover:bg-white/[0.06] ${ringFor(n.type)}`}
+                style={{
+                  borderBottom: "1px solid rgba(255,255,255,0.07)",
+                  background: rowTintFor(n.type),
+                }}
+              >
                 <div className="flex items-start gap-2">
                   <div className="mt-0.5">{iconFor(n.type)}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className={`text-[9px] font-bold uppercase tracking-wider ${
                         n.type === "urgent" || n.type === "cancellation" ? "text-red-status" :
-                        n.type === "postpone" ? "text-amber-status" : "text-teal-dark"
-                      }`}>{n.type}</span>
+                        n.type === "postpone" ? "text-amber-status" : ""
+                      }`} style={n.type === "reminder" || n.type === "info" ? { color: "var(--gold)" } : undefined}>
+                        {n.type}
+                      </span>
                       {n.hoursUntilEvent != null && n.hoursUntilEvent < 24 && (
                         <span className="text-[9px] bg-gold text-teal-dark font-bold px-1.5 rounded">in {n.hoursUntilEvent}h</span>
                       )}
                     </div>
-                    <div className="text-sm font-semibold text-teal-dark leading-tight">{n.title}</div>
-                    <div className="text-xs text-muted-text mt-0.5 leading-snug">{n.body}</div>
-                    <div className="text-[10px] text-muted-text mt-1">{new Date(n.date).toLocaleString()}</div>
+                    <div className="text-sm font-semibold text-white leading-tight">{n.title}</div>
+                    <div className="text-xs mt-0.5 leading-snug text-white/60">{n.body}</div>
+                    <div className="text-[10px] mt-1 text-white/35">{new Date(n.date).toLocaleString()}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="bg-secondary px-4 py-2 text-center text-[11px] font-semibold text-teal-dark hover:bg-teal-soft cursor-pointer">
+
+          {/* Footer */}
+          <div
+            className="px-4 py-2 text-center text-[11px] font-bold cursor-pointer transition-colors hover:bg-white/10"
+            style={{ background: "rgba(0,0,0,0.18)", color: "var(--gold)" }}
+          >
             View all announcements →
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1,5 +1,7 @@
 import { usePortal, type Role } from "./PortalContext";
-import { Mail, Search } from "lucide-react";
+import { Mail, Search, UserCircle2, Settings, LogOut, ChevronRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import AEVMlogo from "../../assets/AEVMlogo.png";
 import { NotificationBell } from "./NotificationBell";
 import topnavBg from "../../assets/topnav-bg.png";
@@ -14,6 +16,154 @@ const roles: { id: Role; label: string }[] = [
   { id: "superadmin",      label: "Super Admin" },
 ];
 
+// ─── User Menu (profile / settings / logout) ──────────────────────────────────
+function UserMenu() {
+  const { setView, setRole } = usePortal();
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, right: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const toggleOpen = () => {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setCoords({ top: r.bottom + 8, right: window.innerWidth - r.right });
+    }
+    setOpen(o => !o);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        btnRef.current && !btnRef.current.contains(target) &&
+        panelRef.current && !panelRef.current.contains(target)
+      ) {
+        setOpen(false);
+      }
+    };
+    const onReposition = () => {
+      if (btnRef.current) {
+        const r = btnRef.current.getBoundingClientRect();
+        setCoords({ top: r.bottom + 8, right: window.innerWidth - r.right });
+      }
+    };
+
+    document.addEventListener("mousedown", onClick);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [open]);
+
+  const goTo = (view: string) => {
+    setOpen(false);
+    setView(view);
+  };
+
+  const handleLogout = () => {
+    setOpen(false);
+    setRole("guest");
+    setView("home");
+  };
+
+  const menuItems = [
+    { label: "My Profile", sub: "View your profile & responsibilities", Icon: UserCircle2, action: () => goTo("profile") },
+    { label: "Settings",   sub: "Preferences, privacy & notifications", Icon: Settings,    action: () => goTo("settings") },
+  ];
+
+  return (
+    <div className="relative">
+      <button ref={btnRef} onClick={toggleOpen} className="flex items-center gap-2 ml-2">
+        <div
+          className="w-9 h-9 rounded-full grid place-items-center border-2 shadow hover:scale-105 transition-transform"
+          style={{
+            background: "rgba(255,255,255,0.08)",
+            borderColor: open ? "var(--gold)" : "rgba(255,255,255,0.25)",
+          }}
+        >
+          <UserCircle2 className="w-6 h-6" style={{ color: "var(--gold)" }} />
+        </div>
+      </button>
+
+      {open && createPortal(
+        <div
+          ref={panelRef}
+          className="fixed w-72 rounded-lg overflow-hidden"
+          style={{
+            top: coords.top,
+            right: coords.right,
+            background: "var(--teal-dark, #0d4a6b)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            boxShadow: "0 20px 48px rgba(0,0,0,0.35)",
+            zIndex: 9999,
+          }}
+        >
+          {/* Identity header */}
+          <div
+            className="px-4 py-3 flex items-center gap-3"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}
+          >
+            <div
+              className="w-10 h-10 rounded-xl grid place-items-center shrink-0"
+              style={{ background: "linear-gradient(135deg, #1B6B8F, #4A8FA8)" }}
+            >
+              <UserCircle2 className="w-6 h-6 text-white/90" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-serif font-bold text-sm text-white truncate">Reb Emnacin</div>
+              <div className="text-[11px] text-white/55 truncate">3rd Year · BSCS · CICS</div>
+            </div>
+          </div>
+
+          {/* Menu items */}
+          <div className="py-1">
+            {menuItems.map(({ label, sub, Icon, action }) => (
+              <button
+                key={label}
+                onClick={action}
+                className="w-full px-4 py-2.5 flex items-center gap-3 text-left transition-colors hover:bg-white/[0.06]"
+              >
+                <div
+                  className="w-8 h-8 rounded-lg grid place-items-center shrink-0"
+                  style={{ background: "rgba(255,255,255,0.08)" }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: "var(--gold)" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-white">{label}</div>
+                  <div className="text-[11px] text-white/45 truncate">{sub}</div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/30 shrink-0" />
+              </button>
+            ))}
+          </div>
+
+          {/* Logout */}
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-3 flex items-center gap-3 text-left transition-colors hover:bg-red-500/10"
+            >
+              <div className="w-8 h-8 rounded-lg grid place-items-center shrink-0 bg-red-500/15">
+                <LogOut className="w-4 h-4 text-red-400" />
+              </div>
+              <div className="text-sm font-semibold text-red-400">Log Out</div>
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+// ─── Top Nav ────────────────────────────────────────────────────────────────
 export function TopNav() {
   const { role, setRole, setView } = usePortal();
 
@@ -42,10 +192,10 @@ export function TopNav() {
         {/* Left Side: Logo + Wordmark */}
         <div className="flex items-center gap-3 shrink-0 w-[280px]">
           <img
-  src={AEVMlogo}
-  alt="AEVM Logo"
-  className="h-10 w-auto shrink-0 object-contain"
-/>
+            src={AEVMlogo}
+            alt="AEVM Logo"
+            className="h-10 w-auto shrink-0 object-contain"
+          />
           <div className="leading-tight flex-1">
             <div
               className="nav-title font-display font-bold text-base tracking-tight truncate"
@@ -110,18 +260,7 @@ export function TopNav() {
               <button className="p-2 rounded-lg transition-all hover:bg-white/10">
                 <Mail className="w-5 h-5" style={{ color: "rgba(255,255,255,0.60)" }} />
               </button>
-              <button className="flex items-center gap-2 ml-2">
-                <div
-                  className="w-9 h-9 rounded-full grid place-items-center text-sm font-bold border-2 shadow hover:scale-105 transition-transform"
-                  style={{
-                    background: "linear-gradient(135deg, var(--gold), var(--amber-status))",
-                    borderColor: "rgba(255,255,255,0.25)",
-                    color: "var(--sidebar-bg)",
-                  }}
-                >
-                  AJ
-                </div>
-              </button>
+              <UserMenu />
             </>
           )}
         </div>

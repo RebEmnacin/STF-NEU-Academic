@@ -1,8 +1,9 @@
 import { usePortal } from "./PortalContext";
 import { Video, Camera, Music, PenLine, Radio, Palette, Youtube } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import neuBg from "../../assets/NewEraUniversity.jpg";
 import AevmLogo from "../../assets/AEVMLogo.png";
+import NeuVideo from "../../assets/NEU.mp4";
+import AevmVideo from "../../assets/AEVM_LOGO.mp4";
 
 // ─── Scroll-triggered Fade-up ─────────────────────────────────────────────────
 function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -36,12 +37,12 @@ function TelegramIcon({ className = "" }: { className?: string }) {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const teams = [
-  { icon: Music,   name: "Music",      slug: "music",      desc: "Worship music, live performances and audio production for all STF-NEU events." },
-  { icon: PenLine, name: "Writing",    slug: "writing",    desc: "Content creation, scripts, written media, and ministry storytelling." },
-  { icon: Video,   name: "Video",      slug: "video",      desc: "Cinematic storytelling, event documentation and post-production." },
-  { icon: Camera,  name: "Photo",      slug: "photo",      desc: "Visual coverage and photography for all STF-NEU events and activities." },
-  { icon: Palette, name: "DGA",        slug: "dga",        desc: "Digital graphics, motion graphics and visual design for the ministry." },
-  { icon: Radio,   name: "Livestream", slug: "livestream", desc: "Live broadcast, technical operations and streaming for all events." },
+  { icon: Music,   name: "Music",      slug: "music",      color: "#a855f7", desc: "Worship music, live performances and audio production for all STF-NEU events." },
+  { icon: PenLine, name: "Writing",    slug: "writing",    color: "#f59e0b", desc: "Content creation, scripts, written media, and ministry storytelling." },
+  { icon: Video,   name: "Video",      slug: "video",      color: "#ef4444", desc: "Cinematic storytelling, event documentation and post-production." },
+  { icon: Camera,  name: "Photo",      slug: "photo",      color: "#3b82f6", desc: "Visual coverage and photography for all STF-NEU events and activities." },
+  { icon: Palette, name: "DGA",        slug: "dga",        color: "#ec4899", desc: "Digital graphics, motion graphics and visual design for the ministry." },
+  { icon: Radio,   name: "Livestream", slug: "livestream", color: "#10b981", desc: "Live broadcast, technical operations and streaming for all events." },
 ];
 
 const events = [
@@ -51,19 +52,10 @@ const events = [
 ];
 
 const stats = [
-  ["6", "Ministry Teams"],
+  ["6",    "Ministry Teams"],
   ["100+", "Active Members"],
-  ["50+", "Events / Sem"],
-  ["15+", "Years Serving"],
-];
-
-const contacts = [
-  { label: "YouTube", handle: "@neu.aevmprogram", href: "https://www.youtube.com/@neu.aevmprogram", bg: "#FF0000", icon: <Youtube className="w-4 h-4 text-white" /> },
-  { label: "Telegram", handle: "@STF_NEU", href: "https://t.me/STF_NEU", bg: "#229ED9", icon: <TelegramIcon className="w-4 h-4 text-white" /> },
-  { label: "Facebook", handle: "STF-NEU AEVM", href: "https://www.facebook.com/STFNEUAEVM", bg: "#1877F2",
-    icon: <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.97h-1.513c-1.491 0-1.956.93-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg> },
-  { label: "Email", handle: "stfneu@neu.edu.ph", href: "mailto:stfneu@neu.edu.ph", bg: "#0d4a6b",
-    icon: <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> },
+  ["50+",  "Events / Sem"],
+  ["15+",  "Years Serving"],
 ];
 
 // ─── Team Card ────────────────────────────────────────────────────────────────
@@ -98,7 +90,7 @@ function TeamCard({ t, onNavigate }: { t: typeof teams[0]; onNavigate: () => voi
   );
 }
 
-// ─── Autoplay YouTube Embed ───────────────────────────────────────────────────
+// ─── AEVM Logo Video ──────────────────────────────────────────────────────────
 function HeroVideo() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -119,14 +111,15 @@ function HeroVideo() {
         transition: "opacity 0.65s cubic-bezier(0.16,1,0.3,1), transform 0.65s cubic-bezier(0.16,1,0.3,1)",
       }}
     >
-      {/* Gold top accent line */}
+      {/* Gold top accent */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #F5C518 50%, transparent)", zIndex: 2, opacity: 0.8 }} />
-      <iframe
-        src="https://www.youtube.com/embed/_G6hOsCh3dI?autoplay=1&mute=1&loop=1&playlist=_G6hOsCh3dI&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
-        title="STF-NEU AEVM"
-        allow="autoplay; encrypted-media"
-        allowFullScreen
-        style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+      <video
+        src={AevmVideo}
+        autoPlay
+        muted
+        loop
+        playsInline
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
     </div>
   );
@@ -154,13 +147,28 @@ export function GuestHome() {
     <div>
       {/* ── Hero ── */}
       <section className="relative overflow-hidden text-white" style={{ minHeight: 480 }}>
-        <img src={neuBg} alt="New Era University campus" className="absolute inset-0 w-full h-full object-cover object-center" style={{ filter: "brightness(0.30) saturate(1.15)" }} />
+
+        {/* NEU.mp4 looping background */}
+        <video
+          src={NeuVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ filter: "brightness(0.30) saturate(1.15)" }}
+        />
+
+        {/* Teal overlay */}
         <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(13,74,107,0.72) 0%, rgba(13,74,107,0.48) 45%, rgba(13,74,107,0.84) 100%)" }} />
+
+        {/* Dot grid */}
         <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, white 1.5px, transparent 1.5px)", backgroundSize: "36px 36px" }} />
+
+        {/* Gold bottom line */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F5C518] to-transparent opacity-80" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-8 py-14">
-          {/* Two-column: left = title+buttons+stats, right = contact cards + 3D logo card */}
           <div className="grid lg:grid-cols-2 gap-10 items-center">
 
             {/* ── Left ── */}
@@ -186,7 +194,8 @@ export function GuestHome() {
                   <button onClick={() => setView("login")} className="border-2 border-white/30 text-white px-5 py-2.5 rounded-md font-semibold hover:border-white hover:bg-white/10 transition text-sm">Member Login →</button>
                 </div>
               </FadeUp>
-              {/* Stats row */}
+
+              {/* Stats */}
               <div className="grid grid-cols-4 gap-3">
                 {stats.map(([v, l], i) => (
                   <FadeUp key={l} delay={240 + i * 50}>
@@ -199,12 +208,12 @@ export function GuestHome() {
               </div>
             </div>
 
-            {/* ── Right: contacts + 3D tilt logo card ── */}
+            {/* ── Right: AEVM video + 3D tilt logo card ── */}
             <div className="flex flex-col gap-4">
-              {/* Slice-animated contacts */}
+              {/* AEVM_LOGO.mp4 */}
               <HeroVideo />
 
-              {/* 3D tilt logo card */}
+              {/* 3D tilt card */}
               <FadeUp delay={160}>
                 <div style={{ perspective: "900px" }}>
                   <div
@@ -225,11 +234,14 @@ export function GuestHome() {
                       style={{
                         background: "rgba(255,255,255,0.08)",
                         backdropFilter: "blur(20px)",
-                        boxShadow: tiltActive ? "0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,197,24,0.12)" : "0 6px 24px rgba(0,0,0,0.25)",
+                        boxShadow: tiltActive
+                          ? "0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,197,24,0.12)"
+                          : "0 6px 24px rgba(0,0,0,0.25)",
                       }}
                     >
-                      {/* glare */}
+                      {/* Glare */}
                       <div className="pointer-events-none absolute inset-0 rounded-2xl" style={{ background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,0.12) 0%, transparent 55%)`, opacity: tiltActive ? 1 : 0, transition: tiltActive ? "none" : "opacity 0.4s" }} />
+
                       <div className="p-6 flex flex-col items-center text-center" style={{ transform: "translateZ(16px)" }}>
                         <img src={AevmLogo} alt="AEVM Logo" style={{ height: 90, width: "auto", marginBottom: 10, filter: "drop-shadow(0 4px 16px rgba(245,197,24,0.35))" }} />
                         <p className="text-white/55 text-xs mb-4 max-w-xs leading-relaxed">Join the STF-NEU community and be part of something greater.</p>
@@ -238,8 +250,12 @@ export function GuestHome() {
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             md@neu.edu.ph
                           </a>
-                          <a href="https://www.youtube.com/@neu.aevmprogram" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-[#FF0000] text-white px-4 py-2 rounded-lg font-bold hover:brightness-110 shadow-lg transition text-xs"><Youtube className="w-3.5 h-3.5" /> YouTube</a>
-                          <a href="https://t.me/STF_NEU" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-[#229ED9] text-white px-4 py-2 rounded-lg font-bold hover:brightness-110 shadow-lg transition text-xs"><TelegramIcon className="w-3.5 h-3.5" /> Telegram</a>
+                          <a href="https://www.youtube.com/@neu.aevmprogram" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-[#FF0000] text-white px-4 py-2 rounded-lg font-bold hover:brightness-110 shadow-lg transition text-xs">
+                            <Youtube className="w-3.5 h-3.5" /> YouTube
+                          </a>
+                          <a href="https://t.me/STF_NEU" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-[#229ED9] text-white px-4 py-2 rounded-lg font-bold hover:brightness-110 shadow-lg transition text-xs">
+                            <TelegramIcon className="w-3.5 h-3.5" /> Telegram
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -247,29 +263,32 @@ export function GuestHome() {
                 </div>
               </FadeUp>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* ── Teams ── */}
-      <section id="teams" className="max-w-6xl mx-auto px-8 py-10">
-        <FadeUp delay={0}>
-          <div className="mb-6">
-            <span className="text-[11px] font-bold tracking-[0.18em] text-teal uppercase">OUR TEAMS</span>
-            <h2 className="font-serif text-2xl font-bold text-teal-dark mt-0.5">Chronicles by Team</h2>
+      <section id="teams">
+        <div className="max-w-6xl mx-auto px-8">
+          <FadeUp delay={0}>
+            <div className="mb-6">
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "rgba(245,197,24,0.7)", textTransform: "uppercase" }}>OUR TEAMS</span>
+              <h2 className="font-serif text-2xl font-bold mt-0.5" style={{ color: "white" }}>Chronicles by Team</h2>
+            </div>
+          </FadeUp>
+          <div className="grid md:grid-cols-3 gap-4">
+            {teams.map((t, i) => (
+              <FadeUp key={t.slug} delay={i * 60}>
+                <TeamCard t={t} onNavigate={() => setView("team-" + t.name)} />
+              </FadeUp>
+            ))}
           </div>
-        </FadeUp>
-        <div className="grid md:grid-cols-3 gap-4">
-          {teams.map((t, i) => (
-            <FadeUp key={t.slug} delay={i * 60}>
-              <TeamCard t={t} onNavigate={() => setView("team-" + t.name)} />
-            </FadeUp>
-          ))}
         </div>
       </section>
 
       {/* ── Events ── */}
-      <section className="max-w-6xl mx-auto px-8 py-10 border-t border-border">
+      <section className="max-w-6xl mx-auto px-8 py-10 border-t border-border" >
         <FadeUp delay={0}>
           <div className="mb-6">
             <span className="text-[11px] font-bold tracking-[0.18em] text-gold uppercase">UPCOMING</span>
@@ -293,7 +312,7 @@ export function GuestHome() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-teal-dark text-white/50 text-center py-2 text-[11px] tracking-wide">
+      <footer className="bg-teal-dark text-white/50 text-center py-6 text-xs tracking-wide">
         © {new Date().getFullYear()} STF-NEU AEVM Portal · New Era University
       </footer>
     </div>
@@ -322,8 +341,17 @@ export function GuestTeamPage({ teamName }: { teamName: string }) {
 
   return (
     <div>
+      {/* ── Team Hero — NEU.mp4 background ── */}
       <div className="relative overflow-hidden text-white" style={{ minHeight: 180 }}>
-        <img src={neuBg} alt="New Era University campus" className="absolute inset-0 w-full h-full object-cover object-center" style={{ filter: "brightness(0.30) saturate(1.1)" }} />
+        <video
+          src={NeuVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ filter: "brightness(0.30) saturate(1.1)" }}
+        />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(13,74,107,0.65) 0%, rgba(13,74,107,0.75) 60%, var(--color-background,#f8fafa) 100%)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F5C518] to-transparent opacity-80" />
         <div className="relative z-10 max-w-6xl mx-auto px-8 py-10">
