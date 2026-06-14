@@ -135,7 +135,7 @@ export function GuestHome() {
 
       {/* ── CTA ── */}
       <section className="bg-gradient-to-br from-teal-dark to-teal py-16 text-center text-white">
-        <h2 className="font-serif text-4xl font-bold mb-3">Ready to Serve?</h2>
+        <h2 className="font-serif text-4xl font-bold mb-3">STF YAY!</h2>
         <p className="text-white/65 mb-6 max-w-md mx-auto">
           Join the STF-NEU community and be part of something greater. Your story starts here.
         </p>

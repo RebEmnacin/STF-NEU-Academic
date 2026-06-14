@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")(({
 function Shell() {
   const { role } = usePortal();
   const dispatcherScope =
-    role === "leader"          ? { locked: true,  label: "Video Team 104" } :
+    role === "leader"          ? { locked: true,  label: "Video Team" } :
     role === "ge-monitor"      ? { locked: true,  label: "GE 101 - Sec A" } :
     role === "panata-monitor"  ? { locked: true,  label: "CICS2 — Panata Group" } :
     role === "admin"           ? { locked: true,  label: "GE 101 - Sec A" } :
@@ -88,7 +88,7 @@ function Content() {
       case "roster": return <Roster />;
       case "qr": return <QRGenerator />;
       case "team-attendance": return <TeamAttendance />;
-      case "team-heatmap": return <HeatmapView scope="Video Team 104" banner="Scoped View Only — Showing Video Team 104 members" />;
+      case "team-heatmap": return <HeatmapView scope="Video Team" banner="Scoped View Only — Showing Video Team members" />;
       case "tasks": return <TasksView showAssign />;
       case "announcements": return <AnnouncementsView canCreate />;
       case "templates": return <TemplateLibrary />;

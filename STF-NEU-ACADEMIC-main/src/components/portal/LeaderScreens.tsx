@@ -310,93 +310,83 @@ function MemberCard({ member, onView, onMessage, onSubmissions }: {
   const taskPct = Math.round((member.tasksDone / member.tasksTotal) * 100);
 
   return (
-    <div className="rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-xl"
-      style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+    <div style={{
+      width: "100%", background: "#1a1a2e", borderRadius: 12,
+      overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+      display: "flex", flexDirection: "column", position: "relative",
+    }}>
+      {/* Crimson banner */}
+      <div style={{ height: 70, background: "#052d40", flexShrink: 0 }} />
 
-      {/* ── Banner + avatar fully inside, no overlap seam ── */}
-      <div className="relative px-4 pt-5 pb-5"
-        style={{ background: "linear-gradient(135deg, #0D4A6B 0%, #1B6B8F 55%, #4A8FA8 100%)" }}>
-        <div style={{ position:"absolute", top:-20, right:-20, width:80, height:80, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
-        <div style={{ position:"absolute", bottom:-10, left:"35%", width:55, height:55, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
-
-        {/* Status badge top-right */}
-        <div className="flex justify-end mb-3 relative">
-          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
-            isActive
-              ? "bg-green-500/20 text-green-200 border-green-400/30"
-              : "bg-amber-400/20 text-amber-200 border-amber-400/30"
-          }`}>{member.status}</span>
-        </div>
-
-        {/* Avatar centered */}
-        <div className="flex justify-center mb-3 relative">
-          <AvatarSVG initials={member.initials} size={72} isOnLeave={!isActive} />
-        </div>
-
-        {/* Name + ID inside banner on dark bg */}
-        <div className="text-center relative">
-          <div className="font-bold text-sm text-white leading-snug truncate px-2">{member.name}</div>
-          <div className="text-[10px] font-mono text-white/50 mt-0.5">{member.id}</div>
-        </div>
+      {/* Circular avatar */}
+      <div style={{
+        position: "absolute", top: 30, left: "50%", transform: "translateX(-50%)",
+        width: 80, height: 80, borderRadius: "50%",
+        border: "5px solid #1a1a2e", overflow: "hidden", zIndex: 2,
+      }}>
+        <AvatarSVG initials={member.initials} size={70} isOnLeave={!isActive} />
       </div>
 
-      {/* ── Info row directly below banner, no overlap ── */}
-      <div className="px-4 pt-3 pb-1 border-b border-border">
-        <div className="flex items-center justify-between gap-1">
-          <span className="text-[11px] text-muted-text truncate">{member.course}</span>
-          <span className="text-[11px] font-semibold text-foreground shrink-0">{member.year}</span>
-        </div>
-      </div>
+      {/* Status badge */}
+      <span style={{
+        position: "absolute", top: 10, right: 10, zIndex: 3,
+        fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 20,
+        background: isActive ? "rgba(34,197,94,0.2)" : "rgba(251,191,36,0.2)",
+        color: isActive ? "#86efac" : "#fde68a",
+        border: `1px solid ${isActive ? "rgba(34,197,94,0.3)" : "rgba(251,191,36,0.3)"}`,
+      }}>{member.status}</span>
 
-      {/* ── Body ── */}
-      <div className="px-4 pt-3 pb-4 flex flex-col gap-2.5 flex-1">
-        {/* Stat strip */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl p-2.5 text-white"
-            style={{ background: "linear-gradient(135deg, #1B6B8F, #4A8FA8)" }}>
-            <div className="text-[9px] font-bold uppercase tracking-wider text-white/70">Attendance</div>
-            <div className="font-serif font-bold text-lg leading-none mt-0.5">{member.attendance}</div>
-          </div>
-          <div className="rounded-xl p-2.5 text-white"
-            style={{ background: taskPct >= 70 ? "linear-gradient(135deg,#1B6B8F,#3D6B7A)" : "linear-gradient(135deg,#d97706,#92400e)" }}>
-            <div className="text-[9px] font-bold uppercase tracking-wider text-white/70">Tasks</div>
-            <div className="font-serif font-bold text-lg leading-none mt-0.5">{member.tasksDone}/{member.tasksTotal}</div>
-          </div>
+      {/* Body */}
+      <div style={{ marginTop: 52, padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 0 }}>
+        {/* Name + ID */}
+        <div style={{ textAlign: "center", marginBottom: 10 }}>
+          <button onClick={onView} style={{ color: "#fff", fontWeight: 700, fontSize: 14, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+            {member.name}
+          </button>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontFamily: "monospace", marginTop: 2 }}>{member.id}</div>
         </div>
 
-        {/* Progress bar */}
-        <div>
-          <div className="flex justify-between text-[10px] mb-1">
-            <span className="text-muted-text font-medium">Completion</span>
-            <span className="font-bold text-teal-dark">{taskPct}%</span>
-          </div>
-          <div className="h-1.5 rounded-full bg-border overflow-hidden">
-            <div className="h-full rounded-full transition-all"
-              style={{ width: `${taskPct}%`, background: taskPct >= 70 ? "var(--teal)" : "#f59e0b" }} />
-          </div>
+        {/* 3-stat strip */}
+        <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
+          {[
+            { label: "Attend", value: member.attendance },
+            { label: "Tasks", value: `${member.tasksDone}/${member.tasksTotal}` },
+            { label: "Group", value: member.panata },
+          ].map((s, i) => (
+            <div key={s.label} style={{ flex: 1, padding: "8px 4px", textAlign: "center", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+              <span style={{ display: "block", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#386a85", marginBottom: 2 }}>{s.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>{s.value}</span>
+            </div>
+          ))}
         </div>
 
-        {/* Badges */}
-        <div className="flex gap-1.5 flex-wrap">
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20 font-mono">{member.panata}</span>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-secondary text-muted-text border border-border">{member.dept}</span>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-1.5 mt-auto pt-1">
-          <button onClick={onView}
-            className="flex-1 py-2 rounded-xl text-[11px] font-bold text-white transition hover:opacity-90 active:scale-95"
-            style={{ background: "linear-gradient(135deg, #0D4A6B, #1B6B8F)" }}>
+        {/* Action buttons */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+          <button onClick={onView} style={{ flex: 1, padding: "5px 8px", borderRadius: 8, fontSize: 10, fontWeight: 700, cursor: "pointer", border: "1px solid #386a85", color: "#386a85", background: "transparent" }}>
             View Profile
           </button>
-          <button onClick={onMessage} title="Message"
-            className="py-2 px-2.5 rounded-xl border border-border text-muted-text hover:bg-secondary transition flex items-center justify-center active:scale-95">
-            <Send className="w-3.5 h-3.5" />
+          <button onClick={onMessage} style={{ width: 32, borderRadius: 8, border: "1px solid #386a85", color: "#386a85", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Send className="w-3 h-3" />
           </button>
-          <button onClick={onSubmissions} title="Submissions"
-            className="py-2 px-2.5 rounded-xl border border-border text-muted-text hover:bg-secondary transition flex items-center justify-center active:scale-95">
-            <ClipboardList className="w-3.5 h-3.5" />
+          <button onClick={onSubmissions} style={{ width: 32, borderRadius: 8, border: "1px solid #386a85", color: "#386a85", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ClipboardList className="w-3 h-3" />
           </button>
+        </div>
+
+        {/* Skill-bar performance section */}
+        <div>
+          <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#386a85", marginBottom: 8 }}>Performance</div>
+          {[
+            { label: "Attendance", pct: member.attendancePct },
+            { label: "Task completion", pct: taskPct },
+          ].map(({ label, pct }) => (
+            <div key={label} style={{ marginBottom: 7 }}>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.55)", marginBottom: 3 }}>{label}</div>
+              <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, borderRadius: 3, background: "#386a85" }} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -597,7 +587,7 @@ export function Roster() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <h1 className="font-serif text-3xl font-bold text-teal-dark">Team Members</h1>
-            <p className="text-sm text-muted-text mt-1">Video Team 104 — Roster</p>
+            <p className="text-sm text-muted-text mt-1">Video Team Roster</p>
           </div>
           <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Leader View</span>
         </div>
@@ -684,7 +674,7 @@ export function Roster() {
             </div>
           )}
           {viewMode === "grid" && (
-            <div className="p-5 grid grid-cols-3 gap-3">
+            <div className="p-5 grid grid-cols-5 gap-2">
               {filtered.map(r => (
                 <MemberCard key={r.id} member={r} onView={() => setViewMember(r)} onMessage={() => setMsgMember(r)} onSubmissions={() => setSubsMember(r)} />
               ))}
@@ -759,7 +749,7 @@ export function QRGenerator() {
       <div className="grid grid-cols-12 gap-5">
         <div className="col-span-7 space-y-4">
           <FadeUp delay={60}>
-            <SectionCard icon={Calendar} title="Step 1 — Select Event">
+            <SectionCard icon={Calendar} title="Select Event">
               <div className="p-5 space-y-3">
                 <select value={event} onChange={e => setEvent(e.target.value)}
                   className="w-full px-4 py-2.5 border border-border rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
@@ -780,7 +770,7 @@ export function QRGenerator() {
             </SectionCard>
           </FadeUp>
           <FadeUp delay={100}>
-            <SectionCard icon={CalendarCheck} title="Step 2 — Date & Time">
+            <SectionCard icon={CalendarCheck} title="Date & Time">
               <div className="p-5 space-y-4">
                 <div className="flex rounded-xl overflow-hidden border border-border">
                   {(["single", "range"] as const).map(mode => (
@@ -1248,7 +1238,7 @@ export function TeamAttendance() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <h1 className="font-serif text-3xl font-bold text-teal-dark">Team Attendance</h1>
-            <p className="text-sm text-muted-text mt-1">Video Team 104 — Session Records</p>
+            <p className="text-sm text-muted-text mt-1">Video Team Session Records</p>
           </div>
           <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Leader View</span>
         </div>
@@ -1389,7 +1379,7 @@ function heatCellColor(pct: number): string {
   return         "rgba(15,78,70,0.85)";
 }
 
-export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: string; banner?: string }) {
+export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; banner?: string }) {
   const [selected, setSelected] = useState<{ dayIdx: number; hourIdx: number } | null>(null);
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [msgMember, setMsgMember]   = useState<Member | null>(null);
@@ -1466,7 +1456,7 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
         <div className="flex items-end justify-between mb-6">
           <div>
             <h1 className="font-serif text-3xl font-bold text-teal-dark">Availability Heatmap</h1>
-            <p className="text-sm text-muted-text mt-1">{scope} — Click any cell to see member availability</p>
+            <p className="text-sm text-muted-text mt-1">{scope}  Click any cell to see member availability</p>
           </div>
           <div className="flex items-center gap-2">
             {["All Departments","All Courses","All Panata Groups","All STF Teams"].map(opt => (
@@ -2099,7 +2089,7 @@ export function MyProfile() {
     attendance: "94%", tasks: "92%", status: "Active",
     dept: "CICS", panata: "CICS2",
     email: "john.narvasa@neu.edu.ph",
-    bio: "Video Team Leader. Manages scheduling, task distribution, and member welfare for Video Team 104.",
+    bio: "Video Team Leader. Manages scheduling, task distribution, and member welfare for Video Team.",
     tasksDone: 23, tasksTotal: 25, attendancePct: 94,
     recentActivity: "Sent weekly Panata reminder to all members",
   };
@@ -2229,7 +2219,7 @@ export function MyProfile() {
                     <Users className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <div className="font-bold text-teal-dark text-sm">Video Team 104</div>
+                    <div className="font-bold text-teal-dark text-sm">Video Team</div>
                     <div className="text-xs text-muted-text mt-0.5">55 members · CICS2 · GE Sec A</div>
                   </div>
                   <span className="ml-auto text-[10px] font-bold px-2.5 py-1 rounded-full bg-teal text-white">Leader</span>
@@ -2244,7 +2234,7 @@ export function MyProfile() {
 }
 
 // ─── Dispatcher Modal (legacy, replaced by ActionCenter page) ─────────────────
-export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team 104" }: { scopeLocked?: boolean; scopeLabel?: string }) {
+export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team" }: { scopeLocked?: boolean; scopeLabel?: string }) {
   const { modal, setModal } = usePortal();
   if (modal !== "dispatcher") return null;
   return (
