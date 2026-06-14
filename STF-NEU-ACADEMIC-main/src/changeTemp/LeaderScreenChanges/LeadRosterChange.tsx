@@ -470,7 +470,7 @@ export function Sidebar() {
 }
 
 
-// -------- CHANGES --------
+// -------- CHANGES -------- (Problem is viewing the ge and panata monitor rosters via sidebar, it opens the student dashboard instead)
 // 🌟 HIGHLIGHTED CHANGE: Added Roster to GE Monitor and Panata Monitor roleTools
 const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   // ... student and leader defs remain the same ...

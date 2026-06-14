@@ -6,28 +6,26 @@ import {
   ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Lock,
   GripVertical, MapPin, Calendar, Send, Pencil, Trash2, Link,
   Upload, FileText, Megaphone, CheckSquare, BarChart2, CalendarCheck,
-  BookOpen, CalendarDays, CalendarPlus, User
+  BookOpen, CalendarDays, CalendarPlus, User, UserCircle, Activity
 } from "lucide-react";
 
 /*
 CHANGES
 1. [Attendance()] Attendance logger added in GE and Panata group monitor
 2. Enhanced heatmap view coloring (either: shades of blue (brightness) or standard shades of yellow green red)
-
-TO BE CHANGED/TO DO:
-1. [Roster() ] 
+3. [Roster() ] 
   - Add panata group members in panata monitor and ge subject group members in ge monitor
     - Sidebar changes
     - linked to team members or make a new function with different list of students
   - add more subjects responsibility for showcasing a ge group monitor handling 2 or more GE subject groups (multiple rosters)
   - add more sample students, change table formatting: student name, yr level, attendance rate, actions
   - change view as list of long cards per handled monitored groups with stats (no. of students, avg. attendance rate. etc.) and view masterlist button to proceed to the students table
+4. [ActionCenterLimited] - Make the audience scope layout more enhanced (like same as the ActionCenter)
+5. Add QRGenerator in GE Monitor role
 
-2. [ActionCenterLimited] - Make the audience scope layout more enhanced (like same as the ActionCenter)
+TO BE CHANGED/TO DO:
+1. Heatmap view - add chevrons to navigate to next/previous week
 
-3. Add QRGenerator in GE Monitor role
-
-4. Heatmap view - add chevrons to navigate to next/previous week
 
 */
 
@@ -1391,8 +1389,10 @@ const HEATMAP_HOURS = ["8 AM","9 AM","10 AM","11 AM","12 PM","1 PM","2 PM","3 PM
 const HEATMAP_DAYS  = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const INITIALS_MAP: Record<string, Member> = Object.fromEntries(roster.map(m => [m.initials, m]));
 
-function getAvailableInitialsForCell(dayIdx: number, hourIdx: number): string[] {
-  const seed = (dayIdx * 7 + hourIdx * 3) % 100;
+// 🌟 HIGHLIGHTED CHANGE: Added weekOffset to influence the availability seed
+function getAvailableInitialsForCell(dayIdx: number, hourIdx: number, weekOffset: number = 0): string[] {
+  // Added weekOffset * 17 to change the seed per week
+  const seed = Math.abs((dayIdx * 7 + hourIdx * 3 + weekOffset * 17) % 100);
   let pct: number;
   if (hourIdx < 2) pct = 15;
   else if (hourIdx >= 10) pct = 35;
@@ -1402,33 +1402,32 @@ function getAvailableInitialsForCell(dayIdx: number, hourIdx: number): string[] 
   else if (seed < 45) pct = 50;
   else if (seed < 70) pct = 72;
   else pct = 85;
+  
+  // Add slight variance based on the week
+  pct = Math.max(0, Math.min(100, pct + ((weekOffset * 5) % 15)));
+  
   const count = Math.max(1, Math.round((pct / 100) * roster.length));
-  const shifted = [...roster.slice((dayIdx + hourIdx) % roster.length), ...roster.slice(0, (dayIdx + hourIdx) % roster.length)];
+  // Shift array index by weekOffset to rotate the available people
+  const shifted = [...roster.slice((dayIdx + hourIdx + Math.abs(weekOffset)) % roster.length), ...roster.slice(0, (dayIdx + hourIdx + Math.abs(weekOffset)) % roster.length)];
   return shifted.slice(0, count).map(m => m.initials);
 }
 
-// A simple hash function to get a more "random" but deterministic number
-function getHash(dayIdx: number, hourIdx: number): number {
-  return (dayIdx * 31 + hourIdx * 73) % 100;
+// 🌟 HIGHLIGHTED CHANGE: Passed weekOffset into the hash generator
+function getHash(dayIdx: number, hourIdx: number, weekOffset: number = 0): number {
+  return Math.abs((dayIdx * 31 + hourIdx * 73 + weekOffset * 101) % 100);
 }
 
-function heatCell(d: number, h: number) {
-  // Get a deterministic random value between 0-99
-  const seed = getHash(d, h);
+// 🌟 HIGHLIGHTED CHANGE: Passed weekOffset into heatCell to shift block percentages
+function heatCell(d: number, h: number, weekOffset: number = 0) {
+  const seed = getHash(d, h, weekOffset);
 
-  // 1. Keep your special business rules first (The "Overrides")
-  if (h < 2) return { pct: 8 };  // Now in Dark Red range
-  if (h >= 10) return { pct: 35 }; // Low-mid range
-  if (d === 2 && h >= 4 && h <= 6) return { pct: 92 }; // Neon Green
-  if (d === 3 && h >= 4 && h <= 7) return { pct: 88 }; // Neon Green
+  if (h < 2) return { pct: Math.max(0, 8 + (weekOffset * 2 % 5)) };  
+  if (h >= 10) return { pct: Math.min(100, Math.max(0, 35 + (weekOffset * 5 % 15))) }; 
+  if (d === 2 && h >= 4 && h <= 6) return { pct: Math.min(100, Math.max(0, 92 - Math.abs(weekOffset * 3))) }; 
+  if (d === 3 && h >= 4 && h <= 7) return { pct: Math.min(100, Math.max(0, 88 - Math.abs(weekOffset * 2))) }; 
 
-  // 2. Map the seed to the full spectrum (0-100)
-  // Instead of fixed buckets (22, 50, 72, 85), use the seed directly
-  // or add a slight offset to ensure variety.
-  // This will distribute values across the entire 0-100% range.
   return { pct: seed }; 
 }
-
 
 // Enhanced heatmap view coloring
 function heatCellColor(pct: number): string {
@@ -1443,13 +1442,18 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
   const [selected, setSelected] = useState<{ dayIdx: number; hourIdx: number } | null>(null);
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [msgMember, setMsgMember]   = useState<Member | null>(null);
+  
+  // 🌟 HIGHLIGHTED CHANGE: New state variable for navigating weeks
+  const [weekOffset, setWeekOffset] = useState(0);
 
   if (selected !== null) {
     const { dayIdx, hourIdx } = selected;
     const day = HEATMAP_DAYS[dayIdx];
     const hour = HEATMAP_HOURS[hourIdx];
-    const availableInitials = getAvailableInitialsForCell(dayIdx, hourIdx);
-    const cell = heatCell(dayIdx, hourIdx);
+    
+    // 🌟 HIGHLIGHTED CHANGE: Pass weekOffset to data functions
+    const availableInitials = getAvailableInitialsForCell(dayIdx, hourIdx, weekOffset);
+    const cell = heatCell(dayIdx, hourIdx, weekOffset);
 
     return (
       <div className="p-7">
@@ -1513,19 +1517,44 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
   return (
     <div className="p-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Availability Heatmap</h1>
-            <p className="text-sm text-muted-text mt-1">{scope} — Click any cell to see member availability</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {["All Departments","All Courses","All Panata Groups","All STF Teams"].map(opt => (
-              <select key={opt} className="text-xs border border-border rounded-xl px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
-                <option>{opt}</option>
-              </select>
-            ))}
-          </div>
-        </div>
+              <div className="flex items-end justify-between mb-6">
+                <div>
+                  <h1 className="font-serif text-3xl font-bold text-teal-dark">Availability Heatmap</h1>
+                  <p className="text-sm text-muted-text mt-1">{scope} — Click any cell to see member availability</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  
+                  {/* 🌟 HIGHLIGHTED CHANGE: The new Chevron Navigation Controls */}
+                  <div className="flex items-center gap-2 bg-card border border-border rounded-xl p-1 shadow-sm">
+                    <button 
+                      onClick={() => setWeekOffset(w => w - 1)} 
+                      title="Previous Week"
+                      className="p-1.5 rounded-lg text-muted-text hover:bg-secondary hover:text-foreground transition active:scale-95"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="text-xs font-bold w-24 text-center text-teal-dark select-none tracking-wide">
+                      {weekOffset === 0 ? "Current Week" : weekOffset === 1 ? "Next Week" : weekOffset === -1 ? "Last Week" : `Week ${weekOffset > 0 ? '+' : ''}${weekOffset}`}
+                    </span>
+                    <button 
+                      onClick={() => setWeekOffset(w => w + 1)} 
+                      title="Next Week"
+                      className="p-1.5 rounded-lg text-muted-text hover:bg-secondary hover:text-foreground transition active:scale-95"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Original filters */}
+                  <div className="flex items-center gap-2">
+                    {["All Departments","All Courses","All Panata Groups","All STF Teams"].map(opt => (
+                      <select key={opt} className="text-xs border border-border rounded-xl px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
+                        <option>{opt}</option>
+                      </select>
+                    ))}
+                  </div>
+                </div>
+              </div>
       </FadeUp>
 
       {banner && (
@@ -1547,9 +1576,12 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
                   <Fragment key={"row" + hi}>
                     <div className="text-xs text-muted-text py-2 font-mono flex items-center">{h}</div>
                     {HEATMAP_DAYS.map((_, di) => {
-                      const c = heatCell(di, hi);
-                      const availCount = getAvailableInitialsForCell(di, hi).length;
+                      
+                      // 🌟 HIGHLIGHTED CHANGE: Pass weekOffset to loops calculating grid values
+                      const c = heatCell(di, hi, weekOffset);
+                      const availCount = getAvailableInitialsForCell(di, hi, weekOffset).length;
                       const cellBg = heatCellColor(c.pct);
+
                       return (
                         <div key={`${di}-${hi}`} className="group relative" style={{ isolation: "isolate" }}>
                           <div
@@ -1561,9 +1593,12 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
                             style={{ position: "absolute", zIndex: 9999, bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)" }}>
                             <div className="bg-teal-dark text-white text-[10px] p-2.5 rounded-xl whitespace-nowrap shadow-xl"
                               style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                              
+                              {/* 🌟 HIGHLIGHTED CHANGE: Tooltip shows the modified percentage */}
                               <div className="font-bold mb-1.5">{HEATMAP_DAYS[di]}, {h} — {c.pct}% available</div>
+                              
                               <div className="flex gap-1 flex-wrap max-w-[140px] mb-1.5">
-                                {getAvailableInitialsForCell(di, hi).slice(0, 6).map(x => (
+                                {getAvailableInitialsForCell(di, hi, weekOffset).slice(0, 6).map(x => (
                                   <span key={x} className="w-5 h-5 rounded-full bg-white/20 grid place-items-center text-[8px] font-bold">{x.slice(0,2)}</span>
                                 ))}
                                 {availCount > 6 && <span className="text-[9px] text-white/70 self-center ml-0.5">+{availCount - 6}</span>}
@@ -1595,6 +1630,7 @@ export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: stri
             </div>
           </SectionCard>
         </FadeUp>
+
         <div className="col-span-3 space-y-4">
           <FadeUp delay={100}>
             <SectionCard icon={CheckCircle} title="Most Available">
@@ -2116,19 +2152,86 @@ export function TemplateLibrary({ global = false }: { global?: boolean }) {
   return <ActionCenter global={global} />;
 }
 
+// 🌟 HIGHLIGHTED CHANGE: Added LeaderRadarChart tailored for Team Leaders
+function LeaderRadarChart() {
+  const [progress, setProgress] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
+  const DURATION = 900;
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      const animate = (now: number) => {
+        if (startRef.current === null) startRef.current = now;
+        const elapsed = now - startRef.current;
+        const t = Math.min(elapsed / DURATION, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        setProgress(eased);
+        if (t < 1) rafRef.current = requestAnimationFrame(animate);
+      };
+      rafRef.current = requestAnimationFrame(animate);
+    }, 200);
+    return () => {
+      clearTimeout(delay);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  // Leader-specific metrics
+  const axes = [
+    { label: "Attendance",   value: 0.94 },
+    { label: "Task Mgmt",    value: 0.92 },
+    { label: "Comms",        value: 0.88 },
+    { label: "Team Health",  value: 0.85 },
+    { label: "Initiative",   value: 0.90 },
+    { label: "Compliance",   value: 0.96 },
+  ];
+  const n = axes.length;
+  const cx = 130; const cy = 130; const maxR = 96;
+  const rings = [0.25, 0.5, 0.75, 1.0];
+
+  function polarToXY(i: number, r: number) {
+    const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  const dataPoints = axes.map((a, i) => polarToXY(i, a.value * maxR * progress));
+  const polyStr = dataPoints.map(p => `${p.x},${p.y}`).join(" ");
+  const ringPolys = rings.map(frac => axes.map((_, i) => polarToXY(i, frac * maxR)).map(p => `${p.x},${p.y}`).join(" "));
+  const labelPositions = axes.map((a, i) => ({ ...polarToXY(i, maxR + 26), label: a.label, value: a.value }));
+
+  return (
+    <svg viewBox="0 0 260 280" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"auto"}}>
+      {ringPolys.map((pts, ri) => <polygon key={ri} points={pts} fill="none" stroke="#1B6B8F" strokeOpacity={0.12 + ri * 0.04} strokeWidth="1"/>)}
+      {axes.map((_, i) => <line key={i} x1={cx} y1={cy} x2={polarToXY(i, maxR).x} y2={polarToXY(i, maxR).y} stroke="#1B6B8F" strokeOpacity="0.18" strokeWidth="1"/>)}
+      <polygon points={polyStr} fill="rgba(27,107,143,0.18)" stroke="#1B6B8F" strokeWidth="2"/>
+      {dataPoints.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="4.5" fill="#1B6B8F" stroke="white" strokeWidth="1.5"/>)}
+      {labelPositions.map((l, i) => (
+        <g key={i}>
+          <text x={l.x} y={l.y} textAnchor="middle" dominantBaseline="middle" fontSize="9.5" fill="#6b7280" fontFamily="Plus Jakarta Sans, sans-serif" fontWeight="600">{l.label.toUpperCase()}</text>
+          <text x={l.x} y={l.y + 12} textAnchor="middle" dominantBaseline="middle" fontSize="9.5" fill="#1B6B8F" fontFamily="Sora, sans-serif" fontWeight="700">{Math.round(l.value * 100)}%</text>
+        </g>
+      ))}
+      <circle cx={cx} cy={cy} r="3" fill="#1B6B8F" opacity="0.4"/>
+    </svg>
+  );
+}
+
 // ─── My Profile ───────────────────────────────────────────────────────────────
 export function MyProfile() {
   const me: Member = {
     initials: "JN", name: "John Patrick Narvasa", id: "STF-2022-0001",
     course: "BS Information Technology", year: "Junior",
     attendance: "94%", tasks: "92%", status: "Active",
-    dept: "CICS", panata: "CICS2",
+    dept: "CICS", team: "Video Team 104", panata: "CICS2", ge: "GE 101 - Sec A",
     email: "john.narvasa@neu.edu.ph",
     bio: "Video Team Leader. Manages scheduling, task distribution, and member welfare for Video Team 104.",
     tasksDone: 23, tasksTotal: 25, attendancePct: 94,
     recentActivity: "Sent weekly Panata reminder to all members",
   };
 
+  // 🌟 HIGHLIGHTED CHANGE: Added state for tabs to match Student Profile
+  const [profileTab, setProfileTab] = useState<"overview"|"academic"|"membership"|"preferences"|"responsibilities"|"activity"|"teams">("overview");
   const [editMode, setEditMode] = useState(false);
   const [bio, setBio] = useState(me.bio);
   const [saved, setSaved] = useState(false);
@@ -2139,135 +2242,191 @@ export function MyProfile() {
     setTimeout(() => setSaved(false), 2500);
   }
 
+  // 🌟 HIGHLIGHTED CHANGE: Standardized SVG Icons for Stat Strip
+  const StatIcons = {
+    Attendance: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M9 16l2 2 4-4"/></svg>,
+    TasksDone:  () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+    TeamSize:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    Events:     () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  };
+
+  const statCards = [
+    { label:"Attendance",  value:"94%", sub:"this semester",  color:"from-teal to-teal-light",      IconComp: StatIcons.Attendance },
+    { label:"Tasks Done",  value:"92%", sub:"of assigned",    color:"from-teal-light to-[#5A8FA8]", IconComp: StatIcons.TasksDone  },
+    { label:"Team Size",   value:"55",  sub:"active members", color:"from-[#4A7A8A] to-[#3D6B7A]",  IconComp: StatIcons.TeamSize   },
+    { label:"Events Led",  value:"12",  sub:"this semester",  color:"from-slate-blue to-[#3D5466]", IconComp: StatIcons.Events     },
+  ];
+
   return (
-    <div className="p-7">
+    <div className="p-0 pb-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">My Profile</h1>
-            <p className="text-sm text-muted-text mt-1">Your personal STF member profile</p>
+        {/* 🌟 HIGHLIGHTED CHANGE: Tall gradient hero banner mirroring Student Profile */}
+        <div className="relative overflow-hidden mb-0" style={{height:160, background:"linear-gradient(135deg, #0D4A6B 0%, #1B6B8F 50%, #4A8FA8 80%, #5A8FA8 100%)"}}>
+          <div style={{position:"absolute",top:-30,right:-30,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,0.06)"}}/>
+          <div style={{position:"absolute",bottom:-40,left:"30%",width:120,height:120,borderRadius:"50%",background:"rgba(255,255,255,0.05)"}}/>
+          <div className="absolute top-5 left-7">
+            <div className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Leader Profile</div>
+            <div className="text-white font-serif font-bold text-2xl">{me.name.toUpperCase()}</div>
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Leader View</span>
+          <div className="absolute top-5 right-7">
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white/90 border border-white/30" style={{background:"rgba(255,255,255,0.15)", backdropFilter:"blur(8px)"}}>
+              Active Leader
+            </span>
+          </div>
         </div>
       </FadeUp>
 
-      <div className="grid grid-cols-12 gap-5">
-        <FadeUp delay={60} className="col-span-4">
-          <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
-            <div className="bg-teal-dark px-6 pt-6 pb-12">
-              <div className="flex items-start justify-between">
-                <AvatarSVG initials={me.initials} size={64} className="rounded-2xl shadow-lg" />
-                <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-400/30">Active</span>
+      <div className="px-7">
+        <FadeUp delay={60}>
+          {/* 🌟 HIGHLIGHTED CHANGE: Floating Avatar and Data block */}
+          <div className="flex gap-5 items-start -mt-8 mb-6">
+            <div className="shrink-0 relative">
+              <div className="w-24 h-24 rounded-2xl border-4 border-background shadow-2xl grid place-items-center overflow-hidden" style={{background:"linear-gradient(135deg, #1B6B8F, #4A8FA8)"}}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16">
+                  <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.9)"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.9)"/>
+                </svg>
               </div>
-              <div className="text-white mt-3">
-                <div className="font-serif text-xl font-bold">{me.name}</div>
-                <div className="text-xs text-white/60 font-mono mt-0.5">{me.id}</div>
-                <div className="text-xs text-white/50 mt-1">Video Team Leader</div>
-              </div>
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-background flex items-center justify-center">
+                <svg viewBox="0 0 10 10" className="w-2.5 h-2.5"><circle cx="5" cy="5" r="3" fill="white"/></svg>
+              </span>
             </div>
-            <div className="-mt-5 mx-4 bg-card rounded-xl px-4 py-3 border border-border mb-4" style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.08)" }}>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Course", value: me.course },
-                  { label: "Year", value: me.year },
-                  { label: "Dept", value: me.dept },
-                  { label: "Panata", value: me.panata },
-                ].map(({ label, value }) => (
-                  <div key={label}>
-                    <div className="text-[10px] text-muted-text font-semibold uppercase tracking-wider">{label}</div>
-                    <div className="text-xs font-bold text-foreground mt-0.5 leading-tight">{value}</div>
+
+            <div className="pt-10 flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div>
+                  <h1 className="font-serif font-bold text-teal-dark text-2xl leading-tight">{me.name}</h1>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="text-sm text-muted-text">{me.year} Year · {me.course} · {me.dept}</span>
+                    <span className="text-muted-text/40">·</span>
+                    <span className="text-sm font-mono text-muted-text">{me.id}</span>
                   </div>
-                ))}
+                  <div className="flex gap-2 mt-2 flex-wrap">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-teal/10 text-teal border border-teal/20">Video Team Leader</span>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-gold/15 text-yellow-700 border border-gold/30">{me.panata} Panata</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => editMode ? handleSave() : setEditMode(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold border transition-all mt-1"
+                  style={editMode ? {background:"var(--teal-dark)", color:"#fff", borderColor:"var(--teal-dark)"} : {borderColor:"var(--border)", color:"var(--muted-text)"}}>
+                  {saved ? <CheckCircle className="w-3.5 h-3.5"/> : <Pencil className="w-3.5 h-3.5"/>} 
+                  {editMode ? "Save Changes" : "Edit Profile"}
+                </button>
               </div>
             </div>
-            <div className="px-4 pb-4 space-y-3">
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-text">Attendance</span>
-                  <span className="font-bold text-green-700">{me.attendance}</span>
+          </div>
+
+          {/* 🌟 HIGHLIGHTED CHANGE: Gradient stat cards mirroring Student Profile */}
+          <div className="grid grid-cols-4 gap-3 mb-6">
+            {statCards.map((s, i) => (
+              <FadeUp key={s.label} delay={i * 50}>
+                <div className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-md`} style={{boxShadow:"0 4px 14px rgba(0,0,0,0.12)"}}>
+                  <div className="mb-1.5"><s.IconComp/></div>
+                  <div className="font-serif font-bold text-3xl leading-none">{s.value}</div>
+                  <div className="text-white/80 text-xs font-semibold mt-1 uppercase tracking-wide">{s.label}</div>
+                  <div className="text-white/60 text-[10px] mt-0.5">{s.sub}</div>
                 </div>
-                <MiniBar pct={me.attendancePct} color="var(--green-status)" />
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-text">Task Completion</span>
-                  <span className="font-bold text-teal-dark">{me.tasksDone}/{me.tasksTotal}</span>
-                </div>
-                <MiniBar pct={(me.tasksDone / me.tasksTotal) * 100} color="var(--teal)" />
-              </div>
-              <div className="text-xs text-muted-text pt-1">📧 {me.email}</div>
-            </div>
+              </FadeUp>
+            ))}
           </div>
         </FadeUp>
 
-        <div className="col-span-8 space-y-4">
-          <FadeUp delay={80}>
-            <SectionCard icon={Pencil} title="About Me"
-              action={
-                <div className="flex items-center gap-2">
-                  {saved && <span className="flex items-center gap-1 text-xs font-semibold text-green-700"><CheckCircle className="w-3.5 h-3.5" /> Saved</span>}
-                  <button onClick={() => editMode ? handleSave() : setEditMode(true)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${editMode ? "bg-teal text-white" : "border border-border text-muted-text hover:bg-secondary"}`}>
-                    {editMode ? <><Save className="w-3.5 h-3.5" /> Save</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
-                  </button>
-                </div>
-              }>
-              <div className="p-5">
-                {editMode ? (
-                  <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4}
-                    className="w-full px-4 py-3 border border-teal/40 rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none" />
-                ) : (
-                  <p className="text-sm text-foreground leading-relaxed">{bio}</p>
-                )}
-              </div>
-            </SectionCard>
-          </FadeUp>
+        {/* 🌟 HIGHLIGHTED CHANGE: Pill-style Tabbed Panel */}
+        <FadeUp delay={120}>
+          <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{boxShadow:"0 2px 12px rgba(0,0,0,0.08)"}}>
+            <div className="flex gap-1 p-2 border-b border-border bg-secondary/20 overflow-x-auto">
+              {[
+                { id:"overview" as const, label:"Overview",      Icon: UserCircle },
+                { id:"activity" as const, label:"Activity Logs", Icon: Activity },
+                { id:"teams" as const,    label:"My Teams",      Icon: Users },
+              ].map(t => (
+                <button key={t.id} onClick={() => setProfileTab(t.id)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all"
+                  style={profileTab === t.id ? {background:"var(--teal-dark)", color:"#fff", boxShadow:"0 2px 8px rgba(13,74,107,0.3)"} : {color:"var(--muted-text)", background:"transparent"}}>
+                  <t.Icon className="w-3.5 h-3.5"/>{t.label}
+                </button>
+              ))}
+            </div>
 
-          <FadeUp delay={120}>
-            <SectionCard icon={ClipboardList} title="Recent Activity">
-              <div className="divide-y divide-border">
-                {[
-                  { action: "Sent weekly Panata reminder to all members", time: "2 hours ago", icon: Send },
-                  { action: "Assigned Choir Concert task to 55 members", time: "Yesterday", icon: CheckSquare },
-                  { action: "Generated QR code for Video Team Practice", time: "Nov 7", icon: QrCode },
-                  { action: "Updated heatmap availability schedule", time: "Nov 5", icon: Calendar },
-                ].map(({ action, time, icon: Icon }, i) => (
-                  <div key={i} className="flex items-center gap-3 px-5 py-3">
-                    <div className="w-7 h-7 rounded-lg bg-teal-soft flex items-center justify-center shrink-0">
-                      <Icon className="w-3.5 h-3.5 text-teal-dark" />
+            <div className="p-6">
+              {profileTab === "overview" && (
+                <div className="flex gap-5 items-start">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-3">Leader Biography</div>
+                    <div className="bg-secondary/30 rounded-xl p-4 transition-colors border border-border/30 mb-5">
+                      {editMode ? (
+                        <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full px-3 py-2 border border-teal/40 rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none"/>
+                      ) : (
+                        <p className="text-sm text-foreground leading-relaxed">{bio}</p>
+                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-foreground truncate">{action}</div>
+                    
+                    <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-3">Quick Info</div>
+                    <div className="grid grid-cols-2 gap-3 mb-5">
+                      {[
+                        {label:"Managed Team", value: me.team},
+                        {label:"Panata Group", value: me.panata},
+                        {label:"GE Group",     value: me.ge},
+                        {label:"Email",        value: me.email},
+                      ].map(({label, value}) => (
+                        <div key={label} className="bg-secondary/30 rounded-xl p-4 transition-colors border border-border/30">
+                          <div className="text-xs text-muted-text font-semibold uppercase tracking-wide mb-1.5">{label}</div>
+                          <div className="font-semibold text-sm text-foreground">{value}</div>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-xs text-muted-text shrink-0">{time}</span>
                   </div>
-                ))}
-              </div>
-            </SectionCard>
-          </FadeUp>
+                  <div className="shrink-0 w-96">
+                    <div className="rounded-2xl border border-border p-6 bg-secondary/10">
+                      <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-1">Leadership Metrics</div>
+                      <p className="text-[11px] text-muted-text mb-4">Core vitals for current semester</p>
+                      <LeaderRadarChart/>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-          <FadeUp delay={160}>
-            <SectionCard icon={Users} title="My Team">
-              <div className="p-5">
-                <div className="flex items-center gap-3 p-4 bg-teal-soft/40 rounded-xl border border-teal/20">
-                  <div className="w-10 h-10 rounded-xl bg-teal flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
+              {profileTab === "activity" && (
+                <div className="divide-y divide-border">
+                  {[
+                    { action: "Sent weekly Panata reminder to all members", time: "2 hours ago", icon: Send },
+                    { action: "Assigned Choir Concert task to 55 members", time: "Yesterday", icon: CheckSquare },
+                    { action: "Generated QR code for Video Team Practice", time: "Nov 7", icon: QrCode },
+                    { action: "Updated heatmap availability schedule", time: "Nov 5", icon: Calendar },
+                  ].map(({ action, time, icon: Icon }, i) => (
+                    <div key={i} className="flex items-center gap-3 py-4">
+                      <div className="w-9 h-9 rounded-xl bg-teal-soft flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-teal-dark" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-foreground truncate">{action}</div>
+                        <div className="text-xs text-muted-text mt-0.5">{time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {profileTab === "teams" && (
+                <div className="flex items-center gap-4 p-5 bg-teal-soft/40 rounded-xl border border-teal/20">
+                  <div className="w-12 h-12 rounded-xl bg-teal flex items-center justify-center shadow-sm">
+                    <Users className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="font-bold text-teal-dark text-sm">Video Team 104</div>
-                    <div className="text-xs text-muted-text mt-0.5">55 members · CICS2 · GE Sec A</div>
+                    <div className="font-bold text-teal-dark text-base">{me.team}</div>
+                    <div className="text-xs text-muted-text mt-1">55 Active Members · Supervised under DGA Multimedia</div>
                   </div>
-                  <span className="ml-auto text-[10px] font-bold px-2.5 py-1 rounded-full bg-teal text-white">Leader</span>
+                  <button className="ml-auto px-4 py-2 rounded-lg bg-teal text-white text-xs font-bold hover:bg-teal-dark transition">Manage Team</button>
                 </div>
-              </div>
-            </SectionCard>
-          </FadeUp>
-        </div>
+              )}
+            </div>
+          </div>
+        </FadeUp>
       </div>
     </div>
   );
 }
-
 // ─── Dispatcher Modal (legacy, replaced by ActionCenter page) ─────────────────
 export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team 104" }: { scopeLocked?: boolean; scopeLabel?: string }) {
   const { modal, setModal } = usePortal();

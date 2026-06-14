@@ -15,11 +15,11 @@ import { useState, useEffect, useRef } from "react";
 CHANGES
 1. StudentDashboard - more sensible sample data
 2. Notification modal with "follow up" functionality
+3. Sensible sample data, Add more colors in piechart in tasks view (Pending, Submitted, Graded, Missing, Overdue)
+4. Sensible consistent sample data across calendar, summary cards, and day drawer to reflect realistic student schedule and commitments
 
 
 TO BE CHANGED/ TO DO :
-1. Add more colors in piechart in tasks view (Pending, Submitted, Graded, Missing, Overdue)
-1. Sensible consistent sample data across calendar, summary cards, and day drawer to reflect realistic student schedule and commitments
 2. Each Students should have their own QR code in their profile (For future QR system implementation)
 */
 
@@ -1286,18 +1286,15 @@ type TaskItem = {
   status: Exclude<TaskStatus,"ALL">;
 };
 
-const taskData: TaskItem[] = [
-  { title:"Task Progress Submissions",      contextTarget:"Video Team 104",  deadline:"Jun 22 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"PENDING"   },
-  { title:"Task Peer Submissions",          contextTarget:"Video Team 104",  deadline:"Jun 21 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"SUBMITTED" },
-  { title:"Task Subjects Choir Orientation",contextTarget:"GE 101-Sec A",    deadline:"Jun 25 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"SUBMITTED" },
-  { title:"Task Progress Choir Meeting",    contextTarget:"GE 101-Sec A",    deadline:"Aug 25 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"GRADED"    },
-  { title:"Task Title Orientation",         contextTarget:"GE 101-Sec A",    deadline:"Jun 21 2025 1PM",  assignedBy:"Super admin", priority:"Medium", status:"GRADED"    },
-  { title:"Task Entmancer Barnta",          contextTarget:"GE 101-Sec A",    deadline:"Aug 18 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"GRADED"    },
-  { title:"Task Parents Orientation",       contextTarget:"GE 101-Sec A",    deadline:"Aug 27 2025 1PM",  assignedBy:"Super admin", priority:"Medium", status:"GRADED"    },
-  { title:"Task Subjects Choir Meeting",    contextTarget:"GE 101-Sec A",    deadline:"Aug 21 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"MISSING"   },
-  { title:"Task Progress Choir Meeting",    contextTarget:"GE 101-Sec A",    deadline:"Aug 21 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"MISSING"   },
-  { title:"Task Proprets Choir Meeting",    contextTarget:"GE 101-Sec A",    deadline:"Aug 27 2025 1PM",  assignedBy:"Super admin", priority:"High",   status:"OVERDUE"   },
-  { title:"Task Proprets Choir Meeting",    contextTarget:"GE 101-Sec A",    deadline:"Jun 22 2025 1PM",  assignedBy:"Super admin", priority:"Medium", status:"OVERDUE"   },
+// 🌟 HIGHLIGHTED CHANGE: Sensible task data with 5 distinct statuses mapping to the chart 🌟
+export const taskData: TaskItem[] = [
+  { title:"Submit Final Video Cut",         contextTarget:"Video Team 104",  deadline:"Nov 15 2023 1PM",  assignedBy:"Team Leader", priority:"High",   status:"PENDING"   },
+  { title:"Ethics Reflection Paper",        contextTarget:"GE 101-Sec A",    deadline:"Nov 12 2023 5PM",  assignedBy:"Prof. Reyes", priority:"Medium", status:"SUBMITTED" },
+  { title:"Art App Critique Essay",         contextTarget:"GE 102-Sec B",    deadline:"Nov 10 2023 1PM",  assignedBy:"Prof. Santos",priority:"Medium", status:"GRADED"    },
+  { title:"Panata Attendance Form",         contextTarget:"CICS2 Panata",    deadline:"Nov 18 2023 8AM",  assignedBy:"Panata Lead", priority:"High",   status:"PENDING"   },
+  { title:"Multimedia Storyboard v1",       contextTarget:"Video Team 104",  deadline:"Nov 05 2023 1PM",  assignedBy:"Team Leader", priority:"High",   status:"OVERDUE"   },
+  { title:"Peer Evaluation Form",           contextTarget:"GE 101-Sec A",    deadline:"Nov 08 2023 5PM",  assignedBy:"Prof. Reyes", priority:"Low",    status:"MISSING"   },
+  { title:"Camera Equipment Checkout",      contextTarget:"Video Team 104",  deadline:"Nov 02 2023 9AM",  assignedBy:"Coordinator", priority:"Medium", status:"GRADED"    },
 ];
 
 const TASKS_PER_PAGE = 6;
@@ -1316,46 +1313,50 @@ const priorityStyle: Record<string, string> = {
 };
 
 // Donut chart SVG — 2-point linear snake: Point A (green) → Point B (red), linear easing
-function DonutChart({ completed, pending, missing }: { completed: number; pending: number; missing: number }) {
-  // 2-point linear snake: Point A (green start) draws to Point B (red end), color changes at each segment boundary
+// 🌟 HIGHLIGHTED CHANGE: DonutChart rebuilt to support 5 dynamic segments with distinct colors 🌟
+function DonutChart({ counts }: { counts: Record<string, number> }) {
   const [go, setGo] = useState(false);
   useEffect(() => { const t = setTimeout(() => setGo(true), 120); return () => clearTimeout(t); }, []);
 
-  const total = completed + pending + missing;
+  const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
   const r = 54; const cx = 70; const cy = 70;
   const circ = 2 * Math.PI * r;
-  const GAP = 3;
-  const compArc = (completed / total) * circ;
-  const pendArc = (pending  / total) * circ;
-  const missArc = (missing  / total) * circ;
-  // Offsets position each segment so they follow each other around the ring
-  const compOff = -circ * 0.25;
-  const pendOff = compOff - compArc - GAP;
-  const missOff = pendOff - pendArc - GAP;
+  const GAP = counts.GRADED === total ? 0 : 2; // Remove gap if 100% complete
 
-  // Linear easing — no ease-in/out, pure constant speed snake draw from A to B
-  const snake = (arc: number, off: number, delay: number) => ({
-    strokeDasharray: go ? `${arc - GAP} ${circ - arc + GAP}` : `0 ${circ}`,
-    strokeDashoffset: off,
-    transition: `stroke-dasharray 0.75s linear ${delay}ms`,
-  });
+  const segments = [
+    { key: "GRADED",    color: "#16a34a" }, // Green
+    { key: "SUBMITTED", color: "#0d9488" }, // Teal
+    { key: "PENDING",   color: "#F5C518" }, // Gold/Amber
+    { key: "MISSING",   color: "#ef4444" }, // Red
+    { key: "OVERDUE",   color: "#991b1b" }  // Dark Red
+  ];
+
+  let currentOffset = -circ * 0.25;
 
   return (
     <svg width="140" height="140" viewBox="0 0 140 140">
-      {/* Track ring */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth="18"/>
-      {/* Point A — green (completed), draws first */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth="18"
-        strokeLinecap="round" style={snake(compArc, compOff, 0)}/>
-      {/* Colour change — gold (pending), linear continuation */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F5C518" strokeWidth="18"
-        strokeLinecap="round" style={snake(pendArc, pendOff, 300)}/>
-      {/* Point B — red (missing), final linear draw */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#ef4444" strokeWidth="18"
-        strokeLinecap="round" style={snake(missArc, missOff, 600)}/>
-      {/* Centre label */}
-      <text x={cx} y={cy - 6} textAnchor="middle" dominantBaseline="middle" fontSize="22" fontWeight="bold" fill="#1B6B8F" fontFamily="Sora, sans-serif">{Math.round((completed/total)*100)}%</text>
-      <text x={cx} y={cy + 16} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#6b7280" fontFamily="Plus Jakarta Sans, sans-serif">completion</text>
+      {segments.map((seg, i) => {
+        const val = counts[seg.key] || 0;
+        if (val === 0) return null;
+        const arc = (val / total) * circ;
+        const off = currentOffset;
+        currentOffset -= (arc); // advance offset for next segment
+        return (
+          <circle key={seg.key} cx={cx} cy={cy} r={r} fill="none" stroke={seg.color} strokeWidth="18"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: go ? `${arc > GAP ? arc - GAP : arc} ${circ}` : `0 ${circ}`,
+              strokeDashoffset: off,
+              transition: `stroke-dasharray 0.75s linear ${i * 100}ms`
+            }} 
+          />
+        );
+      })}
+      <text x={cx} y={cy - 6} textAnchor="middle" dominantBaseline="middle" fontSize="22" fontWeight="bold" fill="#1B6B8F" fontFamily="Sora, sans-serif">
+        {Math.round(((counts.GRADED + counts.SUBMITTED) / total) * 100)}%
+      </text>
+      <text x={cx} y={cy + 16} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#6b7280" fontFamily="Plus Jakarta Sans, sans-serif">completed</text>
     </svg>
   );
 }
@@ -1373,9 +1374,14 @@ export function TasksView({ showAssign = false }: { showAssign?: boolean }) {
 
   const filters: TaskStatus[] = ["ALL","PENDING","SUBMITTED","GRADED","MISSING","OVERDUE"];
 
-  const completed = taskData.filter(t => t.status === "GRADED" || t.status === "SUBMITTED").length;
-  const pending   = taskData.filter(t => t.status === "PENDING").length;
-  const missing   = taskData.filter(t => t.status === "MISSING" || t.status === "OVERDUE").length;
+// 🌟 HIGHLIGHTED CHANGE: Count aggregation updated to support all 5 metrics for the new chart 🌟
+  const counts = {
+    GRADED:    taskData.filter(t => t.status === "GRADED").length,
+    SUBMITTED: taskData.filter(t => t.status === "SUBMITTED").length,
+    PENDING:   taskData.filter(t => t.status === "PENDING").length,
+    MISSING:   taskData.filter(t => t.status === "MISSING").length,
+    OVERDUE:   taskData.filter(t => t.status === "OVERDUE").length,
+  };
   const total     = taskData.length;
 
   const filteredTasks = taskData.filter(t => {
@@ -1425,17 +1431,19 @@ export function TasksView({ showAssign = false }: { showAssign?: boolean }) {
           <div className="bg-card border border-border rounded-2xl p-5 w-60" style={{boxShadow:"0 1px 4px rgba(0,0,0,0.07)"}}>
             <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-5">Task Matrix</div>
 
-            {/* Donut chart */}
+            {/* 🌟 HIGHLIGHTED CHANGE: Passing explicit 5-count object to DonutChart 🌟 */}
             <div className="flex justify-center mb-4">
-              <DonutChart completed={completed} pending={pending} missing={missing}/>
+              <DonutChart counts={counts} />
             </div>
 
-            {/* Legend */}
+            {/* 🌟 HIGHLIGHTED CHANGE: Legend updated to match 5 colors 🌟 */}
             <div className="space-y-2 mb-5">
               {[
-                { label:`COMPLETED (${Math.round((completed/total)*100)}%)`, color:"#22c55e" },
-                { label:`PENDING (${Math.round((pending/total)*100)}%)`,     color:"#F5C518" },
-                { label:`MISSING (${Math.round((missing/total)*100)}%)`,     color:"#ef4444" },
+                { label:`GRADED (${counts.GRADED})`,       color:"#16a34a" },
+                { label:`SUBMITTED (${counts.SUBMITTED})`, color:"#0d9488" },
+                { label:`PENDING (${counts.PENDING})`,     color:"#F5C518" },
+                { label:`MISSING (${counts.MISSING})`,     color:"#ef4444" },
+                { label:`OVERDUE (${counts.OVERDUE})`,     color:"#991b1b" },
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-2 text-xs text-foreground font-medium">
                   <span className="w-3 h-3 rounded-full shrink-0" style={{background:l.color}}/>
@@ -1444,12 +1452,10 @@ export function TasksView({ showAssign = false }: { showAssign?: boolean }) {
               ))}
             </div>
 
-            {/* Stats */}
             <div className="space-y-1.5 border-t border-border pt-4">
               {[
                 { label:"Total Tasks",    value: total  },
-                { label:"Due This Week",  value: 15     },
-                { label:"Overdue",        value: missing },
+                { label:"Action Needed",  value: counts.PENDING + counts.MISSING + counts.OVERDUE }
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
                   <span className="text-sm text-muted-text">{s.label}</span>

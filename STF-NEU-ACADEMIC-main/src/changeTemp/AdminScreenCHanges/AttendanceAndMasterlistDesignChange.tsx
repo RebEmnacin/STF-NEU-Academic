@@ -836,12 +836,12 @@ export function TeamAttendance() {
 
 
 
-roster
-avatarsvg
-minibar
-sectioncard
-profilemodal
-submissionmodal
+// roster
+// avatarsvg
+// minibar
+// sectioncard
+// profilemodal
+// submissionmodal
 
 //--- CHANGES
 
@@ -982,227 +982,14 @@ export function MyStudents({ roster }: { roster: any[] }) {
 }
 
 
-StatCard
-geSessions
-AttendanceLogger
-SessionAttendanceModal
-export function SectionAttendance() {
-  const [mainTab, setMainTab] = useState<"records" | "logger">("records");
-  const [viewSession, setViewSession] = useState<any[] | null>(null);
-  
-  const pct = 84;
-  const r = 36; const circ = 2 * Math.PI * r;
-  const [go, setGo] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
-
-  return (
-    <div className="p-7">
-      <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Attendance</h1>
-            <p className="text-sm text-muted-text mt-1">GE 101 Sec A — Session Records</p>
-          </div>
-          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Admin View</span>
-        </div>
-      </FadeUp>
-
-      <FadeUp delay={40}>
-        <div className="flex gap-0 border-b border-border mb-6">
-          {([["records","Session Records"],["logger","Attendance Logger"]] as const).map(([key, label]) => (
-            <button key={key} onClick={() => setMainTab(key)}
-              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"}`}>
-              {label}
-            </button>
-          ))}
-        </div>
-      </FadeUp>
-
-      {mainTab === "records" && (<>
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <FadeUp delay={60}>
-            <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-              <div className="relative w-20 h-20 shrink-0">
-                <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
-                  <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
-                  <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
-                    style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
-                </svg>
-                <div className="absolute inset-0 grid place-items-center">
-                  <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-text">Section Avg Attendance</div>
-                <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
-                <div className="text-xs text-muted-text mt-0.5">24 sessions</div>
-              </div>
-            </div>
-          </FadeUp>
-          <FadeUp delay={100}><StatCard label="Total Sessions" value="24" sub="This semester" /></FadeUp>
-          <FadeUp delay={140}><StatCard label="Students Needing Attention" value="3 ⚠" accent sub="Below 75% threshold" /></FadeUp>
-        </div>
-
-        <FadeUp delay={220}>
-          <SectionCard icon={ClipboardList} title="Session Log">
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="bg-teal-dark text-white uppercase tracking-wider">
-                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {geSessions.map((s, i) => (
-                    <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
-                      {s.map((c, j) => (
-                        <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
-                          {j===1 ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span> : j===8 ? `${c}%` : c}
-                        </td>
-                      ))}
-                      <td className="px-4 py-3.5">
-                        <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
-                          <ClipboardList className="w-3 h-3" /> View Sheet
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </SectionCard>
-        </FadeUp>
-      </>)}
-
-      {mainTab === "logger" && <AttendanceLogger />}
-      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
-    </div>
-  );
-}
+// StatCard
+// geSessions
+// AttendanceLogger
+// SessionAttendanceModal
 
 
-export function StudentGroups() {
-  const [mainTab, setMainTab] = useState<"all" | "ge" | "team" | "panata">("all");
-  const [openCard, setOpenCard] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
 
-  const groupsData = {
-    ge: [{ id: "GE 101-A", title: "GE 101 - Sec A", count: 30, attendance: 93 }, { id: "GE 102-B", title: "GE 102 - Sec B", count: 28, attendance: 87 }],
-    team: [{ id: "VT-104", title: "Video Team 104", count: 55, attendance: 89 }, { id: "MT-101", title: "Music Team", count: 42, attendance: 92 }],
-    panata: [{ id: "CICS2", title: "CICS2 Panata Group", count: 18, attendance: 96 }, { id: "CAS1", title: "CAS1 Panata Group", count: 15, attendance: 88 }]
-  };
-
-  const filteredStudents = roster.filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()));
-
-  return (
-    <div className="p-7">
-      <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Student Management</h1>
-            <p className="text-sm text-muted-text mt-1">Masterlist & Organizational Groups Overview</p>
-          </div>
-          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
-        </div>
-      </FadeUp>
-
-      <FadeUp delay={40}>
-        <div className="flex gap-0 border-b border-border mb-6">
-          {([["all", "All Students"], ["ge", "GE Subjects"], ["team", "STF Teams"], ["panata", "Panata Groups"]] as const).map(([key, label]) => (
-            <button key={key} onClick={() => setMainTab(key)}
-              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"}`}>
-              {label}
-            </button>
-          ))}
-        </div>
-      </FadeUp>
-
-      {mainTab === "all" ? (
-        <FadeUp delay={60}>
-          <div className="grid grid-cols-4 gap-3 mb-5">
-            {[["Total Students","4,500","bg-teal text-white"], ["Active Teams","6","bg-gold text-teal-dark"], ["Panata Groups","25","bg-slate-blue text-white"], ["18 Departments","18","bg-teal-light text-white"]].map(([k,v,c]) => (
-              <div key={k} className={`${c} rounded-lg p-4 card-soft`}><div className="text-xs opacity-85">{k}</div><div className="font-serif text-3xl font-bold mt-1">{v}</div></div>
-            ))}
-          </div>
-          
-          <SectionCard icon={Users} title="Global Masterlist" action={
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-text" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search any student…" className="pl-9 pr-3 py-2 text-sm border border-border rounded-xl bg-card w-64 focus:outline-none focus:ring-2 focus:ring-teal/30" />
-            </div>
-          }>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-teal-dark text-white text-xs uppercase">
-                  <tr>{["Name","Student ID","Department","Team","Panata","GE Subject Group","Status"].map(h => <th key={h} className="px-4 py-3 text-left">{h}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {filteredStudents.map((r, i) => (
-                    <tr key={i} className={`border-b border-border transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20`}>
-                      <td className="px-4 py-3 font-semibold">{r.name}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{r.id}</td>
-                      <td className="px-4 py-3">{r.dept}</td>
-                      <td className="px-4 py-3"><span className="chip bg-secondary">{r.team}</span></td>
-                      <td className="px-4 py-3"><span className="chip bg-secondary">{r.panata}</span></td>
-                      <td className="px-4 py-3"><span className="chip bg-secondary">{r.ge}</span></td>
-                      <td className="px-4 py-3"><span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${r.status === "Active" ? "bg-green-500/10 text-green-700 border-green-300" : "bg-amber-400/10 text-amber-600 border-amber-300"}`}>{r.status}</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </SectionCard>
-        </FadeUp>
-      ) : (
-        <FadeUp delay={60}>
-          <div className="grid grid-cols-3 gap-4">
-            {groupsData[mainTab].map(c => (
-              <button key={c.id} onClick={() => setOpenCard(c.id)} className="text-left bg-card border border-border rounded-xl p-5 card-soft hover:border-teal/40 transition">
-                <span className="chip bg-teal-soft text-teal text-[10px] uppercase tracking-wider">{mainTab}</span>
-                <div className="font-serif text-xl font-bold text-teal-dark mt-2">{c.title}</div>
-                <div className="text-sm text-muted-text mt-1">{c.count} active members · {c.attendance}% avg attendance</div>
-                <div className="text-xs text-teal font-semibold mt-4 flex items-center gap-1">View Masterlist <ChevronRight className="w-3.5 h-3.5" /></div>
-              </button>
-            ))}
-          </div>
-        </FadeUp>
-      )}
-
-      {openCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenCard(null)}>
-          <div className="bg-card rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-5 bg-teal-dark text-white flex justify-between items-center">
-              <h3 className="font-serif text-xl font-bold">{openCard} · Associated Masterlist</h3>
-              <button onClick={() => setOpenCard(null)} className="hover:bg-white/10 rounded-lg p-1.5 transition"><X className="w-5 h-5" /></button>
-            </div>
-            <div className="overflow-y-auto flex-1 p-0">
-              <table className="w-full text-sm">
-                <thead className="bg-secondary text-xs uppercase text-muted-text border-b border-border sticky top-0">
-                  <tr>{["Name", "Student ID", "Department", "Status"].map(h => <th key={h} className="px-6 py-3 text-left font-semibold">{h}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {roster.slice(0, 5).map((r, i) => (
-                    <tr key={i} className="border-b border-border hover:bg-teal-soft/10">
-                      <td className="px-6 py-3 font-semibold">{r.name}</td>
-                      <td className="px-6 py-3 font-mono text-xs">{r.id}</td>
-                      <td className="px-6 py-3">{r.dept}</td>
-                      <td className="px-6 py-3"><span className="text-[11px] font-semibold px-2.5 py-1 rounded-full border bg-green-500/10 text-green-700 border-green-300">Active</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-4 border-t border-border flex justify-end gap-2">
-              <button className="px-5 py-2 text-sm border border-teal text-teal rounded-xl font-semibold hover:bg-teal hover:text-white transition">Export Data</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-
+// CANNOT load the page
 export function SessionLogs() {
   const [viewSession, setViewSession] = useState<any[] | null>(null);
   
@@ -1580,6 +1367,100 @@ export function StudentGroups() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+export function SectionAttendance() {
+  const [mainTab, setMainTab] = useState<"records" | "logger">("records");
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  
+  const pct = 84;
+  const r = 36; const circ = 2 * Math.PI * r;
+  const [go, setGo] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
+
+  return (
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Attendance</h1>
+            <p className="text-sm text-muted-text mt-1">GE 101 Sec A — Session Records</p>
+          </div>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Admin View</span>
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={40}>
+        <div className="flex gap-0 border-b border-border mb-6">
+          {([["records","Session Records"],["logger","Attendance Logger"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setMainTab(key)}
+              className={`px-5 py-3 text-sm font-semibold border-b-2 -mb-px transition-all ${mainTab === key ? "border-teal-dark text-teal-dark" : "border-transparent text-foreground/50 hover:text-teal-dark hover:border-teal/40"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {mainTab === "records" && (<>
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <FadeUp delay={60}>
+            <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+              <div className="relative w-20 h-20 shrink-0">
+                <svg viewBox="0 0 100 100" className="-rotate-90 w-20 h-20">
+                  <circle cx="50" cy="50" r={r} stroke="var(--muted)" strokeWidth="14" fill="none" />
+                  <circle cx="50" cy="50" r={r} stroke="var(--green-status)" strokeWidth="14" fill="none" strokeLinecap="round"
+                    style={{ strokeDasharray: go ? `${(pct/100)*circ} ${circ}` : `0 ${circ}`, strokeDashoffset: -circ*0.25, transition: "stroke-dasharray 0.75s linear" }} />
+                </svg>
+                <div className="absolute inset-0 grid place-items-center">
+                  <span className="font-serif font-bold text-teal-dark text-lg">{pct}%</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-text">Section Avg Attendance</div>
+                <div className="font-serif text-2xl font-bold text-teal-dark">{pct}%</div>
+                <div className="text-xs text-muted-text mt-0.5">24 sessions</div>
+              </div>
+            </div>
+          </FadeUp>
+          <FadeUp delay={100}><StatCard label="Total Sessions" value="24" sub="This semester" /></FadeUp>
+          <FadeUp delay={140}><StatCard label="Students Needing Attention" value="3 ⚠" accent sub="Below 75% threshold" /></FadeUp>
+        </div>
+
+        <FadeUp delay={220}>
+          <SectionCard icon={ClipboardList} title="Session Log">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                    {["Session Name","Type","Date","Time","Present","Absent","Late","Excused","Rate %","Sheet"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {geSessions.map((s, i) => (
+                    <tr key={i} className={`border-b border-border transition-colors ${i%2===0?"bg-card hover:bg-teal-soft/20":"bg-secondary/20 hover:bg-teal-soft/20"}`}>
+                      {s.map((c, j) => (
+                        <td key={j} className={`px-4 py-3.5 ${j===8?"font-bold text-green-700":""}`}>
+                          {j===1 ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-teal-soft text-teal-dark border border-teal/20">{c}</span> : j===8 ? `${c}%` : c}
+                        </td>
+                      ))}
+                      <td className="px-4 py-3.5">
+                        <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                          <ClipboardList className="w-3 h-3" /> View Sheet
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        </FadeUp>
+      </>)}
+
+      {mainTab === "logger" && <AttendanceLogger />}
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>
   );
 }

@@ -14,28 +14,18 @@ ClipboardList,
 import { roster, SectionCard, AvatarSVG, MiniBar, ProfileModal, MessageModal, SubmissionsModal,
         StatCard, geSessions, AttendanceLogger, SessionAttendanceModal
 } from './LeaderScreens';
+
+
 /*
 CHANGES
-1. Added calendar in SectionDashboard() (Regular admin) and AdminDashboard() (Super admin)
-2. Added AdminProfile() - just needs linking to view the look of it (right now it just links into admin dashboard)
-
-TO BE CHANGED/ TO DO:
-1. Sensible Consistent data based on dashboard
-  - Scrape all the both dashboard data and compare it to other data 
-  - use AI to make it consistent with each other
-
+1. Added AdminProfile() - just needs linking to view the look of it (right now it just links into admin dashboard)
 2. Deprecate the old regular admin design (MyStudents()) and old super admin design (StudentManagement())
   - MyStudents() for regular admin
     - add more subjects responsibility for showcasing a ge group monitor handling 2 or more GE subject groups (multiple rosters)
   - StudentManagement() [masterlist of all students (for super admin)] (with search bar function and sorting)
     - View all students, all existing GE subject groups, team ,panata groups
     - subtabs for filtering by GE subjects groups, team, panata groups
-
-3. Add AdminSettings (for both regular and super admin)
-
-4. Remove attendancelogs() in regular admin
-
-5. Changes in OperationControl() superadmin
+3. Changes in OperationControl() superadmin
   - StudentAssigner (apply subtabs (for ge subject group, team, panata group, event(additional)))
     - GE Subject 
       - show GE subject as a card (shows how many enrolled there, with view button that shows the list of students))
@@ -57,6 +47,7 @@ TO BE CHANGED/ TO DO:
   - ADD [FUTURE implementation] Event Manager tab (additional)
      - determine the roles (generic, unique) needed for such event
 
+TO BE CHANGED/ TO DO:
   6. Changes in Grading System
   - View all existing GE Subject groups (view performance, attendance rate), panata groups (attendance rate), teams (attendance rate)
     - 
@@ -64,117 +55,6 @@ TO BE CHANGED/ TO DO:
 */
 
 
-// ============ Section Admin (Professor) Screens ============
-
-// ─── Shared Constants & Helper Tools ──────────────────────────────────────────
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const DAYS_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-// AD1: Section Dashboard (scoped)
-// 🟢 ADDED: Professor/Teacher Schedule Datasets mapped into the Master Calendar structure
-const teacherCalData: Record<number, { events: { label: string; color: string }[]; deadline?: boolean }> = {
-  2:  { events: [{ label: "Choir Orientation", color: "bg-amber-status text-white" }] },
-  6:  { events: [{ label: "GE 101 Sec A (8 AM)", color: "bg-teal text-white" }, { label: "Office Hours", color: "bg-teal-light text-white" }] },
-  8:  { events: [{ label: "GE 101 Sec A (8 AM)", color: "bg-teal text-white" }, { label: "Section Workshop", color: "bg-gold text-teal-dark" }] },
-  9:  { events: [{ label: "Office Hours", color: "bg-teal-light text-white" }] },
-  13: { events: [{ label: "GE 101 Sec A (8 AM)", color: "bg-teal text-white" }] }
-};
-
-export function SectionDashboard() {
-  // 🟢 ADDED: Hooks matching StudentDashboard layout tracking systems
-  const { setDrawerDay } = usePortal();
-  const today = new Date();
-  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const startOffset = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-  
-  // 🟢 ADDED: Specific schedule tracking filter state configuration for section tasks
-  const [sectionFilter, setSectionFilter] = useState<"all" | "lectures" | "tasks">("all");
-
-  // 🔄 CHANGED: Converted flat tabular statistics array to standardized Summary Strip button items
-  const summaryCards = [
-    { count: "30", period: "enrolled",  category: "Students in Sec", Icon: Users,      bg: "bg-teal" },
-    { count: "84%", period: "average",   category: "Attendance Rate",  Icon: BookOpen,   bg: "bg-teal-light" },
-    { count: "12",  period: "pending",   category: "Awaiting Grading", Icon: BookMarked, bg: "bg-amber-status" },
-    { count: "2",   period: "upcoming",  category: "Section Events",   Icon: Calendar,   bg: "bg-gold text-teal-dark" },
-  ];
-
-  return (
-    <div className="p-7">
-      {/* 🔄 CHANGED: Formatted Heading block style to perfectly reflect Student View structure */}
-      <div className="flex items-end justify-between mb-6">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Dashboard — GE 101, Sec A</h1>
-          <p className="text-sm text-muted-text mt-1">{MONTHS[month]} {year} — GE Subject Group Teacher View</p>
-        </div>
-        <span className="chip bg-gold text-teal-dark text-sm px-3 py-1">Admin · Section Scoped</span>
-      </div>
-
-      {/* 🔄 CHANGED: Injected the responsive Summary Strip layout Grid */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {summaryCards.map((c) => (
-          <button key={c.category} className={`${c.bg} rounded-xl px-4 py-3 flex items-center gap-3 w-full text-left hover:opacity-90 active:scale-95 transition-all`}>
-            <c.Icon className={`w-7 h-7 shrink-0 ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/80"}`} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className={`font-serif font-bold text-2xl leading-none ${c.bg.includes("text-teal-dark") ? "text-teal-dark" : "text-white"}`}>{c.count}</span>
-                <span className={`text-xs font-medium ${c.bg.includes("text-teal-dark") ? "text-teal-dark/80" : "text-white/80"}`}>{c.period}</span>
-              </div>
-              <div className={`text-[11px] font-medium mt-0.5 truncate ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/70"}`}>{c.category}</div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* 🔄 CHANGED: Modified calendar control nav elements to embed custom Filter Tab controllers */}
-      <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronLeft className="w-4 h-4" /></button>
-        <span className="font-serif font-bold text-teal-dark text-lg min-w-[180px] text-center">{MONTHS[month]} {year}</span>
-        <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronRight className="w-4 h-4" /></button>
-        
-        <div className="ml-auto flex border border-border bg-secondary p-0.5 rounded-lg text-xs font-medium">
-          <button onClick={() => setSectionFilter("all")} className={`px-3 py-1 rounded-md transition ${sectionFilter === "all" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>All Entries</button>
-          <button onClick={() => setSectionFilter("lectures")} className={`px-3 py-1 rounded-md transition ${sectionFilter === "lectures" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Lectures</button>
-          <button onClick={() => setSectionFilter("tasks")} className={`px-3 py-1 rounded-md transition ${sectionFilter === "tasks" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Tasks/Hours</button>
-        </div>
-      </div>
-
-      {/* 🔄 CHANGED: Transformed simple HTML table block to the standardized `educ-calendar-grid` component */}
-      <div className="educ-calendar-grid">
-        {DAYS_SHORT.map(d => <div key={d} className="educ-day-label">{d}</div>)}
-        {Array.from({ length: totalCells }).map((_, i) => {
-          const day = i - startOffset + 1;
-          const valid = day >= 1 && day <= daysInMonth;
-          const data = valid ? teacherCalData[day] : undefined;
-          
-          const filteredEvents = (data?.events ?? []).filter(e => {
-            if (sectionFilter === "lectures") return e.label.includes("GE 101");
-            if (sectionFilter === "tasks") return !e.label.includes("GE 101");
-            return true;
-          });
-
-          return (
-            <div key={i} onClick={() => valid && setDrawerDay(`${MONTHS[month]} ${day}, ${year}`)} className={`educ-date-cell${!valid ? " empty" : ""}`}>
-              {valid && (
-                <>
-                  <div className="educ-day-num">{day}</div>
-                  <div className="space-y-0.5">
-                    {filteredEvents.map((e, j) => (
-                      <span key={j} className={`educ-chip text-[10px] p-1 rounded font-semibold leading-tight block truncate ${e.color}`}>{e.label}</span>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 // AD2: My Students (section)
 
@@ -315,53 +195,6 @@ export function MyStudents() {
 }
 
 
-// AD3: Task Evaluator & Grader
-export function TaskGrader() {
-  const [scoreA, setScoreA] = useState("92.50");
-  const [scoreB, setScoreB] = useState("105");
-  return (
-    <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-4">Task Evaluator & Grade Entry</h1>
-      <div className="flex gap-3 mb-4">
-        <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>GE 101 - Sec A</option><option>GE 101 - Sec B</option></select>
-        <select className="px-3 py-2 border border-border rounded text-sm bg-card"><option>GRADED</option><option>PENDING</option><option>SUBMITTED</option></select>
-      </div>
-      <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-        <table className="w-full text-sm">
-          <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student Name","Student ID","Submitted File","Max Score","Score Input","Status","Progress"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
-          <tbody>
-            <tr className="row-alt border-b border-border">
-              <td className="px-3 py-3 font-semibold">⭕ Jane Smith</td>
-              <td className="px-3 py-3 font-mono text-xs">ID 543</td>
-              <td className="px-3 py-3 text-teal">essay_v2.pdf 📥</td>
-              <td className="px-3 py-3">/100</td>
-              <td className="px-3 py-3">
-                <input value={scoreA} onChange={e=>setScoreA(e.target.value)} className="w-20 px-2 py-1 border-2 border-green-status/60 rounded text-sm"/>
-                <div className="text-[10px] text-green-status mt-1">✓ SCORE INPUT VALIDATED</div>
-              </td>
-              <td className="px-3 py-3"><button className="bg-teal text-white px-3 py-1 rounded text-xs hover:bg-teal-dark">Save Grade</button></td>
-              <td className="px-3 py-3"><div className="relative w-10 h-10"><svg viewBox="0 0 100 100" className="-rotate-90"><circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none"/><circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="176 251"/></svg></div></td>
-            </tr>
-            <tr className="row-alt border-b border-border">
-              <td className="px-3 py-3 font-semibold">○ Tom King</td>
-              <td className="px-3 py-3 font-mono text-xs">ID 544</td>
-              <td className="px-3 py-3 text-teal">essay_v2.pdf 📥</td>
-              <td className="px-3 py-3">/100</td>
-              <td className="px-3 py-3">
-                <input value={scoreB} onChange={e=>setScoreB(e.target.value)} className={`w-20 px-2 py-1 border-2 rounded text-sm ${Number(scoreB)>100?"border-red-status":"border-border"}`}/>
-                {Number(scoreB)>100 && <div className="text-[10px] text-red-status mt-1 font-bold">⚠ ERROR: SCORE OUT OF RANGE (MAX 100)</div>}
-              </td>
-              <td className="px-3 py-3"><select className="px-2 py-1 border border-border rounded text-xs"><option>GRADED</option><option>PENDING</option></select></td>
-              <td className="px-3 py-3"><div className="relative w-10 h-10"><svg viewBox="0 0 100 100" className="-rotate-90"><circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none"/><circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="176 251"/></svg></div></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-
 // AD4: Section Attendance Tracker (reuse Super Admin session list scoped)
 export function SectionAttendance() {
   const [mainTab, setMainTab] = useState<"records" | "logger">("records");
@@ -456,305 +289,8 @@ export function SectionAttendance() {
     </div>
   );
 }
-// ============ Super Admin Screens ============
 
-// 🟢 ADDED: Master Overseer Institutional data model representing specialized Panata, Team, and Event modules
-const adminCalData: Record<number, { events: { label: string; color: string }[]; deadline?: boolean }> = {
-  1:  { events: [{ label: "Weekly Panata (Wk3)", color: "bg-teal text-white" }] },
-  4:  { events: [{ label: "Parents Orientation", color: "bg-teal text-white" }, { label: "Photo Profiling", color: "bg-gold text-teal-dark" }] },
-  5:  { events: [{ label: "CBI Weekly Panata", color: "bg-teal-light text-white" }, { label: "Panata Sync", color: "bg-slate-blue text-white" }] },
-  6:  { events: [{ label: "Choir Orientation B1", color: "bg-gold text-teal-dark" }] },
-  7:  { events: [{ label: "Peer Counsel Seminar", color: "bg-amber-status text-white" }] },
-  8:  { events: [{ label: "DGA Team Sync", color: "bg-gold text-teal-dark" }] }
-};
-
-export function AdminDashboard() {
-  // 🟢 ADDED: Hooks mapping standard system navigation targets
-  const { setDrawerDay, setView } = usePortal();
-  const today = new Date();
-  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const startOffset = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-
-  // 🟢 ADDED: Overseer perspective schedule tracking filter state configuration
-  const [adminFilter, setAdminFilter] = useState<"all" | "panata" | "teams" | "events">("all");
-
-  // 🔄 CHANGED: Restructured analytical metric row items into interactive visual card metrics
-  const summaryCards = [
-    { count: "3 Total",  period: "active",    category: "Church Events",         Icon: Calendar,   bg: "bg-teal" },
-    { count: "4 Total",  period: "mandatory", category: "Mandatory Activities",  Icon: Tv2,        bg: "bg-gold text-teal-dark" },
-    { count: "2 Critical",period: "urgent",    category: "Institutional Deadlines",Icon: Info,       bg: "bg-slate-blue" },
-    { count: "28 Total", period: "assigned",  category: "Total GE Subject Groups",Icon: BookMarked, bg: "bg-card border border-border !text-teal-dark" },
-  ];
-
-  return (
-    <div className="p-7">
-      {/* 🔄 CHANGED: Modified Heading component layouts to mimic Student Dashboard style constraints */}
-      <div className="flex items-end justify-between mb-6">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-teal-dark">Admin Dashboard</h1>
-          <p className="text-sm text-muted-text mt-1">{MONTHS[month]} {year} — Comprehensive Institutional Control Overview</p>
-        </div>
-        <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
-      </div>
-
-      {/* 🔄 CHANGED: Implemented full-width 4-column master summary panel items */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {summaryCards.map((c) => (
-          <button key={c.category} className={`${c.bg} rounded-xl px-4 py-3 flex items-center gap-3 w-full text-left hover:opacity-90 transition-all shadow-sm`}>
-            <c.Icon className={`w-7 h-7 shrink-0 ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/80"}`} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className={`font-serif font-bold text-2xl leading-none ${c.bg.includes("text-teal-dark") ? "text-teal-dark" : "text-white"}`}>{c.count}</span>
-                <span className={`text-xs font-medium ${c.bg.includes("text-teal-dark") ? "text-teal-dark/80" : "text-white/80"}`}>{c.period}</span>
-              </div>
-              <div className={`text-[11px] font-medium mt-0.5 truncate ${c.bg.includes("text-teal-dark") ? "text-teal-dark/70" : "text-white/70"}`}>{c.category}</div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* 🔄 CHANGED: Integrated an expansive multi-layer structural sub-filter menu array */}
-      <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronLeft className="w-4 h-4" /></button>
-        <span className="font-serif font-bold text-teal-dark text-lg min-w-[180px] text-center">{MONTHS[month]} {year}</span>
-        <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-2 border border-border rounded-lg hover:bg-secondary"><ChevronRight className="w-4 h-4" /></button>
-        
-        <div className="ml-auto flex border border-border bg-secondary p-0.5 rounded-lg text-xs font-medium">
-          <button onClick={() => setAdminFilter("all")} className={`px-3 py-1 rounded-md transition ${adminFilter === "all" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>All Schedules</button>
-          <button onClick={() => setAdminFilter("panata")} className={`px-3 py-1 rounded-md transition ${adminFilter === "panata" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Panata Overseer</button>
-          <button onClick={() => setAdminFilter("teams")} className={`px-3 py-1 rounded-md transition ${adminFilter === "teams" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Team Overseer</button>
-          <button onClick={() => setAdminFilter("events")} className={`px-3 py-1 rounded-md transition ${adminFilter === "events" ? "bg-card text-teal-dark shadow-sm font-semibold" : "text-muted-text"}`}>Clear view of Events</button>
-        </div>
-      </div>
-
-      {/* 🔄 CHANGED: Rewrote basic hourly week layout into highly scannable uniform `educ-calendar-grid` cells */}
-      <div className="educ-calendar-grid">
-        {DAYS_SHORT.map(d => <div key={d} className="educ-day-label">{d}</div>)}
-        {Array.from({ length: totalCells }).map((_, i) => {
-          const day = i - startOffset + 1;
-          const valid = day >= 1 && day <= daysInMonth;
-          const data = valid ? adminCalData[day] : undefined;
-          
-          const filteredEvents = (data?.events ?? []).filter(e => {
-            if (adminFilter === "panata") return e.label.toLowerCase().includes("panata");
-            if (adminFilter === "teams") return e.label.toLowerCase().includes("team") || e.label.includes("Profiling");
-            if (adminFilter === "events") return e.label.toLowerCase().includes("orientation") || e.label.includes("Seminar");
-            return true;
-          });
-
-          return (
-            <div key={i} onClick={() => valid && setView("event-detail")} className={`educ-date-cell${!valid ? " empty" : ""} cursor-pointer hover:bg-teal-soft/10 transition-colors`}>
-              {valid && (
-                <>
-                  <div className="educ-day-num">{day}</div>
-                  <div className="space-y-0.5">
-                    {filteredEvents.map((e, j) => (
-                      <span key={j} className={`educ-chip text-[10px] p-1 rounded font-semibold leading-tight block truncate ${e.color}`}>{e.label}</span>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// SA2: Event Detail
-export function EventDetail() {
-  const { setView } = usePortal();
-  return (
-    <div className="p-6">
-      <button onClick={() => setView("dashboard")} className="text-xs text-teal mb-2 hover:underline">← Dashboard / Calendar / Event Detail</button>
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="font-serif text-2xl font-bold text-teal-dark">🎵 STF-NEU Choir Orientation (Batch 1)</h1>
-          <span className="chip bg-gold text-teal-dark mt-1">Published · In Progress</span>
-        </div>
-        <div className="flex gap-2">
-          <button className="px-3 py-2 text-xs border border-teal text-teal rounded font-semibold hover:bg-teal-soft">✏️ Edit Event</button>
-          <button className="px-3 py-2 text-xs bg-teal text-white rounded font-semibold hover:bg-teal-dark">Record Attendance</button>
-          <button className="px-3 py-2 text-xs bg-gold text-teal-dark rounded font-semibold">Manage Audience</button>
-        </div>
-      </div>
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-4 space-y-3">
-          {[
-            ["TIME & DURATION","Thursday, Nov 2, 2023 · 1:00–3:00 PM (2 Hours)"],
-            ["TARGET AUDIENCE","STF Choir Candidates · 55 Registered"],
-            ["VENUE & SETUP","IS Bldg B, Room 234 · Capacity: 70"],
-            ["ORGANIZER","@CoordinatorJerald"],
-          ].map(([k,v]) => (
-            <div key={k} className="bg-card border border-border rounded-lg p-3 card-soft">
-              <div className="text-[10px] font-bold text-muted-text tracking-wider">{k}</div>
-              <div className="text-sm mt-1">{v}</div>
-            </div>
-          ))}
-        </div>
-        <div className="col-span-5 bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs font-bold text-muted-text mb-2">DAILY TIMELINE (THU, NOV 2)</div>
-          {[11,12,13,14,15,16].map(h => (
-            <div key={h} className="flex gap-2 border-t border-border py-1">
-              <div className="w-12 text-xs text-muted-text font-mono">{h}:00</div>
-              {h===13 && (
-                <div className="flex-1 bg-gold rounded p-2 text-xs text-teal-dark" style={{minHeight: 90}}>
-                  <div className="font-bold">STF-NEU Choir Orientation (Batch 1)</div>
-                  <div>IS Bldg B, Room 234</div>
-                  <div className="flex gap-1 mt-2">{["A","M","J","K"].map(x => <span key={x} className="w-5 h-5 rounded-full bg-teal text-white grid place-items-center text-[9px]">{x}</span>)}</div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="col-span-3 bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs font-bold text-muted-text mb-2">LIVE ATTENDANCE FEED</div>
-          <ul className="text-xs space-y-1.5">
-            {[["Alice Cooper","1:05 PM"],["Michael Chen","1:07 PM"],["Alicea Gliies","1:07 PM"],["Michael Beus","1:07 PM"]].map(([n,t]) => (
-              <li key={n} className="flex justify-between border-b border-border pb-1"><span>{n}</span><span className="text-muted-text">{t}</span></li>
-            ))}
-          </ul>
-          <div className="mt-3 text-center">
-            <div className="font-serif text-3xl font-bold text-teal-dark">10</div>
-            <div className="text-xs text-muted-text">checked in</div>
-            <div className="relative w-20 h-20 mx-auto mt-2">
-              <svg viewBox="0 0 100 100" className="-rotate-90"><circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none"/><circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="45 251"/></svg>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-4 bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs font-bold text-muted-text mb-2">FULL DESCRIPTION</div>
-          <p className="text-sm text-foreground/80">Orientation session for Batch 1 of new STF-NEU Choir members. Covers attendance expectations, weekly rehearsal cadence, and uniform requirements.</p>
-        </div>
-        <div className="col-span-4 bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs font-bold text-muted-text mb-2">RESOURCE CHECKLIST</div>
-          <ul className="text-sm space-y-1">{["Sound System ✓","Piano/Keyboard ✓","Attendance Forms ✓","Team Vests ◯"].map(x => <li key={x}>{x}</li>)}</ul>
-        </div>
-        <div className="col-span-4 bg-card border border-border rounded-lg p-4 card-soft">
-          <div className="text-xs font-bold text-muted-text mb-2">ASSOCIATED CONTENT</div>
-          <div className="flex flex-wrap gap-1">
-            <span className="chip bg-teal-soft text-teal">Multimedia training (Wk3)</span>
-            <span className="chip bg-gold-soft text-amber-status">Choir orientation task</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// SA5: Session & Attendance Analytics
-const adminSessions = [
-  ["GE 101 - Online Launch Meeting","Class","Aug 11 2025","10–11:30 AM","Online (Webex)",450,390,87],
-  ["Video Team Practice - DGA Studio","Team","Aug 14 2025","1–3 PM","Studio B",55,50,91],
-  ["Choir Orientation - Batch 1","Team","Aug 18 2025","1–2 PM","IS Bldg B, 234",120,112,93],
-  ["CBI Hour - Panata (Week 1)","Panata","Aug 1 2025","8:30–9:30 PM","Google Meet",450,345,77],
-  ["AEVM Task - Multimedia Meeting","Task","Aug 25 2025","3–4 PM","IS Bldg B, 234",450,90,20],
-  ["Engineering Gear - Team Sync","Team","Sep 1 2025","11–12 PM","Engineering Lab",30,28,93],
-  ["GE Subjects - Parents Orientation","Task","Aug 8 2025","9–10:30 AM","Online",450,315,70],
-  ["Engineering Practice - Meeting","Team","Sep 1 2025","9 AM–12 PM","Google Meet",450,312,69],
-  ["GE Subjects - Team Orientation","Task","Aug 8 2025","9–10:30 AM","Online",450,315,70],
-];
-
-export function SessionLogs() {
-  const [viewSession, setViewSession] = useState<any[] | null>(null);
-  
-  return (
-    <div className="p-7">
-      <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">System Session Logs</h1>
-            <p className="text-sm text-muted-text mt-1">Global attendance oversight and log auditing</p>
-          </div>
-          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
-        </div>
-      </FadeUp>
-
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <FadeUp delay={40}>
-          <div className="bg-teal text-white rounded-xl p-5 card-soft" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-            <div className="text-sm opacity-85">Total Tracked Sessions</div>
-            <div className="font-serif text-4xl font-bold mt-2">185</div>
-          </div>
-        </FadeUp>
-        <FadeUp delay={80}>
-          <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4 card-soft">
-            <div className="relative w-20 h-20">
-              <svg viewBox="0 0 100 100" className="-rotate-90">
-                <circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none" />
-                <circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="196 251" strokeLinecap="round" />
-              </svg>
-              <div className="absolute inset-0 grid place-items-center font-bold text-teal-dark">78%</div>
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-teal-dark">Global Attendance</div>
-              <div className="text-xs text-muted-text mt-1">Registered: 4,500</div>
-              <div className="text-xs text-muted-text">Present: 3,510</div>
-            </div>
-          </div>
-        </FadeUp>
-        <FadeUp delay={120}>
-          <div className="bg-card border border-border rounded-xl p-5 card-soft">
-            <div className="text-xs font-semibold text-muted-text uppercase tracking-wider mb-3">Sessions by Context</div>
-            {[["GE Subjects",35,"bg-teal"],["Team Practices",24,"bg-gold"],["Panata Groups",21,"bg-slate-blue"],["Tasks/Anns",20,"bg-amber-status"]].map(([k,v,c]) => (
-              <div key={k as string} className="text-xs flex items-center gap-2 mb-2">
-                <span className={`w-3 h-3 rounded ${c}`} /> 
-                <span className="font-medium text-foreground">{k}</span>
-                <strong className="ml-auto text-teal-dark">{v}%</strong>
-              </div>
-            ))}
-          </div>
-        </FadeUp>
-      </div>
-
-      <FadeUp delay={160}>
-        <SectionCard icon={Library} title="Complete Audit Log" action={
-          <div className="flex gap-2">
-            <select className="px-3 py-1.5 border border-border rounded-lg text-xs bg-card"><option>All Contexts</option><option>Class</option><option>Team</option><option>Panata</option></select>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-secondary transition"><Download className="w-3.5 h-3.5" /> Export DB</button>
-          </div>
-        }>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="bg-teal-dark text-white uppercase tracking-wider">
-                  {["Session Name","Type","Date","Time","Location","Reg","Present","Rate %","Action"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {adminSessions.map((s,i) => (
-                  <tr key={i} className={`border-b border-border transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20 ${(s[7] as number)<50?"border-l-4 border-l-red-status":""}`}>
-                    <td className="px-4 py-3.5 font-semibold text-foreground">{s[0]}</td>
-                    <td className="px-4 py-3.5"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${s[1]==="Panata"?"bg-gold/20 text-yellow-800 border-gold/40":s[1]==="Task"?"bg-amber-status/20 text-amber-700 border-amber-status/40":"bg-teal-soft text-teal-dark border-teal/20"}`}>{s[1]}</span></td>
-                    <td className="px-4 py-3.5 text-muted-text">{s[2]}</td>
-                    <td className="px-4 py-3.5 font-mono">{s[3]}</td>
-                    <td className="px-4 py-3.5 text-muted-text">{s[4]}</td>
-                    <td className="px-4 py-3.5">{s[5]}</td>
-                    <td className="px-4 py-3.5">{s[6]}</td>
-                    <td className="px-4 py-3.5 font-bold">{s[7]}%</td>
-                    <td className="px-4 py-3.5">
-                      <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
-                        <ClipboardList className="w-3 h-3" /> Audit Sheet
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </SectionCard>
-      </FadeUp>
-
-      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
-    </div>
-  );
-}
-
+// SA7: Operations Control (tabbed)
 // SA7: Operations Control (tabbed)
 export function Operations() {
   // 🟢 HIGHLIGHT: 1. Updated main tabs - Removed 'algorithms', added 'events'
@@ -1049,166 +585,102 @@ export function Operations() {
   );
 }
 
-// SA6: Grade Manager
-export function Endoar() {
-  const [tab, setTab] = useState<"ge" | "team" | "final">("ge");
-  const [geView, setGeView] = useState<"cards" | "all">("cards");
-  const [openSubject, setOpenSubject] = useState<string | null>(null);
-  const [openTeam, setOpenTeam] = useState<string | null>(null);
 
-  const geSubjects = ["Art Appreciation", "Sosyedad at Literatura", "Ethics", "PE 3"];
-  const teams = [
-    { name: "Video Team 104", members: 55, avgAevm: "B+" },
-    { name: "DGA Team", members: 25, avgAevm: "A-" },
-    { name: "Writers Team", members: 18, avgAevm: "B" },
-    { name: "Music Team", members: 30, avgAevm: "A" },
-  ];
-  const geGroups: Record<string, { group: string; teacher: string; members: number; attendance: number }[]> = {
-    "Art Appreciation": [{ group: "Art App — M414B", teacher: "Prof. Reyes", members: 32, attendance: 91 }],
-    "Sosyedad at Literatura": [{ group: "SosLit — IS233B", teacher: "Prof. Sandoval", members: 28, attendance: 84 }, { group: "SosLit — IS234A", teacher: "Prof. Sandoval", members: 30, attendance: 88 }],
-    "Ethics": [{ group: "Ethics — M210A", teacher: "Prof. Mariano", members: 35, attendance: 93 }],
-    "PE 3": [{ group: "PE 3 — G2", teacher: "Coach Lim", members: 40, attendance: 78 }],
-  };
-
-  const gradeRows = [
-    { student: "Natalie Portman", group: "Art App — M414B", attendance: 94, tasks: 92, grade: 1.4 },
-    { student: "Alex Ammin", group: "SosLit — IS233B", attendance: 81, tasks: 78, grade: 1.7 },
-    { student: "Ben Affleck", group: "Ethics — M210A", attendance: 100, tasks: 96, grade: 1.1 },
-    { student: "Maria Santos", group: "PE 3 — G2", attendance: 70, tasks: 65, grade: 2.3 },
-  ];
-
-  const gradeChip = (g: number) => g <= 1.5 ? "bg-green-status text-white" : g <= 2.0 ? "bg-teal text-white" : g <= 2.5 ? "bg-amber-status text-white" : "bg-red-status text-white";
-
+export function SessionLogs() {
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  
   return (
-    <div className="p-6">
-      <h1 className="font-serif text-2xl font-bold text-teal-dark mb-1">Grade Manager</h1>
-      <p className="text-sm text-muted-text mb-4">GE grading by subject group · Team AEVM scores · Final grade by GE subject.</p>
-      <div className="border-b border-border flex gap-1 mb-4">
-        {[["ge", "GE Subject"], ["team", "Team"], ["final", "Final Grade"]].map(([id, l]) => (
-          <button key={id} onClick={() => setTab(id as typeof tab)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab === id ? "border-teal text-teal-dark" : "border-transparent text-muted-text"}`}>{l}</button>
-        ))}
-      </div>
-
-      {tab === "ge" && (
-        <>
-          <div className="flex gap-2 mb-4">
-            <button onClick={() => setGeView("cards")} className={`px-3 py-1.5 text-xs font-bold rounded-lg ${geView === "cards" ? "bg-teal text-white" : "bg-card border border-border"}`}>Subject Cards</button>
-            <button onClick={() => setGeView("all")} className={`px-3 py-1.5 text-xs font-bold rounded-lg ${geView === "all" ? "bg-teal text-white" : "bg-card border border-border"}`}>All View</button>
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">System Session Logs</h1>
+            <p className="text-sm text-muted-text mt-1">Global attendance oversight and log auditing</p>
           </div>
-          {geView === "cards" ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-              {geSubjects.map(s => (
-                <button key={s} onClick={() => setOpenSubject(s)} className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition card-soft">
-                  <div className="font-serif font-bold text-teal-dark">{s}</div>
-                  <div className="text-xs text-muted-text mt-1">{(geGroups[s] ?? []).length} subgroup(s)</div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-card border border-border rounded-lg overflow-hidden card-soft mb-4">
-              <table className="w-full text-sm">
-                <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student", "GE Subject Group", "Attendance %", "Task %", "Grade"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
-                <tbody>
-                  {gradeRows.map((r, i) => (
-                    <tr key={i} className="row-alt border-b border-border">
-                      <td className="px-3 py-2 font-semibold">{r.student}</td>
-                      <td className="px-3 py-2">{r.group}</td>
-                      <td className="px-3 py-2">{r.attendance}%</td>
-                      <td className="px-3 py-2">{r.tasks}%</td>
-                      <td className="px-3 py-2"><span className={`chip ${gradeChip(r.grade)}`}>{r.grade.toFixed(2)}</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          {openSubject && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenSubject(null)}>
-              <div className="bg-card rounded-xl max-w-lg w-full p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
-                <h3 className="font-serif font-bold text-teal-dark mb-3">{openSubject} · Subgroups</h3>
-                <div className="space-y-2">
-                  {(geGroups[openSubject] ?? []).map(g => (
-                    <div key={g.group} className="p-3 border border-border rounded-lg">
-                      <div className="font-semibold">{g.group}</div>
-                      <div className="text-xs text-muted-text">Teacher: {g.teacher} · {g.members} members · {g.attendance}% attendance</div>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={() => setOpenSubject(null)} className="mt-4 w-full py-2 bg-teal text-white rounded font-semibold text-sm">Close</button>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {tab === "team" && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {teams.map(t => (
-            <button key={t.name} onClick={() => setOpenTeam(t.name)} className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition card-soft">
-              <div className="font-serif font-bold text-teal-dark">{t.name}</div>
-              <div className="text-xs text-muted-text mt-1">{t.members} members</div>
-              <div className="mt-2"><span className="chip bg-teal text-white">Avg AEVM: {t.avgAevm}</span></div>
-            </button>
-          ))}
-          {openTeam && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpenTeam(null)}>
-              <div className="bg-card rounded-xl max-w-2xl w-full p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
-                <h3 className="font-serif font-bold text-teal-dark mb-3">{openTeam} · AEVM Scores</h3>
-                <table className="w-full text-sm">
-                  <thead><tr className="text-xs uppercase text-muted-text border-b"><th className="py-2 text-left">Student</th><th className="py-2 text-left">Attendance</th><th className="py-2 text-left">Tasks</th><th className="py-2 text-left">AEVM</th></tr></thead>
-                  <tbody>
-                    {gradeRows.slice(0, 3).map((r, i) => (
-                      <tr key={i} className="border-b border-border"><td className="py-2 font-semibold">{r.student}</td><td>{r.attendance}%</td><td>{r.tasks}%</td><td><span className="chip bg-teal text-white">{["A-", "B+", "A"][i]}</span></td></tr>
-                    ))}
-                  </tbody>
-                </table>
-                <button onClick={() => setOpenTeam(null)} className="mt-4 w-full py-2 bg-teal text-white rounded font-semibold text-sm">Close</button>
-              </div>
-            </div>
-          )}
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
         </div>
-      )}
+      </FadeUp>
 
-      {tab === "final" && (
-        <>
-          <div className="bg-teal-soft/40 border border-teal/20 rounded-lg px-4 py-2 text-xs mb-4">
-            Final Grade = average of GE subject group score and AEVM score · drill down by GE subject.
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <FadeUp delay={40}>
+          <div className="bg-teal text-white rounded-xl p-5 card-soft" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div className="text-sm opacity-85">Total Tracked Sessions</div>
+            <div className="font-serif text-4xl font-bold mt-2">185</div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-            {geSubjects.map(s => (
-              <button key={s} onClick={() => setOpenSubject(s)} className="text-left p-4 rounded-xl border border-border bg-card hover:border-teal/40 transition card-soft">
-                <div className="font-serif font-bold text-teal-dark">{s}</div>
-                <div className="text-xs text-muted-text mt-1">View final grades</div>
-              </button>
+        </FadeUp>
+        <FadeUp delay={80}>
+          <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4 card-soft">
+            <div className="relative w-20 h-20">
+              <svg viewBox="0 0 100 100" className="-rotate-90">
+                <circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none" />
+                <circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="196 251" strokeLinecap="round" />
+              </svg>
+              <div className="absolute inset-0 grid place-items-center font-bold text-teal-dark">78%</div>
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-teal-dark">Global Attendance</div>
+              <div className="text-xs text-muted-text mt-1">Registered: 4,500</div>
+              <div className="text-xs text-muted-text">Present: 3,510</div>
+            </div>
+          </div>
+        </FadeUp>
+        <FadeUp delay={120}>
+          <div className="bg-card border border-border rounded-xl p-5 card-soft">
+            <div className="text-xs font-semibold text-muted-text uppercase tracking-wider mb-3">Sessions by Context</div>
+            {[["GE Subjects",35,"bg-teal"],["Team Practices",24,"bg-gold"],["Panata Groups",21,"bg-slate-blue"],["Tasks/Anns",20,"bg-amber-status"]].map(([k,v,c]) => (
+              <div key={k as string} className="text-xs flex items-center gap-2 mb-2">
+                <span className={`w-3 h-3 rounded ${c}`} /> 
+                <span className="font-medium text-foreground">{k}</span>
+                <strong className="ml-auto text-teal-dark">{v}%</strong>
+              </div>
             ))}
           </div>
-          <div className="bg-card border border-border rounded-lg overflow-hidden card-soft">
-            <table className="w-full text-sm">
-              <thead className="bg-teal-dark text-white text-xs uppercase"><tr>{["Student", "GE Score", "AEVM", "Final Grade"].map(h => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr></thead>
+        </FadeUp>
+      </div>
+
+      <FadeUp delay={160}>
+        <SectionCard icon={Library} title="Complete Audit Log" action={
+          <div className="flex gap-2">
+            <select className="px-3 py-1.5 border border-border rounded-lg text-xs bg-card"><option>All Contexts</option><option>Class</option><option>Team</option><option>Panata</option></select>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-secondary transition"><Download className="w-3.5 h-3.5" /> Export DB</button>
+          </div>
+        }>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                  {["Session Name","Type","Date","Time","Location","Reg","Present","Rate %","Action"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
+                </tr>
+              </thead>
               <tbody>
-                {[{ s: "Natalie Portman", ge: 1.4, aevm: "A-", final: 1.33 }, { s: "Alex Ammin", ge: 1.7, aevm: "B+", final: 1.6 }, { s: "Ben Affleck", ge: 1.1, aevm: "A", final: 1.05 }].map((r, i) => (
-                  <tr key={i} className="row-alt border-b border-border">
-                    <td className="px-3 py-2 font-semibold">{r.s}</td>
-                    <td className="px-3 py-2"><span className={`chip ${gradeChip(r.ge)}`}>{r.ge.toFixed(2)}</span></td>
-                    <td className="px-3 py-2"><span className="chip bg-teal text-white">{r.aevm}</span></td>
-                    <td className="px-3 py-2"><span className={`chip ${gradeChip(r.final)}`}>{r.final.toFixed(2)}</span></td>
+                {adminSessions.map((s,i) => (
+                  <tr key={i} className={`border-b border-border transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20 ${(s[7] as number)<50?"border-l-4 border-l-red-status":""}`}>
+                    <td className="px-4 py-3.5 font-semibold text-foreground">{s[0]}</td>
+                    <td className="px-4 py-3.5"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${s[1]==="Panata"?"bg-gold/20 text-yellow-800 border-gold/40":s[1]==="Task"?"bg-amber-status/20 text-amber-700 border-amber-status/40":"bg-teal-soft text-teal-dark border-teal/20"}`}>{s[1]}</span></td>
+                    <td className="px-4 py-3.5 text-muted-text">{s[2]}</td>
+                    <td className="px-4 py-3.5 font-mono">{s[3]}</td>
+                    <td className="px-4 py-3.5 text-muted-text">{s[4]}</td>
+                    <td className="px-4 py-3.5">{s[5]}</td>
+                    <td className="px-4 py-3.5">{s[6]}</td>
+                    <td className="px-4 py-3.5 font-bold">{s[7]}%</td>
+                    <td className="px-4 py-3.5">
+                      <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                        <ClipboardList className="w-3 h-3" /> Audit Sheet
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>
-      )}
+        </SectionCard>
+      </FadeUp>
 
-      <div className="flex justify-end gap-2 mt-4">
-        <button className="bg-gold text-teal-dark px-5 py-2 rounded font-bold text-sm hover:brightness-105">Compute Final Grades</button>
-        <button className="bg-teal text-white px-5 py-2 rounded font-semibold text-sm hover:bg-teal-dark">Save Grades</button>
-      </div>
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>
   );
 }
 
-// SA-Student Management (org-wide)
 export function StudentGroups() {
   const [mainTab, setMainTab] = useState<"all" | "ge" | "team" | "panata">("all");
   const [openCard, setOpenCard] = useState<string | null>(null);
@@ -1350,30 +822,102 @@ export function StudentGroups() {
   );
 }
 
-// Fade-up structural layout hook
-function useFadeUp(delay = 0) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), delay + 40);
-    return () => clearTimeout(t);
-  }, [delay]);
-  return visible;
-}
-
-function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-  const visible = useFadeUp(delay);
+export function SessionLogs() {
+  const [viewSession, setViewSession] = useState<any[] | null>(null);
+  
   return (
-    <div className={className} style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(14px)",
-      transition: "opacity 0.4s ease, transform 0.4s ease",
-    }}>
-      {children}
+    <div className="p-7">
+      <FadeUp>
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">System Session Logs</h1>
+            <p className="text-sm text-muted-text mt-1">Global attendance oversight and log auditing</p>
+          </div>
+          <span className="chip bg-teal-soft text-teal text-sm px-3 py-1">Super Admin View</span>
+        </div>
+      </FadeUp>
+
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <FadeUp delay={40}>
+          <div className="bg-teal text-white rounded-xl p-5 card-soft" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div className="text-sm opacity-85">Total Tracked Sessions</div>
+            <div className="font-serif text-4xl font-bold mt-2">185</div>
+          </div>
+        </FadeUp>
+        <FadeUp delay={80}>
+          <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4 card-soft">
+            <div className="relative w-20 h-20">
+              <svg viewBox="0 0 100 100" className="-rotate-90">
+                <circle cx="50" cy="50" r="40" stroke="var(--muted)" strokeWidth="14" fill="none" />
+                <circle cx="50" cy="50" r="40" stroke="var(--green-status)" strokeWidth="14" fill="none" strokeDasharray="196 251" strokeLinecap="round" />
+              </svg>
+              <div className="absolute inset-0 grid place-items-center font-bold text-teal-dark">78%</div>
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-teal-dark">Global Attendance</div>
+              <div className="text-xs text-muted-text mt-1">Registered: 4,500</div>
+              <div className="text-xs text-muted-text">Present: 3,510</div>
+            </div>
+          </div>
+        </FadeUp>
+        <FadeUp delay={120}>
+          <div className="bg-card border border-border rounded-xl p-5 card-soft">
+            <div className="text-xs font-semibold text-muted-text uppercase tracking-wider mb-3">Sessions by Context</div>
+            {[["GE Subjects",35,"bg-teal"],["Team Practices",24,"bg-gold"],["Panata Groups",21,"bg-slate-blue"],["Tasks/Anns",20,"bg-amber-status"]].map(([k,v,c]) => (
+              <div key={k as string} className="text-xs flex items-center gap-2 mb-2">
+                <span className={`w-3 h-3 rounded ${c}`} /> 
+                <span className="font-medium text-foreground">{k}</span>
+                <strong className="ml-auto text-teal-dark">{v}%</strong>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+      </div>
+
+      <FadeUp delay={160}>
+        <SectionCard icon={Library} title="Complete Audit Log" action={
+          <div className="flex gap-2">
+            <select className="px-3 py-1.5 border border-border rounded-lg text-xs bg-card"><option>All Contexts</option><option>Class</option><option>Team</option><option>Panata</option></select>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-semibold hover:bg-secondary transition"><Download className="w-3.5 h-3.5" /> Export DB</button>
+          </div>
+        }>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-teal-dark text-white uppercase tracking-wider">
+                  {["Session Name","Type","Date","Time","Location","Reg","Present","Rate %","Action"].map(h => <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {adminSessions.map((s,i) => (
+                  <tr key={i} className={`border-b border-border transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20 ${(s[7] as number)<50?"border-l-4 border-l-red-status":""}`}>
+                    <td className="px-4 py-3.5 font-semibold text-foreground">{s[0]}</td>
+                    <td className="px-4 py-3.5"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${s[1]==="Panata"?"bg-gold/20 text-yellow-800 border-gold/40":s[1]==="Task"?"bg-amber-status/20 text-amber-700 border-amber-status/40":"bg-teal-soft text-teal-dark border-teal/20"}`}>{s[1]}</span></td>
+                    <td className="px-4 py-3.5 text-muted-text">{s[2]}</td>
+                    <td className="px-4 py-3.5 font-mono">{s[3]}</td>
+                    <td className="px-4 py-3.5 text-muted-text">{s[4]}</td>
+                    <td className="px-4 py-3.5">{s[5]}</td>
+                    <td className="px-4 py-3.5">{s[6]}</td>
+                    <td className="px-4 py-3.5 font-bold">{s[7]}%</td>
+                    <td className="px-4 py-3.5">
+                      <button onClick={() => setViewSession(s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal text-teal text-[11px] font-semibold hover:bg-teal hover:text-white transition whitespace-nowrap">
+                        <ClipboardList className="w-3 h-3" /> Audit Sheet
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      </FadeUp>
+
+      {viewSession && <SessionAttendanceModal session={viewSession} onClose={() => setViewSession(null)} />}
     </div>
   );
 }
 
-// 🌟 HIGHLIGHTED CHANGE: Added AdminRadarChart tailored for Admin/SuperAdmin System Metrics
+
 function AdminRadarChart({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   const [progress, setProgress] = useState(0);
   const rafRef = useRef<number | null>(null);
@@ -1447,7 +991,6 @@ function AdminRadarChart({ isSuperAdmin }: { isSuperAdmin: boolean }) {
     </svg>
   );
 }
-
 
 // ─── Admin Profile ────────────────────────────────────────────────────────────
 export function AdminProfile() {

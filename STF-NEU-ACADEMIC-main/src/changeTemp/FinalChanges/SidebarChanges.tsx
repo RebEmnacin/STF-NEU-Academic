@@ -1,4 +1,3 @@
-// 🌟 HIGHLIGHTED CHANGE: Profile view for admin / superadmin linking within the sidebar to open the profile
 import { usePortal, type Role } from "./PortalContext";
 import {
   LayoutDashboard, Calendar, CheckSquare, Megaphone, User, Settings,
@@ -6,6 +5,7 @@ import {
   SlidersHorizontal, ListChecks, BookOpen, GraduationCap, Database,
   UserCircle // 🌟 HIGHLIGHTED CHANGE: Added UserCircle icon for AdminProfile link
 } from "lucide-react";
+
 
 /*
 CHANGES
