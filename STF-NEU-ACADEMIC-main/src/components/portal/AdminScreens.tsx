@@ -108,7 +108,7 @@ export function SectionDashboard() {
       <FadeUp>
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Dashboard — GE 101, Sec A</h1>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">Section Dashboard</h1>
             <p className="text-sm text-muted-text mt-1">{MONTHS[month]} {year} — GE Subject Group Teacher View</p>
           </div>
           <span className="chip bg-gold text-teal-dark text-sm px-3 py-1">Admin · Section Scoped</span>
@@ -318,7 +318,7 @@ export function SectionAttendance() {
   return (
     <div className="p-6">
       <FadeUp>
-        <h1 className="font-serif text-2xl font-bold text-teal-dark mb-4">Section Attendance Tracker — GE 101 Sec A</h1>
+        <h1 className="font-serif text-2xl font-bold text-teal-dark mb-4">Section Attendance Tracker</h1>
       </FadeUp>
 
       <div className="grid grid-cols-3 gap-4 mb-4">
