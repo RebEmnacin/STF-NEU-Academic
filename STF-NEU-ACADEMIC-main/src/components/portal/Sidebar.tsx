@@ -29,23 +29,23 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   },
   leader: {
     shared: [
-      { id: "dashboard",       label: "Dashboard",           icon: LayoutDashboard },
-      { id: "schedule",        label: "Schedule Management", icon: Calendar },
-      { id: "tasks",           label: "Tasks",               icon: CheckSquare },
-      { id: "announcements",   label: "Announcements",       icon: Megaphone },
-      { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
+      { id: "dashboard",     label: "Dashboard",           icon: LayoutDashboard },
+      { id: "schedule",      label: "Schedule Management", icon: Calendar },
+      { id: "tasks",         label: "Tasks",               icon: CheckSquare },
+      { id: "announcements", label: "Announcements",       icon: Megaphone },
+      { id: "attendance-logs", label: "Attendance Logs",   icon: ClipboardList },
     ],
     roleLabel: "Leader Tools",
     roleTools: [
-      { id: "roster",          label: "Team Members",        icon: Users },
-      { id: "qr",              label: "QR Generator",        icon: QrCode },
-      { id: "team-attendance", label: "Team Attendance",     icon: ClipboardList },
-      { id: "team-heatmap",    label: "Team Heatmap",        icon: Thermometer },
-      { id: "templates",       label: "Action Center",       icon: Library },
+      { id: "roster",          label: "Team Members",      icon: Users },
+      { id: "qr",              label: "QR Generator",      icon: QrCode },
+      { id: "team-attendance", label: "Team Attendance",   icon: ClipboardList },
+      { id: "team-heatmap",    label: "Team Heatmap",      icon: Thermometer },
+      { id: "templates",       label: "Action Center",     icon: Library },
     ],
     footer: [
-      { id: "profile",         label: "My Profile",          icon: User },
-      { id: "settings",        label: "Settings",            icon: Settings },
+      { id: "profile",       label: "My Profile",          icon: User },
+      { id: "settings",      label: "Settings",            icon: Settings },
     ],
   },
   "ge-monitor": {
@@ -58,8 +58,10 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "GE Monitor Tools",
     roleTools: [
-      { id: "ge-attendance",   label: "Course Attendance",   icon: ClipboardList },
-      { id: "templates",       label: "Action Center",       icon: Library },
+      { id: "roster",        label: "GE Group Masterlist",       icon: Users },
+      { id: "qr",              label: "QR Generator",      icon: QrCode },
+      { id: "ge-attendance", label: "Course Attendance",    icon: ClipboardList },
+      { id: "templates",     label: "Action Center",        icon: Library },
     ],
     footer: [
       { id: "profile",         label: "My Profile",          icon: User },
@@ -76,6 +78,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     ],
     roleLabel: "Panata Monitor Tools",
     roleTools: [
+      { id: "roster",            label: "Panata Group Masterlist",    icon: Users },
       { id: "panata-attendance", label: "Panata Attendance", icon: ClipboardList },
       { id: "templates",         label: "Action Center",     icon: Library },
     ],
@@ -86,18 +89,17 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   },
   admin: {
     shared: [
-      { id: "dashboard",       label: "Dashboard",           icon: LayoutDashboard },
-      { id: "schedule",        label: "Schedule Management", icon: Calendar },
-      { id: "announcements",   label: "Announcements",       icon: Megaphone },
-      { id: "attendance-logs", label: "Attendance Logs",     icon: ClipboardList },
+      { id: "dashboard",     label: "Dashboard",           icon: LayoutDashboard },
+      { id: "schedule",      label: "Schedule Management", icon: Calendar },
+      { id: "announcements", label: "Announcements",       icon: Megaphone },
     ],
     roleLabel: "Monitor Tools",
     roleTools: [
-      { id: "students",        label: "My Students",             icon: GraduationCap },
-      { id: "heatmap",         label: "Section Heatmap",         icon: Thermometer },
-      { id: "attendance",      label: "Attendance Tracker",      icon: ClipboardList },
-      { id: "grader",         label: "Task Evaluator & Grader",  icon: ListChecks },
-      { id: "templates",       label: "Action Center",           icon: Library },
+      { id: "students",   label: "My Students",             icon: GraduationCap },
+      { id: "heatmap",    label: "Section Heatmap",         icon: Thermometer },
+      { id: "attendance", label: "Attendance Tracker",      icon: ClipboardList },
+      { id: "grader",     label: "Task Evaluator & Grader", icon: ListChecks },
+      { id: "templates",  label: "Action Center",           icon: Library },
     ],
     footer: [
       // 🌟 HIGHLIGHTED CHANGE: Rerouted profile item ID targeting for admin to trigger AdminProfile
@@ -107,18 +109,18 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
   },
   superadmin: {
     shared: [
-      { id: "dashboard",       label: "Institutional Dashboard",  icon: LayoutDashboard },
-      { id: "schedule",        label: "Institutional Scheduling", icon: Calendar },
-      { id: "announcements",   label: "Announcements",            icon: Megaphone },
+      { id: "dashboard",     label: "Institutional Dashboard",  icon: LayoutDashboard },
+      { id: "schedule",      label: "Institutional Scheduling", icon: Calendar },
+      { id: "announcements", label: "Announcements",        icon: Megaphone },
     ],
     roleLabel: "Admin Tools",
     roleTools: [
-      { id: "groups",          label: "Student Management",             icon: Database },
-      { id: "heatmap",         label: "Global Heatmap",                 icon: Thermometer },
-      { id: "sessions",        label: "Session & Attendance Analytics", icon: ClipboardList },
-      { id: "operations",      label: "Operations Control",             icon: SlidersHorizontal },
-      { id: "templates",       label: "Action Centers",                 icon: Library },
-      { id: "endoar",          label: "Grade Manager",                  icon: BookOpen },
+      { id: "groups",     label: "Student Management",              icon: Database },
+      { id: "heatmap",    label: "Global Heatmap",                  icon: Thermometer },
+      { id: "sessions",   label: "Session & Attendance Analytics",  icon: ClipboardList },
+      { id: "operations", label: "Operations Control",              icon: SlidersHorizontal },
+      { id: "templates",  label: "Action Centers",                  icon: Library },
+      { id: "endoar",     label: "Grade Manager",                   icon: BookOpen },
     ],
     footer: [
       // 🌟 HIGHLIGHTED CHANGE: Rerouted profile item ID targeting for superadmin to trigger AdminProfile

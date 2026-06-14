@@ -10,11 +10,11 @@ import {
 } from "@/components/portal/StudentScreens";
 import {
   Roster, QRGenerator, TeamAttendance, HeatmapView, Dispatcher,
-  AttendanceLogger, TemplateLibrary,   GEAttendance, PanataAttendance, ActionCenterLimited,
+  AttendanceLogger, TemplateLibrary,   GEAttendance, PanataAttendance, ActionCenterLimited, MyProfile
 } from "@/components/portal/LeaderScreens";
 import {
   AdminDashboard, EventDetail, SessionLogs, Operations, Endoar, StudentGroups,
-  SectionDashboard, MyStudents, TaskGrader, SectionAttendance,
+  SectionDashboard, MyStudents, TaskGrader, SectionAttendance, AdminProfile
 } from "@/components/portal/AdminScreens";
 
 export const Route = createFileRoute("/")(({
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")(({
 function Shell() {
   const { role } = usePortal();
   const dispatcherScope =
-    role === "leader"          ? { locked: true,  label: "Video Team" } :
+    role === "leader"          ? { locked: true,  label: "Video Team 104" } :
     role === "ge-monitor"      ? { locked: true,  label: "GE 101 - Sec A" } :
     role === "panata-monitor"  ? { locked: true,  label: "CICS2 — Panata Group" } :
     role === "admin"           ? { locked: true,  label: "GE 101 - Sec A" } :
@@ -88,14 +88,14 @@ function Content() {
       case "roster": return <Roster />;
       case "qr": return <QRGenerator />;
       case "team-attendance": return <TeamAttendance />;
-      case "team-heatmap": return <HeatmapView scope="Video Team" banner="Scoped View Only — Showing Video Team members" />;
+      case "team-heatmap": return <HeatmapView scope="Video Team 104" banner="Scoped View Only — Showing Video Team 104 members" />;
       case "tasks": return <TasksView showAssign />;
       case "announcements": return <AnnouncementsView canCreate />;
       case "templates": return <TemplateLibrary />;
       case "settings": return <SettingsView />;
       default: return <StudentDashboard />;
       case "attendance-logs": return <AttendanceLogsView />;
-      case "profile": return <ProfileView />;
+      case "profile": return <MyProfile />;
     }
   }
   // ADD after the leader block (after its closing brace), before the DispatcherCTA function:
@@ -107,10 +107,12 @@ function Content() {
       case "tasks":          return <TasksView showAssign />;
       case "announcements":  return <AnnouncementsView canCreate />;
       case "attendance-logs":return <AttendanceLogsView />;
-      case "profile":        return <ProfileView />;
+      case "profile":        return <MyProfile />;
       case "ge-attendance":  return <GEAttendance />;
       case "templates":      return <ActionCenterLimited scope="GE 101 — Section A" />;
       case "settings":       return <SettingsView />;
+      case "roster":         return <Roster />;
+      case "qr":             return <QRGenerator />;
       default:               return <StudentDashboard />;
     }
   }
@@ -127,6 +129,7 @@ function Content() {
       case "panata-attendance":  return <PanataAttendance />;
       case "templates":          return <ActionCenterLimited scope="CICS2 — Panata Group" />;
       case "settings":           return <SettingsView />;
+      case "roster":             return <Roster />;
       default:                   return <StudentDashboard />;
     }
   }
@@ -157,6 +160,7 @@ function Content() {
       case "attendance": return <SectionAttendance />;
       case "grader": return <TaskGrader />;
       case "templates": return <TemplateLibrary />;
+      case "admin-profile": return <AdminProfile />;
       case "settings": return <SettingsView />;
       default: return <SectionDashboard />;
     }
@@ -175,6 +179,7 @@ function Content() {
     case "endoar": return <Endoar />;
     case "templates": return <TemplateLibrary global />;
     case "operations": return <Operations />;
+      case "admin-profile": return <AdminProfile />;
     case "settings": return <SettingsView />;
     default: return <AdminDashboard />;
   }

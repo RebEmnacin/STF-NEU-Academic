@@ -274,7 +274,7 @@ export function GuestHome() {
           <FadeUp delay={0}>
             <div className="mb-6">
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "rgba(245,197,24,0.7)", textTransform: "uppercase" }}>OUR TEAMS</span>
-              <h2 className="font-serif text-2xl font-bold mt-0.5" style={{ color: "white" }}>Chronicles by Team</h2>
+              <h2 className="font-serif text-2xl font-bold mt-0.5" style={{ color: "teal-dark" }}>Chronicles by Team</h2>
             </div>
           </FadeUp>
           <div className="grid md:grid-cols-3 gap-4">

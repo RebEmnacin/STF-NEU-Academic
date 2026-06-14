@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Lock,
   GripVertical, MapPin, Calendar, Send, Pencil, Trash2, Link,
   Upload, FileText, Megaphone, CheckSquare, BarChart2, CalendarCheck,
-  BookOpen, CalendarDays, CalendarPlus,
+  BookOpen, CalendarDays, CalendarPlus, User, UserCircle, Activity
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -33,7 +33,7 @@ function FadeUp({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-function SectionCard({ icon: Icon, title, children, action }: {
+export function SectionCard({ icon: Icon, title, children, action }: {
   icon: React.ElementType; title: string; children: React.ReactNode; action?: React.ReactNode;
 }) {
   return (
@@ -52,7 +52,7 @@ function SectionCard({ icon: Icon, title, children, action }: {
   );
 }
 
-function StatCard({ label, value, sub, accent = false }: { label: string; value: string | number; sub?: string; accent?: boolean }) {
+export function StatCard({ label, value, sub, accent = false }: { label: string; value: string | number; sub?: string; accent?: boolean }) {
   return (
     <div className="bg-card border border-border rounded-xl px-4 py-3.5" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
       <div className="text-xs text-muted-text font-medium">{label}</div>
@@ -66,23 +66,24 @@ function StatCard({ label, value, sub, accent = false }: { label: string; value:
 type Member = {
   initials: string; name: string; id: string; course: string; year: string;
   attendance: string; tasks: string; status: string;
-  dept: string; panata: string; email: string; bio: string;
+  dept: string; team: string; panata: string; ge: string; email: string; bio: string;
   tasksDone: number; tasksTotal: number; attendancePct: number;
   recentActivity: string;
 };
 
-const roster: Member[] = [
-  { initials:"NP", name:"Natalie Portman",  id:"STF-2022-0101", course:"BS Nursing",        year:"Junior",    attendance:"95%", tasks:"88%", status:"Active",   dept:"CICS",  panata:"CICS2",  email:"natalie.portman@neu.edu.ph",  bio:"Visual storyteller and camera operator. 3-year STF member.",        tasksDone:22, tasksTotal:25, attendancePct:95, recentActivity:"Submitted Week 8 video footage" },
-  { initials:"AA", name:"Alex Ammin",       id:"STF-2022-0102", course:"BS IT",             year:"Sophomore", attendance:"87%", tasks:"72%", status:"Active",   dept:"CICS",  panata:"CICS2",  email:"alex.ammin@neu.edu.ph",       bio:"Backend developer and motion graphics editor.",                     tasksDone:18, tasksTotal:25, attendancePct:87, recentActivity:"Edited promo reel for AEVM Week" },
-  { initials:"BA", name:"Ben Affleck",      id:"STF-2021-0088", course:"BS Civil Eng",      year:"Senior",    attendance:"91%", tasks:"95%", status:"Active",   dept:"CEA",   panata:"CEA1",   email:"ben.affleck@neu.edu.ph",      bio:"Senior videographer, specializes in event coverage.",               tasksDone:24, tasksTotal:25, attendancePct:91, recentActivity:"Led direction for November gala" },
-  { initials:"MS", name:"Maria Santos",     id:"STF-2023-0103", course:"BA Communication", year:"Freshman",  attendance:"76%", tasks:"60%", status:"Active",   dept:"CAS",   panata:"CAS2",   email:"maria.santos@neu.edu.ph",     bio:"Scriptwriter and social media content creator.",                    tasksDone:15, tasksTotal:25, attendancePct:76, recentActivity:"Drafted script for orientation video" },
-  { initials:"JR", name:"Jose Reyes",       id:"STF-2023-0104", course:"BS Psychology",    year:"Freshman",  attendance:"82%", tasks:"55%", status:"Active",   dept:"CAS",   panata:"CAS3",   email:"jose.reyes@neu.edu.ph",       bio:"Drone operator and color grading assistant.",                       tasksDone:14, tasksTotal:25, attendancePct:82, recentActivity:"Submitted color grading output" },
-  { initials:"AC", name:"Ana Cruz",         id:"STF-2022-0105", course:"BS Accountancy",   year:"Junior",    attendance:"65%", tasks:"40%", status:"On Leave", dept:"COA",   panata:"COA1",   email:"ana.cruz@neu.edu.ph",         bio:"On approved leave since Oct 2023. Documentary editor.",             tasksDone:10, tasksTotal:25, attendancePct:65, recentActivity:"Last active: Oct 12, 2023" },
-  { initials:"DL", name:"Diego Luna",       id:"STF-2022-0106", course:"BS Criminology",   year:"Sophomore", attendance:"88%", tasks:"79%", status:"Active",   dept:"COC",   panata:"COC1",   email:"diego.luna@neu.edu.ph",       bio:"Audio-visual technician and live stream operator.",                  tasksDone:20, tasksTotal:25, attendancePct:88, recentActivity:"Set up livestream for Panata night" },
-  { initials:"RG", name:"Rosa Gomez",       id:"STF-2023-0107", course:"BS Midwifery",     year:"Freshman",  attendance:"92%", tasks:"83%", status:"Active",   dept:"CMT",   panata:"CMT1",   email:"rosa.gomez@neu.edu.ph",       bio:"Photography lead and video team archivist.",                        tasksDone:21, tasksTotal:25, attendancePct:92, recentActivity:"Uploaded photo archive for Nov events" },
+export const roster: Member[] = [
+  { initials:"NP", name:"Natalie Portman",  id:"STF-2022-0101", course:"BS Nursing",       year:"Junior",    attendance:"95%", tasks:"88%", status:"Active",   dept:"CICS", team:"Video Team 104", panata:"CICS2 - Panata", ge:"GE 101 - Sec A",  email:"natalie.portman@neu.edu.ph",  bio:"Visual storyteller.", tasksDone:22, tasksTotal:25, attendancePct:95, recentActivity:"Submitted Week 8 footage" },
+  { initials:"AA", name:"Alex Ammin",       id:"STF-2022-0102", course:"BS IT",            year:"Sophomore", attendance:"87%", tasks:"72%", status:"Active",   dept:"CICS", team:"Video Team 104", panata:"CICS2 - Panata", ge:"GE 101 - Sec A",  email:"alex.ammin@neu.edu.ph",       bio:"Backend dev.", tasksDone:18, tasksTotal:25, attendancePct:87, recentActivity:"Edited promo reel" },
+  { initials:"BA", name:"Ben Affleck",      id:"STF-2021-0088", course:"BS Civil Eng",     year:"Senior",    attendance:"91%", tasks:"95%", status:"Active",   dept:"CEA",  team:"Video Team 104", panata:"CEA1 - Panata",  ge:"GE 102 - Sec B",  email:"ben.affleck@neu.edu.ph",      bio:"Senior videographer.", tasksDone:24, tasksTotal:25, attendancePct:91, recentActivity:"Led direction" },
+  { initials:"MS", name:"Maria Santos",     id:"STF-2023-0103", course:"BA Comm",          year:"Freshman",  attendance:"76%", tasks:"60%", status:"Active",   dept:"CAS",  team:"Creative Team A",panata:"CAS2 - Panata",  ge:"GE 101 - Sec A",  email:"maria.santos@neu.edu.ph",     bio:"Scriptwriter.", tasksDone:15, tasksTotal:25, attendancePct:76, recentActivity:"Drafted script" },
+  { initials:"JR", name:"Jose Reyes",       id:"STF-2023-0104", course:"BS Psychology",    year:"Freshman",  attendance:"82%", tasks:"55%", status:"Active",   dept:"CAS",  team:"Video Team 104", panata:"CAS2 - Panata",  ge:"LIT 101 - Sec C", email:"jose.reyes@neu.edu.ph",       bio:"Drone operator.", tasksDone:14, tasksTotal:25, attendancePct:82, recentActivity:"Submitted output" },
+  { initials:"AC", name:"Ana Cruz",         id:"STF-2022-0105", course:"BS Accountancy",   year:"Junior",    attendance:"65%", tasks:"40%", status:"On Leave", dept:"COA",  team:"Creative Team A",panata:"COA1 - Panata",  ge:"GE 102 - Sec B",  email:"ana.cruz@neu.edu.ph",         bio:"Documentary editor.", tasksDone:10, tasksTotal:25, attendancePct:65, recentActivity:"Last active: Oct 12" },
+  { initials:"DL", name:"Diego Luna",       id:"STF-2022-0106", course:"BS Criminology",   year:"Sophomore", attendance:"88%", tasks:"79%", status:"Active",   dept:"COC",  team:"Video Team 104", panata:"COC1 - Panata",  ge:"GE 101 - Sec A",  email:"diego.luna@neu.edu.ph",       bio:"AV tech.", tasksDone:20, tasksTotal:25, attendancePct:88, recentActivity:"Set up livestream" },
+  { initials:"RG", name:"Rosa Gomez",       id:"STF-2023-0107", course:"BS Midwifery",     year:"Freshman",  attendance:"92%", tasks:"83%", status:"Active",   dept:"CMT",  team:"Video Team 104", panata:"CMT1 - Panata",  ge:"LIT 101 - Sec C", email:"rosa.gomez@neu.edu.ph",       bio:"Photography lead.", tasksDone:21, tasksTotal:25, attendancePct:92, recentActivity:"Uploaded photo archive" },
+  { initials:"EJ", name:"Elijah Jones",     id:"STF-2022-0201", course:"BS Architecture",  year:"Junior",    attendance:"80%", tasks:"85%", status:"Active",   dept:"CEA",  team:"Creative Team A",panata:"CEA1 - Panata",  ge:"GE 102 - Sec B",  email:"elijah.jones@neu.edu.ph",     bio:"Set designer.", tasksDone:20, tasksTotal:25, attendancePct:80, recentActivity:"Reviewed set layout" },
+  { initials:"KP", name:"Kevin Park",       id:"STF-2023-0205", course:"BS IT",            year:"Freshman",  attendance:"98%", tasks:"90%", status:"Active",   dept:"CICS", team:"Creative Team A",panata:"CICS2 - Panata", ge:"GE 101 - Sec A",  email:"kevin.park@neu.edu.ph",       bio:"Motion graphics.", tasksDone:23, tasksTotal:25, attendancePct:98, recentActivity:"Exported lower thirds" },
 ];
-
-function MiniBar({ pct, color = "var(--teal)" }: { pct: number; color?: string }) {
+export function MiniBar({ pct, color = "var(--teal)" }: { pct: number; color?: string }) {
   return (
     <div className="w-full h-1.5 rounded-full bg-border mt-1">
       <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
@@ -90,7 +91,7 @@ function MiniBar({ pct, color = "var(--teal)" }: { pct: number; color?: string }
   );
 }
 
-function AvatarSVG({ initials, size = 48, isOnLeave = false, className = "" }: { initials: string; size?: number; isOnLeave?: boolean; className?: string }) {
+export function AvatarSVG({ initials, size = 48, isOnLeave = false, className = "" }: { initials: string; size?: number; isOnLeave?: boolean; className?: string }) {
   const bg = isOnLeave
     ? "linear-gradient(135deg, #f59e0b, #92400e)"
     : "linear-gradient(135deg, #1B6B8F, #4A8FA8)";
@@ -114,7 +115,7 @@ function AvatarSVG({ initials, size = 48, isOnLeave = false, className = "" }: {
   );
 }
 
-function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose: () => void; onMessage: () => void }) {
+export function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose: () => void; onMessage: () => void }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
@@ -222,7 +223,7 @@ function ProfileModal({ member, onClose, onMessage }: { member: Member; onClose:
     , document.body);
 }
 
-function MessageModal({ member, onClose }: { member: Member; onClose: () => void }) {
+export function MessageModal({ member, onClose }: { member: Member; onClose: () => void }) {
   const [msg, setMsg] = useState("");
   const [messages, setMessages] = useState([
     { from: "them", text: "Hey! Just checking in about the video footage.", time: "10:24 AM" },
@@ -468,7 +469,7 @@ function FilePreviewModal({ file, onClose }: { file: FileAttachment; onClose: ()
   , document.body);
 }
 
-function SubmissionsModal({ member, onClose }: { member: Member; onClose: () => void }) {
+export function SubmissionsModal({ member, onClose }: { member: Member; onClose: () => void }) {
   const [visible, setVisible] = useState(false);
   const [previewFile, setPreviewFile] = useState<FileAttachment | null>(null);
   useEffect(() => {
@@ -568,14 +569,87 @@ function SubmissionsModal({ member, onClose }: { member: Member; onClose: () => 
 }
 
 // ─── Roster ───────────────────────────────────────────────────────────────────
+// 🌟 HIGHLIGHTED CHANGE: Completely refactored Roster component to support Long Cards / Overview state 
+// and dynamic groupings based on role (GE Monitor handles multiple subjects, etc.)
 export function Roster() {
-  const [search, setSearch]       = useState("");
-  const [viewMode, setViewMode]   = useState<"list" | "grid">("list");
+  const { role } = usePortal(); // Fetch role to determine which groups to show
+  
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+  const [search, setSearch]           = useState("");
+  const [viewMode, setViewMode]       = useState<"list" | "grid">("list");
+  
   const [viewMember, setViewMember]   = useState<Member | null>(null);
   const [msgMember, setMsgMember]     = useState<Member | null>(null);
   const [subsMember, setSubsMember]   = useState<Member | null>(null);
 
-  const filtered = roster.filter(r =>
+  // 1. Determine Groups based on Role
+  const myGroups = (() => {
+    if (role === "ge-monitor") return ["GE 101 - Sec A", "GE 102 - Sec B", "LIT 101 - Sec C"];
+    if (role === "panata-monitor") return ["CICS2 - Panata", "CAS2 - Panata"];
+    return ["Video Team 104", "Creative Team A"]; // default/leader
+  })();
+
+  const filterKey = role === "ge-monitor" ? "ge" : role === "panata-monitor" ? "panata" : "team";
+
+  // ─── STATE 1: GROUP OVERVIEW (Long Cards) ─────────────────────────────────
+  if (!activeGroup) {
+    return (
+      <div className="p-7">
+        <FadeUp>
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <h1 className="font-serif text-3xl font-bold text-teal-dark">Rosters & Masterlists</h1>
+              <p className="text-sm text-muted-text mt-1">Select a group to view its members</p>
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">
+              {role === "ge-monitor" ? "GE Monitor View" : role === "panata-monitor" ? "Panata View" : "Leader View"}
+            </span>
+          </div>
+        </FadeUp>
+
+        <div className="space-y-4">
+          {myGroups.map((group, i) => {
+            // Aggregate stats per group
+            const groupMembers = roster.filter(r => r[filterKey] === group);
+            const total = groupMembers.length;
+            const avgAtt = total > 0 
+              ? Math.round(groupMembers.reduce((acc, curr) => acc + curr.attendancePct, 0) / total) 
+              : 0;
+
+            return (
+              <FadeUp key={group} delay={i * 60}>
+                <div className="bg-card border border-border rounded-xl p-5 flex items-center justify-between hover:border-teal/50 transition-all shadow-sm group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-teal-soft flex items-center justify-center text-teal-dark shrink-0">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">{group}</h3>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-text font-medium">
+                        <span className="flex items-center gap-1.5"><User className="w-4 h-4 text-teal" /> {total} Students</span>
+                        <span className="flex items-center gap-1.5"><CalendarCheck className="w-4 h-4 text-teal" /> {avgAtt}% Avg. Attendance</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setActiveGroup(group)} 
+                    className="bg-teal text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-teal-dark transition flex items-center gap-2"
+                  >
+                    View Masterlist <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </FadeUp>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── STATE 2: DETAILED MASTERLIST (Table/Grid) ────────────────────────────
+  // Filter members by the selected group, then by search query
+  const groupRoster = roster.filter(r => r[filterKey] === activeGroup);
+  const filtered = groupRoster.filter(r =>
     r.name.toLowerCase().includes(search.toLowerCase()) ||
     r.id.includes(search) ||
     r.course.toLowerCase().includes(search.toLowerCase())
@@ -584,33 +658,32 @@ export function Roster() {
   return (
     <div className="p-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex items-center gap-4 mb-6">
+          <button 
+            onClick={() => { setActiveGroup(null); setSearch(""); }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-sm font-semibold hover:bg-secondary transition"
+          >
+            <ChevronLeft className="w-4 h-4" /> Groups
+          </button>
           <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Team Members</h1>
-            <p className="text-sm text-muted-text mt-1">Video Team Roster</p>
+            <h1 className="font-serif text-3xl font-bold text-teal-dark">{activeGroup}</h1>
+            <p className="text-sm text-muted-text mt-0.5">Masterlist · {groupRoster.length} total members</p>
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Leader View</span>
+          <span className="ml-auto text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">
+            Filtered View
+          </span>
         </div>
       </FadeUp>
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {[
-          { label: "Total Members", value: "55" },
-          { label: "Active", value: "52" },
-          { label: "On Leave", value: "3", accent: true },
-          { label: "Avg Attendance", value: "89%" },
-        ].map((s, i) => (
-          <FadeUp key={s.label} delay={i * 60}><StatCard {...s} /></FadeUp>
-        ))}
-      </div>
-      <FadeUp delay={260}>
+      
+      <FadeUp delay={60}>
         <SectionCard
           icon={Users}
-          title="Member List"
+          title="Student Roster"
           action={
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-text" />
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search members…"
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search students…"
                   className="pl-9 pr-3 py-2 text-sm border border-border rounded-xl bg-card w-52 focus:outline-none focus:ring-2 focus:ring-teal/30" />
               </div>
               <div className="flex border border-border rounded-xl overflow-hidden">
@@ -636,7 +709,8 @@ export function Roster() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-teal-dark text-white text-xs uppercase tracking-wider">
-                    {["","Name","Student ID","Course","Year","Attendance","Tasks","Status","Actions"].map(h => (
+                    {/* 🌟 HIGHLIGHTED CHANGE: Simplified table columns as requested */}
+                    {["","Student Name","Yr Level","Attendance Rate","Actions"].map(h => (
                       <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
                     ))}
                   </tr>
@@ -644,45 +718,44 @@ export function Roster() {
                 <tbody>
                   {filtered.map((r, i) => (
                     <tr key={r.id} className={`border-b border-border last:border-0 transition-colors ${i % 2 === 0 ? "bg-card" : "bg-secondary/20"} hover:bg-teal-soft/20`}>
-                      <td className="px-4 py-3"><AvatarSVG initials={r.initials} size={32} isOnLeave={r.status !== "Active"} className="rounded-full" /></td>
-                      <td className="px-4 py-3 font-semibold">{r.name}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-muted-text">{r.id}</td>
-                      <td className="px-4 py-3 text-sm">{r.course}</td>
-                      <td className="px-4 py-3 text-sm">{r.year}</td>
+                      <td className="px-4 py-3 w-12"><AvatarSVG initials={r.initials} size={32} isOnLeave={r.status !== "Active"} className="rounded-full" /></td>
                       <td className="px-4 py-3">
+                        <div className="font-semibold text-foreground">{r.name}</div>
+                        <div className="text-[11px] font-mono text-muted-text mt-0.5">{r.id} · {r.course}</div>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium">{r.year}</td>
+                      <td className="px-4 py-3 w-48">
                         <span className={`text-sm font-bold ${r.attendancePct >= 80 ? "text-green-700" : "text-red-status"}`}>{r.attendance}</span>
                         <MiniBar pct={r.attendancePct} color={r.attendancePct >= 80 ? "var(--green-status)" : "var(--red-status)"} />
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="text-sm font-bold text-teal-dark">{r.tasksDone}/{r.tasksTotal}</span>
-                        <MiniBar pct={(r.tasksDone / r.tasksTotal) * 100} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${r.status === "Active" ? "bg-green-500/10 text-green-700 border-green-300" : "bg-amber-400/10 text-amber-600 border-amber-300"}`}>{r.status}</span>
-                      </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 w-56">
                         <div className="flex gap-1.5">
-                          <button onClick={() => setViewMember(r)} className="px-2.5 py-1 rounded-lg border border-teal text-teal text-xs font-semibold hover:bg-teal hover:text-white transition">View</button>
-                          <button onClick={() => setMsgMember(r)} className="px-2.5 py-1 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1"><Send className="w-3 h-3" />Message</button>
-                          <button onClick={() => setSubsMember(r)} className="px-2.5 py-1 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1"><ClipboardList className="w-3 h-3" />{r.tasksDone}/{r.tasksTotal}</button>
+                          <button onClick={() => setViewMember(r)} className="px-2.5 py-1.5 rounded-lg border border-teal text-teal text-xs font-semibold hover:bg-teal hover:text-white transition">View</button>
+                          <button onClick={() => setMsgMember(r)} className="px-2.5 py-1.5 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1"><Send className="w-3 h-3" />Msg</button>
+                          <button onClick={() => setSubsMember(r)} className="px-2.5 py-1.5 rounded-lg border border-border text-muted-text text-xs font-semibold hover:bg-secondary transition flex items-center gap-1"><ClipboardList className="w-3 h-3" />Tasks</button>
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {filtered.length === 0 && (
+                     <tr><td colSpan={5} className="text-center text-muted-text py-12 text-sm">No students found.</td></tr>
+                  )}
                 </tbody>
               </table>
             </div>
           )}
+          
           {viewMode === "grid" && (
-            <div className="p-5 grid grid-cols-5 gap-2">
+            <div className="p-5 grid grid-cols-3 gap-3">
               {filtered.map(r => (
                 <MemberCard key={r.id} member={r} onView={() => setViewMember(r)} onMessage={() => setMsgMember(r)} onSubmissions={() => setSubsMember(r)} />
               ))}
-              {filtered.length === 0 && <div className="col-span-3 text-center text-muted-text py-16 text-sm">No members match your search.</div>}
+              {filtered.length === 0 && <div className="col-span-3 text-center text-muted-text py-16 text-sm">No students match your search.</div>}
             </div>
           )}
+          
           <div className="flex justify-between items-center px-4 py-3 border-t border-border">
-            <span className="text-xs text-muted-text">Showing {filtered.length} of 55 members</span>
+            <span className="text-xs text-muted-text">Showing {filtered.length} of {groupRoster.length} students</span>
             <div className="flex gap-1">
               {["‹","1","2","3","›"].map(p => (
                 <button key={p} className="w-7 h-7 rounded-lg border border-border bg-card text-xs hover:bg-secondary transition">{p}</button>
@@ -691,6 +764,8 @@ export function Roster() {
           </div>
         </SectionCard>
       </FadeUp>
+
+      {/* Modals remain structurally identical, just called from the refactored view */}
       {viewMember && <ProfileModal member={viewMember} onClose={() => setViewMember(null)} onMessage={() => { setViewMember(null); setMsgMember(viewMember); }} />}
       {msgMember && <MessageModal member={msgMember} onClose={() => setMsgMember(null)} />}
       {subsMember && <SubmissionsModal member={subsMember} onClose={() => setSubsMember(null)} />}
@@ -1090,7 +1165,7 @@ type SessionRow = {
   name: string; id: string; dept: string; course: string; group: string; status: string;
 };
 
-function SessionAttendanceModal({ session, onClose }: { session: any[]; onClose: () => void }) {
+export function SessionAttendanceModal({ session, onClose }: { session: any[]; onClose: () => void }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => { const t = setTimeout(() => setVisible(true), 20); return () => clearTimeout(t); }, []);
 
@@ -1343,8 +1418,10 @@ const HEATMAP_HOURS = ["8 AM","9 AM","10 AM","11 AM","12 PM","1 PM","2 PM","3 PM
 const HEATMAP_DAYS  = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const INITIALS_MAP: Record<string, Member> = Object.fromEntries(roster.map(m => [m.initials, m]));
 
-function getAvailableInitialsForCell(dayIdx: number, hourIdx: number): string[] {
-  const seed = (dayIdx * 7 + hourIdx * 3) % 100;
+// 🌟 HIGHLIGHTED CHANGE: Added weekOffset to influence the availability seed
+function getAvailableInitialsForCell(dayIdx: number, hourIdx: number, weekOffset: number = 0): string[] {
+  // Added weekOffset * 17 to change the seed per week
+  const seed = Math.abs((dayIdx * 7 + hourIdx * 3 + weekOffset * 17) % 100);
   let pct: number;
   if (hourIdx < 2) pct = 15;
   else if (hourIdx >= 10) pct = 35;
@@ -1354,42 +1431,58 @@ function getAvailableInitialsForCell(dayIdx: number, hourIdx: number): string[] 
   else if (seed < 45) pct = 50;
   else if (seed < 70) pct = 72;
   else pct = 85;
+  
+  // Add slight variance based on the week
+  pct = Math.max(0, Math.min(100, pct + ((weekOffset * 5) % 15)));
+  
   const count = Math.max(1, Math.round((pct / 100) * roster.length));
-  const shifted = [...roster.slice((dayIdx + hourIdx) % roster.length), ...roster.slice(0, (dayIdx + hourIdx) % roster.length)];
+  // Shift array index by weekOffset to rotate the available people
+  const shifted = [...roster.slice((dayIdx + hourIdx + Math.abs(weekOffset)) % roster.length), ...roster.slice(0, (dayIdx + hourIdx + Math.abs(weekOffset)) % roster.length)];
   return shifted.slice(0, count).map(m => m.initials);
 }
 
-function heatCell(d: number, h: number) {
-  const seed = (d * 7 + h * 3) % 100;
-  if (h < 2)                        return { pct: 15 };
-  if (h >= 10)                      return { pct: 35 };
-  if (d === 2 && h >= 4 && h <= 6) return { pct: 90 };
-  if (d === 3 && h >= 4 && h <= 7) return { pct: 88 };
-  if (seed < 20)                    return { pct: 22 };
-  if (seed < 45)                    return { pct: 50 };
-  if (seed < 70)                    return { pct: 72 };
-  return                             { pct: 85 };
+// 🌟 HIGHLIGHTED CHANGE: Passed weekOffset into the hash generator
+function getHash(dayIdx: number, hourIdx: number, weekOffset: number = 0): number {
+  return Math.abs((dayIdx * 31 + hourIdx * 73 + weekOffset * 101) % 100);
 }
 
+// 🌟 HIGHLIGHTED CHANGE: Passed weekOffset into heatCell to shift block percentages
+function heatCell(d: number, h: number, weekOffset: number = 0) {
+  const seed = getHash(d, h, weekOffset);
+
+  if (h < 2) return { pct: Math.max(0, 8 + (weekOffset * 2 % 5)) };  
+  if (h >= 10) return { pct: Math.min(100, Math.max(0, 35 + (weekOffset * 5 % 15))) }; 
+  if (d === 2 && h >= 4 && h <= 6) return { pct: Math.min(100, Math.max(0, 92 - Math.abs(weekOffset * 3))) }; 
+  if (d === 3 && h >= 4 && h <= 7) return { pct: Math.min(100, Math.max(0, 88 - Math.abs(weekOffset * 2))) }; 
+
+  return { pct: seed }; 
+}
+
+// Enhanced heatmap view coloring
 function heatCellColor(pct: number): string {
-  if (pct < 20)  return "rgba(148,163,184,0.20)";
-  if (pct < 40)  return "rgba(100,116,139,0.30)";
-  if (pct < 60)  return "rgba(234,179,8,0.55)";
-  if (pct < 80)  return "rgba(13,148,136,0.50)";
-  return         "rgba(15,78,70,0.85)";
+if (pct < 20) return "#8A151B"; // Dark Red
+  if (pct < 40) return "#F28B8B"; // Salmon
+  if (pct < 60) return "#FDE073"; // Yellow
+  if (pct < 80) return "#8BCC7A"; // Light Green
+  return "#1E7145";               // Dark Green
 }
 
-export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; banner?: string }) {
+export function HeatmapView({ scope = "Video Team 104", banner }: { scope?: string; banner?: string }) {
   const [selected, setSelected] = useState<{ dayIdx: number; hourIdx: number } | null>(null);
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [msgMember, setMsgMember]   = useState<Member | null>(null);
+  
+  // 🌟 HIGHLIGHTED CHANGE: New state variable for navigating weeks
+  const [weekOffset, setWeekOffset] = useState(0);
 
   if (selected !== null) {
     const { dayIdx, hourIdx } = selected;
     const day = HEATMAP_DAYS[dayIdx];
     const hour = HEATMAP_HOURS[hourIdx];
-    const availableInitials = getAvailableInitialsForCell(dayIdx, hourIdx);
-    const cell = heatCell(dayIdx, hourIdx);
+    
+    // 🌟 HIGHLIGHTED CHANGE: Pass weekOffset to data functions
+    const availableInitials = getAvailableInitialsForCell(dayIdx, hourIdx, weekOffset);
+    const cell = heatCell(dayIdx, hourIdx, weekOffset);
 
     return (
       <div className="p-7">
@@ -1453,19 +1546,44 @@ export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; 
   return (
     <div className="p-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">Availability Heatmap</h1>
-            <p className="text-sm text-muted-text mt-1">{scope}  Click any cell to see member availability</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {["All Departments","All Courses","All Panata Groups","All STF Teams"].map(opt => (
-              <select key={opt} className="text-xs border border-border rounded-xl px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
-                <option>{opt}</option>
-              </select>
-            ))}
-          </div>
-        </div>
+              <div className="flex items-end justify-between mb-6">
+                <div>
+                  <h1 className="font-serif text-3xl font-bold text-teal-dark">Availability Heatmap</h1>
+                  <p className="text-sm text-muted-text mt-1">{scope} — Click any cell to see member availability</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  
+                  {/* 🌟 HIGHLIGHTED CHANGE: The new Chevron Navigation Controls */}
+                  <div className="flex items-center gap-2 bg-card border border-border rounded-xl p-1 shadow-sm">
+                    <button 
+                      onClick={() => setWeekOffset(w => w - 1)} 
+                      title="Previous Week"
+                      className="p-1.5 rounded-lg text-muted-text hover:bg-secondary hover:text-foreground transition active:scale-95"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="text-xs font-bold w-24 text-center text-teal-dark select-none tracking-wide">
+                      {weekOffset === 0 ? "Current Week" : weekOffset === 1 ? "Next Week" : weekOffset === -1 ? "Last Week" : `Week ${weekOffset > 0 ? '+' : ''}${weekOffset}`}
+                    </span>
+                    <button 
+                      onClick={() => setWeekOffset(w => w + 1)} 
+                      title="Next Week"
+                      className="p-1.5 rounded-lg text-muted-text hover:bg-secondary hover:text-foreground transition active:scale-95"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Original filters */}
+                  <div className="flex items-center gap-2">
+                    {["All Departments","All Courses","All Panata Groups","All STF Teams"].map(opt => (
+                      <select key={opt} className="text-xs border border-border rounded-xl px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-teal/30">
+                        <option>{opt}</option>
+                      </select>
+                    ))}
+                  </div>
+                </div>
+              </div>
       </FadeUp>
 
       {banner && (
@@ -1487,9 +1605,12 @@ export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; 
                   <Fragment key={"row" + hi}>
                     <div className="text-xs text-muted-text py-2 font-mono flex items-center">{h}</div>
                     {HEATMAP_DAYS.map((_, di) => {
-                      const c = heatCell(di, hi);
-                      const availCount = getAvailableInitialsForCell(di, hi).length;
+                      
+                      // 🌟 HIGHLIGHTED CHANGE: Pass weekOffset to loops calculating grid values
+                      const c = heatCell(di, hi, weekOffset);
+                      const availCount = getAvailableInitialsForCell(di, hi, weekOffset).length;
                       const cellBg = heatCellColor(c.pct);
+
                       return (
                         <div key={`${di}-${hi}`} className="group relative" style={{ isolation: "isolate" }}>
                           <div
@@ -1501,9 +1622,12 @@ export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; 
                             style={{ position: "absolute", zIndex: 9999, bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)" }}>
                             <div className="bg-teal-dark text-white text-[10px] p-2.5 rounded-xl whitespace-nowrap shadow-xl"
                               style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                              
+                              {/* 🌟 HIGHLIGHTED CHANGE: Tooltip shows the modified percentage */}
                               <div className="font-bold mb-1.5">{HEATMAP_DAYS[di]}, {h} — {c.pct}% available</div>
+                              
                               <div className="flex gap-1 flex-wrap max-w-[140px] mb-1.5">
-                                {getAvailableInitialsForCell(di, hi).slice(0, 6).map(x => (
+                                {getAvailableInitialsForCell(di, hi, weekOffset).slice(0, 6).map(x => (
                                   <span key={x} className="w-5 h-5 rounded-full bg-white/20 grid place-items-center text-[8px] font-bold">{x.slice(0,2)}</span>
                                 ))}
                                 {availCount > 6 && <span className="text-[9px] text-white/70 self-center ml-0.5">+{availCount - 6}</span>}
@@ -1520,11 +1644,11 @@ export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; 
               <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border text-xs flex-wrap">
                 <span className="text-muted-text font-semibold">Members available:</span>
                 {[
-                  { bg: "rgba(148,163,184,0.20)", border: "1px solid var(--border)", label: "0–20%" },
-                  { bg: "rgba(100,116,139,0.30)", border: "none", label: "20–40%" },
-                  { bg: "rgba(234,179,8,0.55)", border: "none", label: "40–60%" },
-                  { bg: "rgba(13,148,136,0.50)", border: "none", label: "60–80%" },
-                  { bg: "rgba(15,78,70,0.85)", border: "none", label: "80–100%" },
+                  { bg: "#8A151B", border: "1px solid var(--border)", label: "0–20%" },   // Dark Red
+                    { bg: "#F28B8B", border: "none", label: "20–40%" },                  // Salmon
+                    { bg: "#FDE073", border: "none", label: "40–60%" },                  // Yellow
+                    { bg: "#8BCC7A", border: "none", label: "60–80%" },                  // Light Green
+                    { bg: "#1E7145", border: "none", label: "80–100%" }                  // Dark Green
                 ].map(({ bg, border, label }) => (
                   <span key={label} className="flex items-center gap-1.5">
                     <span className="w-3.5 h-3.5 rounded inline-block" style={{ background: bg, border }} />
@@ -1535,6 +1659,7 @@ export function HeatmapView({ scope = "Video Team", banner }: { scope?: string; 
             </div>
           </SectionCard>
         </FadeUp>
+
         <div className="col-span-3 space-y-4">
           <FadeUp delay={100}>
             <SectionCard icon={CheckCircle} title="Most Available">
@@ -2082,18 +2207,85 @@ export function TemplateLibrary({ global = false }: { global?: boolean }) {
 }
 
 // ─── My Profile ───────────────────────────────────────────────────────────────
+function LeaderRadarChart() {
+  const [progress, setProgress] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
+  const DURATION = 900;
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      const animate = (now: number) => {
+        if (startRef.current === null) startRef.current = now;
+        const elapsed = now - startRef.current;
+        const t = Math.min(elapsed / DURATION, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        setProgress(eased);
+        if (t < 1) rafRef.current = requestAnimationFrame(animate);
+      };
+      rafRef.current = requestAnimationFrame(animate);
+    }, 200);
+    return () => {
+      clearTimeout(delay);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  // Leader-specific metrics
+  const axes = [
+    { label: "Attendance",   value: 0.94 },
+    { label: "Task Mgmt",    value: 0.92 },
+    { label: "Comms",        value: 0.88 },
+    { label: "Team Health",  value: 0.85 },
+    { label: "Initiative",   value: 0.90 },
+    { label: "Compliance",   value: 0.96 },
+  ];
+  const n = axes.length;
+  const cx = 130; const cy = 130; const maxR = 96;
+  const rings = [0.25, 0.5, 0.75, 1.0];
+
+  function polarToXY(i: number, r: number) {
+    const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  const dataPoints = axes.map((a, i) => polarToXY(i, a.value * maxR * progress));
+  const polyStr = dataPoints.map(p => `${p.x},${p.y}`).join(" ");
+  const ringPolys = rings.map(frac => axes.map((_, i) => polarToXY(i, frac * maxR)).map(p => `${p.x},${p.y}`).join(" "));
+  const labelPositions = axes.map((a, i) => ({ ...polarToXY(i, maxR + 26), label: a.label, value: a.value }));
+
+  return (
+    <svg viewBox="0 0 260 280" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"auto"}}>
+      {ringPolys.map((pts, ri) => <polygon key={ri} points={pts} fill="none" stroke="#1B6B8F" strokeOpacity={0.12 + ri * 0.04} strokeWidth="1"/>)}
+      {axes.map((_, i) => <line key={i} x1={cx} y1={cy} x2={polarToXY(i, maxR).x} y2={polarToXY(i, maxR).y} stroke="#1B6B8F" strokeOpacity="0.18" strokeWidth="1"/>)}
+      <polygon points={polyStr} fill="rgba(27,107,143,0.18)" stroke="#1B6B8F" strokeWidth="2"/>
+      {dataPoints.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="4.5" fill="#1B6B8F" stroke="white" strokeWidth="1.5"/>)}
+      {labelPositions.map((l, i) => (
+        <g key={i}>
+          <text x={l.x} y={l.y} textAnchor="middle" dominantBaseline="middle" fontSize="9.5" fill="#6b7280" fontFamily="Plus Jakarta Sans, sans-serif" fontWeight="600">{l.label.toUpperCase()}</text>
+          <text x={l.x} y={l.y + 12} textAnchor="middle" dominantBaseline="middle" fontSize="9.5" fill="#1B6B8F" fontFamily="Sora, sans-serif" fontWeight="700">{Math.round(l.value * 100)}%</text>
+        </g>
+      ))}
+      <circle cx={cx} cy={cy} r="3" fill="#1B6B8F" opacity="0.4"/>
+    </svg>
+  );
+}
+
+// ─── My Profile ───────────────────────────────────────────────────────────────
 export function MyProfile() {
   const me: Member = {
     initials: "JN", name: "John Patrick Narvasa", id: "STF-2022-0001",
     course: "BS Information Technology", year: "Junior",
     attendance: "94%", tasks: "92%", status: "Active",
-    dept: "CICS", panata: "CICS2",
+    dept: "CICS", team: "Video Team 104", panata: "CICS2", ge: "GE 101 - Sec A",
     email: "john.narvasa@neu.edu.ph",
-    bio: "Video Team Leader. Manages scheduling, task distribution, and member welfare for Video Team.",
+    bio: "Video Team Leader. Manages scheduling, task distribution, and member welfare for Video Team 104.",
     tasksDone: 23, tasksTotal: 25, attendancePct: 94,
     recentActivity: "Sent weekly Panata reminder to all members",
   };
 
+  // 🌟 HIGHLIGHTED CHANGE: Added state for tabs to match Student Profile
+  const [profileTab, setProfileTab] = useState<"overview"|"academic"|"membership"|"preferences"|"responsibilities"|"activity"|"teams">("overview");
   const [editMode, setEditMode] = useState(false);
   const [bio, setBio] = useState(me.bio);
   const [saved, setSaved] = useState(false);
@@ -2104,130 +2296,187 @@ export function MyProfile() {
     setTimeout(() => setSaved(false), 2500);
   }
 
+  // 🌟 HIGHLIGHTED CHANGE: Standardized SVG Icons for Stat Strip
+  const StatIcons = {
+    Attendance: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M9 16l2 2 4-4"/></svg>,
+    TasksDone:  () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+    TeamSize:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    Events:     () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white/80"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  };
+
+  const statCards = [
+    { label:"Attendance",  value:"94%", sub:"this semester",  color:"from-teal to-teal-light",      IconComp: StatIcons.Attendance },
+    { label:"Tasks Done",  value:"92%", sub:"of assigned",    color:"from-teal-light to-[#5A8FA8]", IconComp: StatIcons.TasksDone  },
+    { label:"Team Size",   value:"55",  sub:"active members", color:"from-[#4A7A8A] to-[#3D6B7A]",  IconComp: StatIcons.TeamSize   },
+    { label:"Events Led",  value:"12",  sub:"this semester",  color:"from-slate-blue to-[#3D5466]", IconComp: StatIcons.Events     },
+  ];
+
   return (
-    <div className="p-7">
+    <div className="p-0 pb-7">
       <FadeUp>
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-teal-dark">My Profile</h1>
-            <p className="text-sm text-muted-text mt-1">Your personal STF member profile</p>
+        {/* 🌟 HIGHLIGHTED CHANGE: Tall gradient hero banner mirroring Student Profile */}
+        <div className="relative overflow-hidden mb-0" style={{height:160, background:"linear-gradient(135deg, #0D4A6B 0%, #1B6B8F 50%, #4A8FA8 80%, #5A8FA8 100%)"}}>
+          <div style={{position:"absolute",top:-30,right:-30,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,0.06)"}}/>
+          <div style={{position:"absolute",bottom:-40,left:"30%",width:120,height:120,borderRadius:"50%",background:"rgba(255,255,255,0.05)"}}/>
+          <div className="absolute top-5 left-7">
+            <div className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Leader Profile</div>
+            <div className="text-white font-serif font-bold text-2xl">{me.name.toUpperCase()}</div>
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-teal-soft text-teal border border-teal/20">Leader View</span>
+          <div className="absolute top-5 right-7">
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white/90 border border-white/30" style={{background:"rgba(255,255,255,0.15)", backdropFilter:"blur(8px)"}}>
+              Active Leader
+            </span>
+          </div>
         </div>
       </FadeUp>
 
-      <div className="grid grid-cols-12 gap-5">
-        <FadeUp delay={60} className="col-span-4">
-          <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
-            <div className="bg-teal-dark px-6 pt-6 pb-12">
-              <div className="flex items-start justify-between">
-                <AvatarSVG initials={me.initials} size={64} className="rounded-2xl shadow-lg" />
-                <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-400/30">Active</span>
+      <div className="px-7">
+        <FadeUp delay={60}>
+          {/* 🌟 HIGHLIGHTED CHANGE: Floating Avatar and Data block */}
+          <div className="flex gap-5 items-start -mt-8 mb-6">
+            <div className="shrink-0 relative">
+              <div className="w-24 h-24 rounded-2xl border-4 border-background shadow-2xl grid place-items-center overflow-hidden" style={{background:"linear-gradient(135deg, #1B6B8F, #4A8FA8)"}}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16">
+                  <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.9)"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.9)"/>
+                </svg>
               </div>
-              <div className="text-white mt-3">
-                <div className="font-serif text-xl font-bold">{me.name}</div>
-                <div className="text-xs text-white/60 font-mono mt-0.5">{me.id}</div>
-                <div className="text-xs text-white/50 mt-1">Video Team Leader</div>
-              </div>
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-background flex items-center justify-center">
+                <svg viewBox="0 0 10 10" className="w-2.5 h-2.5"><circle cx="5" cy="5" r="3" fill="white"/></svg>
+              </span>
             </div>
-            <div className="-mt-5 mx-4 bg-card rounded-xl px-4 py-3 border border-border mb-4" style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.08)" }}>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Course", value: me.course },
-                  { label: "Year", value: me.year },
-                  { label: "Dept", value: me.dept },
-                  { label: "Panata", value: me.panata },
-                ].map(({ label, value }) => (
-                  <div key={label}>
-                    <div className="text-[10px] text-muted-text font-semibold uppercase tracking-wider">{label}</div>
-                    <div className="text-xs font-bold text-foreground mt-0.5 leading-tight">{value}</div>
+
+            <div className="pt-10 flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div>
+                  <h1 className="font-serif font-bold text-teal-dark text-2xl leading-tight">{me.name}</h1>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="text-sm text-muted-text">{me.year} Year · {me.course} · {me.dept}</span>
+                    <span className="text-muted-text/40">·</span>
+                    <span className="text-sm font-mono text-muted-text">{me.id}</span>
                   </div>
-                ))}
+                  <div className="flex gap-2 mt-2 flex-wrap">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-teal/10 text-teal border border-teal/20">Video Team Leader</span>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-gold/15 text-yellow-700 border border-gold/30">{me.panata} Panata</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => editMode ? handleSave() : setEditMode(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold border transition-all mt-1"
+                  style={editMode ? {background:"var(--teal-dark)", color:"#fff", borderColor:"var(--teal-dark)"} : {borderColor:"var(--border)", color:"var(--muted-text)"}}>
+                  {saved ? <CheckCircle className="w-3.5 h-3.5"/> : <Pencil className="w-3.5 h-3.5"/>} 
+                  {editMode ? "Save Changes" : "Edit Profile"}
+                </button>
               </div>
             </div>
-            <div className="px-4 pb-4 space-y-3">
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-text">Attendance</span>
-                  <span className="font-bold text-green-700">{me.attendance}</span>
+          </div>
+
+          {/* 🌟 HIGHLIGHTED CHANGE: Gradient stat cards mirroring Student Profile */}
+          <div className="grid grid-cols-4 gap-3 mb-6">
+            {statCards.map((s, i) => (
+              <FadeUp key={s.label} delay={i * 50}>
+                <div className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-md`} style={{boxShadow:"0 4px 14px rgba(0,0,0,0.12)"}}>
+                  <div className="mb-1.5"><s.IconComp/></div>
+                  <div className="font-serif font-bold text-3xl leading-none">{s.value}</div>
+                  <div className="text-white/80 text-xs font-semibold mt-1 uppercase tracking-wide">{s.label}</div>
+                  <div className="text-white/60 text-[10px] mt-0.5">{s.sub}</div>
                 </div>
-                <MiniBar pct={me.attendancePct} color="var(--green-status)" />
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-text">Task Completion</span>
-                  <span className="font-bold text-teal-dark">{me.tasksDone}/{me.tasksTotal}</span>
-                </div>
-                <MiniBar pct={(me.tasksDone / me.tasksTotal) * 100} color="var(--teal)" />
-              </div>
-              <div className="text-xs text-muted-text pt-1">📧 {me.email}</div>
-            </div>
+              </FadeUp>
+            ))}
           </div>
         </FadeUp>
 
-        <div className="col-span-8 space-y-4">
-          <FadeUp delay={80}>
-            <SectionCard icon={Pencil} title="About Me"
-              action={
-                <div className="flex items-center gap-2">
-                  {saved && <span className="flex items-center gap-1 text-xs font-semibold text-green-700"><CheckCircle className="w-3.5 h-3.5" /> Saved</span>}
-                  <button onClick={() => editMode ? handleSave() : setEditMode(true)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${editMode ? "bg-teal text-white" : "border border-border text-muted-text hover:bg-secondary"}`}>
-                    {editMode ? <><Save className="w-3.5 h-3.5" /> Save</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
-                  </button>
-                </div>
-              }>
-              <div className="p-5">
-                {editMode ? (
-                  <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4}
-                    className="w-full px-4 py-3 border border-teal/40 rounded-xl text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none" />
-                ) : (
-                  <p className="text-sm text-foreground leading-relaxed">{bio}</p>
-                )}
-              </div>
-            </SectionCard>
-          </FadeUp>
+        {/* 🌟 HIGHLIGHTED CHANGE: Pill-style Tabbed Panel */}
+        <FadeUp delay={120}>
+          <div className="bg-card border border-border rounded-2xl overflow-hidden" style={{boxShadow:"0 2px 12px rgba(0,0,0,0.08)"}}>
+            <div className="flex gap-1 p-2 border-b border-border bg-secondary/20 overflow-x-auto">
+              {[
+                { id:"overview" as const, label:"Overview",      Icon: UserCircle },
+                { id:"activity" as const, label:"Activity Logs", Icon: Activity },
+                { id:"teams" as const,    label:"My Teams",      Icon: Users },
+              ].map(t => (
+                <button key={t.id} onClick={() => setProfileTab(t.id)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all"
+                  style={profileTab === t.id ? {background:"var(--teal-dark)", color:"#fff", boxShadow:"0 2px 8px rgba(13,74,107,0.3)"} : {color:"var(--muted-text)", background:"transparent"}}>
+                  <t.Icon className="w-3.5 h-3.5"/>{t.label}
+                </button>
+              ))}
+            </div>
 
-          <FadeUp delay={120}>
-            <SectionCard icon={ClipboardList} title="Recent Activity">
-              <div className="divide-y divide-border">
-                {[
-                  { action: "Sent weekly Panata reminder to all members", time: "2 hours ago", icon: Send },
-                  { action: "Assigned Choir Concert task to 55 members", time: "Yesterday", icon: CheckSquare },
-                  { action: "Generated QR code for Video Team Practice", time: "Nov 7", icon: QrCode },
-                  { action: "Updated heatmap availability schedule", time: "Nov 5", icon: Calendar },
-                ].map(({ action, time, icon: Icon }, i) => (
-                  <div key={i} className="flex items-center gap-3 px-5 py-3">
-                    <div className="w-7 h-7 rounded-lg bg-teal-soft flex items-center justify-center shrink-0">
-                      <Icon className="w-3.5 h-3.5 text-teal-dark" />
+            <div className="p-6">
+              {profileTab === "overview" && (
+                <div className="flex gap-5 items-start">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-3">Leader Biography</div>
+                    <div className="bg-secondary/30 rounded-xl p-4 transition-colors border border-border/30 mb-5">
+                      {editMode ? (
+                        <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full px-3 py-2 border border-teal/40 rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-teal/30 resize-none"/>
+                      ) : (
+                        <p className="text-sm text-foreground leading-relaxed">{bio}</p>
+                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-foreground truncate">{action}</div>
+                    
+                    <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-3">Quick Info</div>
+                    <div className="grid grid-cols-2 gap-3 mb-5">
+                      {[
+                        {label:"Managed Team", value: me.team},
+                        {label:"Panata Group", value: me.panata},
+                        {label:"GE Group",     value: me.ge},
+                        {label:"Email",        value: me.email},
+                      ].map(({label, value}) => (
+                        <div key={label} className="bg-secondary/30 rounded-xl p-4 transition-colors border border-border/30">
+                          <div className="text-xs text-muted-text font-semibold uppercase tracking-wide mb-1.5">{label}</div>
+                          <div className="font-semibold text-sm text-foreground">{value}</div>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-xs text-muted-text shrink-0">{time}</span>
                   </div>
-                ))}
-              </div>
-            </SectionCard>
-          </FadeUp>
+                  <div className="shrink-0 w-96">
+                    <div className="rounded-2xl border border-border p-6 bg-secondary/10">
+                      <div className="text-xs font-bold text-muted-text uppercase tracking-widest mb-1">Leadership Metrics</div>
+                      <p className="text-[11px] text-muted-text mb-4">Core vitals for current semester</p>
+                      <LeaderRadarChart/>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-          <FadeUp delay={160}>
-            <SectionCard icon={Users} title="My Team">
-              <div className="p-5">
-                <div className="flex items-center gap-3 p-4 bg-teal-soft/40 rounded-xl border border-teal/20">
-                  <div className="w-10 h-10 rounded-xl bg-teal flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
+              {profileTab === "activity" && (
+                <div className="divide-y divide-border">
+                  {[
+                    { action: "Sent weekly Panata reminder to all members", time: "2 hours ago", icon: Send },
+                    { action: "Assigned Choir Concert task to 55 members", time: "Yesterday", icon: CheckSquare },
+                    { action: "Generated QR code for Video Team Practice", time: "Nov 7", icon: QrCode },
+                    { action: "Updated heatmap availability schedule", time: "Nov 5", icon: Calendar },
+                  ].map(({ action, time, icon: Icon }, i) => (
+                    <div key={i} className="flex items-center gap-3 py-4">
+                      <div className="w-9 h-9 rounded-xl bg-teal-soft flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-teal-dark" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-foreground truncate">{action}</div>
+                        <div className="text-xs text-muted-text mt-0.5">{time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {profileTab === "teams" && (
+                <div className="flex items-center gap-4 p-5 bg-teal-soft/40 rounded-xl border border-teal/20">
+                  <div className="w-12 h-12 rounded-xl bg-teal flex items-center justify-center shadow-sm">
+                    <Users className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="font-bold text-teal-dark text-sm">Video Team</div>
-                    <div className="text-xs text-muted-text mt-0.5">55 members · CICS2 · GE Sec A</div>
+                    <div className="font-bold text-teal-dark text-base">{me.team}</div>
+                    <div className="text-xs text-muted-text mt-1">55 Active Members · Supervised under DGA Multimedia</div>
                   </div>
-                  <span className="ml-auto text-[10px] font-bold px-2.5 py-1 rounded-full bg-teal text-white">Leader</span>
+                  <button className="ml-auto px-4 py-2 rounded-lg bg-teal text-white text-xs font-bold hover:bg-teal-dark transition">Manage Team</button>
                 </div>
-              </div>
-            </SectionCard>
-          </FadeUp>
-        </div>
+              )}
+            </div>
+          </div>
+        </FadeUp>
       </div>
     </div>
   );
@@ -2259,7 +2508,7 @@ export function Dispatcher({ scopeLocked = true, scopeLabel = "Video Team" }: { 
 }
 
 
-const geSessions = [
+export const geSessions = [
   ["Sosyedad at Literatura Group 1 Class","Class","Aug 3, 2025","6:45–10AM",14,0,1,0,96],
   ["PE 4 Group 3 Class","Class","Aug 10, 2025","2:30–3PM",13,0,1,1,96]
 ];
@@ -2273,10 +2522,6 @@ export function GEAttendance() {
   const r = 36; const circ = 2 * Math.PI * r;
   const [go, setGo] = useState(false);
   useEffect(() => { const t = setTimeout(() => setGo(true), 200); return () => clearTimeout(t); }, []);
-
-
-  const filters = ["ALL","ART APPRECIATION","SOSYEDAD","PE4","DAA","CONTEMPORARY WORLD"];
-
 
   return (
     <div className="p-7">
@@ -2331,18 +2576,6 @@ export function GEAttendance() {
         </div>
 
 
-        <FadeUp delay={180}>
-          <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
-            {filters.map(f => (
-              <button key={f} onClick={() => setTab(f)}
-                className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition ${tab === f ? "bg-teal text-white" : "bg-card border border-border hover:bg-secondary"}`}>
-                {f}
-              </button>
-            ))}
-          </div>
-        </FadeUp>
-
-
         <FadeUp delay={220}>
           <SectionCard icon={ClipboardList} title="Session Log">
             <div className="overflow-x-auto">
@@ -2394,8 +2627,8 @@ export function GEAttendance() {
 
 // ─── Panata Attendance (Refactored to match TeamAttendance) ────────────────────
 const panataSessions = [
-  ["Panata — CICS1","Panata","Aug 3, 2025","6:45–10AM",14,0,1,0,96],
-  ["Panata — CICS1","Panata","Aug 24, 2025","6:45–10AM",12,1,1,0,89],
+  ["Panata — CICS1","Panata","Aug 3, 2025","9PM–9:30PM",14,0,1,0,96],
+  ["Panata — CICS1","Panata","Aug 24, 2025","12:45NN–1:15PM",12,1,1,0,89],
 ];
 
 
@@ -2616,99 +2849,107 @@ export function ActionCenterLimited({ scope = "Group" }: { scope?: string }) {
             </div>
           </div>
 
-          <div className="px-6 py-5 space-y-5">
-            {activeTab === "announcement" && (<>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Title</label>
-                <input value={annTitle} onChange={e => setAnnTitle(e.target.value)} placeholder="Announcement title…" className={inputCls} />
+          {/* HIGHLIGHT: Transformed to 12-column grid layout identical to ActionCenter */}
+          <div className="grid grid-cols-12 gap-5 p-5">
+            
+            {/* HIGHLIGHT: NEW Left Sidebar for Scope & Effectivity */}
+            <div className="col-span-4 space-y-3">
+              <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Audience / Scope</div>
+              <div className="bg-secondary/50 border border-border rounded-xl p-3 text-sm space-y-2 max-h-80 overflow-y-auto">
+                <label className="flex items-center gap-2 font-semibold">
+                  <input type="checkbox" defaultChecked className="accent-teal"/> {scope}
+                </label>
+                <div className="pl-5 space-y-1.5 text-xs">
+                  <label className="flex items-center gap-2"><input type="checkbox" defaultChecked className="accent-teal"/> All Members</label>
+                  <label className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> Leads Only</label>
+                  <label className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> Monitors Only</label>
+                  <div className="text-muted-text font-bold mt-2 pt-1 border-t border-border">Specific People</div>
+                  {["Natalie Portman", "Alex Ammin", "Ben Affleck", "Maria Santos"].map(n => (
+                    <label key={n} className="flex items-center gap-2"><input type="checkbox" className="accent-teal"/> {n}</label>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Body</label>
-                <textarea value={annBody} onChange={e => setAnnBody(e.target.value)} rows={4} placeholder="Write your announcement…" className={inputCls + " resize-none"} />
+              <div className="bg-teal-soft border border-teal/30 rounded-xl p-3 text-xs">
+                <strong>Reach preview:</strong> this will be sent to <strong>55</strong> members in <strong>{scope}</strong>.
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Audience / Scope</label>
-                  <select value={annScope} onChange={e => setAnnScope(e.target.value)} className={selectCls}>
-                    <option>All Members</option>
-                    <option>{scope}</option>
-                  </select>
-                  <div className="text-[11px] text-muted-text flex items-center gap-1">
-                    <Users className="w-3 h-3" /> Reaches members of <strong className="ml-0.5">{scope}</strong>
+              
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-muted-text uppercase tracking-wider">Effectivity</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-muted-text">Start</label>
+                    {/* HIGHLIGHT: Automatically switches bound state based on Active Tab */}
+                    <input type="date" 
+                      value={activeTab === "announcement" ? annEffStart : taskEffStart} 
+                      onChange={e => activeTab === "announcement" ? setAnnEffStart(e.target.value) : setTaskEffStart(e.target.value)} 
+                      className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-muted-text">End</label>
+                    <input type="date" 
+                      value={activeTab === "announcement" ? annEffEnd : taskEffEnd} 
+                      onChange={e => activeTab === "announcement" ? setAnnEffEnd(e.target.value) : setTaskEffEnd(e.target.value)} 
+                      className="w-full mt-0.5 px-2 py-1.5 border border-border rounded-lg text-xs bg-background"/>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* HIGHLIGHT: Right column containing the composed fields for forms */}
+            <div className="col-span-8 space-y-5">
+              {activeTab === "announcement" && (<>
                 <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Title</label>
+                  <input value={annTitle} onChange={e => setAnnTitle(e.target.value)} placeholder="Announcement title…" className={inputCls} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Body</label>
+                  <textarea value={annBody} onChange={e => setAnnBody(e.target.value)} rows={4} placeholder="Write your announcement…" className={inputCls + " resize-none"} />
+                </div>
+                {/* HIGHLIGHT: Simplified Priority input block since Scope/Effectivity are now on the left */}
+                <div className="w-1/2 space-y-1.5">
                   <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Priority</label>
                   <select value={annPriority} onChange={e => setAnnPriority(e.target.value)} className={selectCls}>
                     <option>Normal</option><option>High</option><option>Low</option>
                   </select>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity Start</label>
-                  <input type="date" value={annEffStart} onChange={e => setAnnEffStart(e.target.value)} className={inputCls} />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity End</label>
-                  <input type="date" value={annEffEnd} onChange={e => setAnnEffEnd(e.target.value)} className={inputCls} />
-                </div>
-              </div>
-            </>)}
+              </>)}
 
-            {activeTab === "task" && (<>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Task Title</label>
-                <input value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="Task title…" className={inputCls} />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Description</label>
-                <textarea value={taskDesc} onChange={e => setTaskDesc(e.target.value)} rows={4} placeholder="Describe the task…" className={inputCls + " resize-none"} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+              {activeTab === "task" && (<>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Audience / Scope</label>
-                  <select value={taskScope} onChange={e => setTaskScope(e.target.value)} className={selectCls}>
-                    <option>All Members</option>
-                    <option>{scope}</option>
-                  </select>
-                  <div className="text-[11px] text-muted-text flex items-center gap-1">
-                    <Users className="w-3 h-3" /> Reaches members of <strong className="ml-0.5">{scope}</strong>
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Task Title</label>
+                  <input value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="Task title…" className={inputCls} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Description</label>
+                  <textarea value={taskDesc} onChange={e => setTaskDesc(e.target.value)} rows={4} placeholder="Describe the task…" className={inputCls + " resize-none"} />
+                </div>
+                {/* HIGHLIGHT: Adjusted grid layout to hold Deadline & Priority side-by-side */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Deadline</label>
+                    <input type="datetime-local" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} className={inputCls} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Priority</label>
+                    <select value={taskPriority} onChange={e => setTaskPriority(e.target.value)} className={selectCls}>
+                      <option>Normal</option><option>High</option><option>Low</option>
+                    </select>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Priority</label>
-                  <select value={taskPriority} onChange={e => setTaskPriority(e.target.value)} className={selectCls}>
-                    <option>Normal</option><option>High</option><option>Low</option>
-                  </select>
+                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Graded?</label>
+                  <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-xl bg-background w-fit">
+                    <input type="checkbox" checked={taskGraded} onChange={e => setTaskGraded(e.target.checked)} className="accent-teal w-4 h-4" />
+                    <span className="text-sm text-foreground">Graded</span>
+                    {taskGraded && (
+                      <input value={taskPoints} onChange={e => setTaskPoints(e.target.value)}
+                        className="w-16 px-2 py-1 border border-border rounded-lg text-sm bg-card focus:outline-none ml-1" />
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Deadline</label>
-                  <input type="datetime-local" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} className={inputCls} />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity Start</label>
-                  <input type="date" value={taskEffStart} onChange={e => setTaskEffStart(e.target.value)} className={inputCls} />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Effectivity End</label>
-                  <input type="date" value={taskEffEnd} onChange={e => setTaskEffEnd(e.target.value)} className={inputCls} />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-text uppercase tracking-wider">Graded?</label>
-                <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-xl bg-background w-fit">
-                  <input type="checkbox" checked={taskGraded} onChange={e => setTaskGraded(e.target.checked)} className="accent-teal w-4 h-4" />
-                  <span className="text-sm text-foreground">Graded</span>
-                  {taskGraded && (
-                    <input value={taskPoints} onChange={e => setTaskPoints(e.target.value)}
-                      className="w-16 px-2 py-1 border border-border rounded-lg text-sm bg-card focus:outline-none ml-1" />
-                  )}
-                </div>
-              </div>
-            </>)}
+              </>)}
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-secondary/20">
