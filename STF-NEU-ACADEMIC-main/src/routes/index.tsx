@@ -130,6 +130,7 @@ function Content() {
       case "templates":          return <ActionCenterLimited scope="CICS2 — Panata Group" />;
       case "settings":           return <SettingsView />;
       case "roster":             return <Roster />;
+      case "qr":             return <QRGenerator />;
       default:                   return <StudentDashboard />;
     }
   }
@@ -157,6 +158,7 @@ function Content() {
       case "announcements": return <AnnouncementsView canCreate />;
       case "heatmap": return <HeatmapView scope="GE 101 Sec A" banner="Scoped View — GE 101 Sec A Only" />;
       case "dispatcher": return <DispatcherCTA scope="GE 101 - Sec A" />;
+      case "qr":             return <QRGenerator />;
       case "attendance": return <SectionAttendance />;
       case "grader": return <TaskGrader />;
       case "templates": return <TemplateLibrary />;
@@ -174,6 +176,7 @@ function Content() {
     case "schedule": return <ScheduleView />;
     case "announcements": return <AnnouncementsView canCreate />;
     case "heatmap": return <HeatmapView scope="ALL STUDENTS (4,500)" />;
+    case "qr":             return <QRGenerator />;
     case "dispatcher": return <DispatcherCTA scope="Full Organization (4,500)" />;
     case "sessions": return <SessionLogs />;
     case "endoar": return <Endoar />;

@@ -79,6 +79,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     roleLabel: "Panata Monitor Tools",
     roleTools: [
       { id: "roster",            label: "Panata Group Masterlist",    icon: Users },
+      { id: "qr",              label: "QR Generator",      icon: QrCode },
       { id: "panata-attendance", label: "Panata Attendance", icon: ClipboardList },
       { id: "templates",         label: "Action Center",     icon: Library },
     ],
@@ -96,6 +97,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     roleLabel: "Monitor Tools",
     roleTools: [
       { id: "students",   label: "My Students",             icon: GraduationCap },
+      { id: "qr",              label: "QR Generator",      icon: QrCode },
       { id: "heatmap",    label: "Section Heatmap",         icon: Thermometer },
       { id: "attendance", label: "Attendance Tracker",      icon: ClipboardList },
       { id: "grader",     label: "Task Evaluator & Grader", icon: ListChecks },
@@ -116,6 +118,7 @@ const menuDefs: Record<Exclude<Role, "guest">, MenuDef> = {
     roleLabel: "Admin Tools",
     roleTools: [
       { id: "groups",     label: "Student Management",              icon: Database },
+      { id: "qr",              label: "QR Generator",      icon: QrCode },
       { id: "heatmap",    label: "Global Heatmap",                  icon: Thermometer },
       { id: "sessions",   label: "Session & Attendance Analytics",  icon: ClipboardList },
       { id: "operations", label: "Operations Control",              icon: SlidersHorizontal },
