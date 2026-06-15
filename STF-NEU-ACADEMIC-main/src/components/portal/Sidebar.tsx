@@ -169,7 +169,7 @@ export function Sidebar() {
       style={{
         width: "240px",
         height: role === "leader" ? "1180px" 
-              : (role === "ge-monitor" || role === "panata-monitor") ? "1050px" 
+              : (role === "ge-monitor" || role === "panata-monitor") ? "1100px" 
               : role === "admin" ? "1120px" 
               : role === "superadmin" ? "1120px" 
               : "900px",      
