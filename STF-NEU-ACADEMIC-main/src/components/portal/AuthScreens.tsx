@@ -62,7 +62,7 @@ export function LoginPage() {
               <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" /> {err}
             </div>
           )}
-          <p className="mt-2 text-[11px] text-muted-text">Non-NEU emails will be rejected. OAuth via Google / Microsoft SSO.</p>
+          <p className="mt-2 text-[11px] text-muted-text">Non-NEU emails will be rejected. OAuth via Google SSO.</p>
         </div>
 
         <button
@@ -70,12 +70,6 @@ export function LoginPage() {
           className="w-full bg-card border-2 border-border hover:border-teal text-foreground px-4 py-2.5 rounded-md font-semibold text-sm flex items-center justify-center gap-2 transition"
         >
           <span className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 via-red-500 to-yellow-400" /> Continue with Google
-        </button>
-        <button
-          onClick={() => submit("student")}
-          className="w-full bg-card border-2 border-border hover:border-teal text-foreground px-4 py-2.5 rounded-md font-semibold text-sm flex items-center justify-center gap-2 transition"
-        >
-          <span className="w-5 h-5 rounded-sm bg-[#0078D4]" /> Continue with Microsoft
         </button>
 
         <div className="border-t border-border pt-4">

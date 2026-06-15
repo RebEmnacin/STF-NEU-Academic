@@ -2275,7 +2275,7 @@ function LeaderRadarChart() {
 export function MyProfile() {
   const me: Member = {
     initials: "JN", name: "John Patrick Narvasa", id: "STF-2022-0001",
-    course: "BS Information Technology", year: "Junior",
+    course: "BS Computer Science", year: "3rd",
     attendance: "94%", tasks: "92%", status: "Active",
     dept: "CICS", team: "Video Team 104", panata: "CICS2", ge: "GE 101 - Sec A",
     email: "john.narvasa@neu.edu.ph",
